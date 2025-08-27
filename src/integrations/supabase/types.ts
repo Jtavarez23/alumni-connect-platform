@@ -168,48 +168,72 @@ export type Database = {
       }
       profiles: {
         Row: {
+          allow_friend_requests: boolean | null
+          allow_messages: boolean | null
+          allow_tags: boolean | null
           avatar_url: string | null
           bio: string | null
           created_at: string | null
           email: string
+          email_notifications: boolean | null
           first_name: string
           graduation_year: number | null
           id: string
           last_name: string
           privacy_level: string | null
+          push_notifications: boolean | null
           school_id: string | null
+          show_graduation_year: boolean | null
+          show_in_search: boolean | null
+          show_school: boolean | null
           subscription_status: string | null
           updated_at: string | null
           username: string | null
           verification_status: string | null
         }
         Insert: {
+          allow_friend_requests?: boolean | null
+          allow_messages?: boolean | null
+          allow_tags?: boolean | null
           avatar_url?: string | null
           bio?: string | null
           created_at?: string | null
           email: string
+          email_notifications?: boolean | null
           first_name: string
           graduation_year?: number | null
           id: string
           last_name: string
           privacy_level?: string | null
+          push_notifications?: boolean | null
           school_id?: string | null
+          show_graduation_year?: boolean | null
+          show_in_search?: boolean | null
+          show_school?: boolean | null
           subscription_status?: string | null
           updated_at?: string | null
           username?: string | null
           verification_status?: string | null
         }
         Update: {
+          allow_friend_requests?: boolean | null
+          allow_messages?: boolean | null
+          allow_tags?: boolean | null
           avatar_url?: string | null
           bio?: string | null
           created_at?: string | null
           email?: string
+          email_notifications?: boolean | null
           first_name?: string
           graduation_year?: number | null
           id?: string
           last_name?: string
           privacy_level?: string | null
+          push_notifications?: boolean | null
           school_id?: string | null
+          show_graduation_year?: boolean | null
+          show_in_search?: boolean | null
+          show_school?: boolean | null
           subscription_status?: string | null
           updated_at?: string | null
           username?: string | null

@@ -1,36 +1,52 @@
+import { useState } from "react";
 import { AppLayout } from "@/components/layout/AppLayout";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Settings as SettingsIcon, ArrowLeft } from "lucide-react";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Shield, Bell, User } from "lucide-react";
+import PrivacySettings from "@/components/settings/PrivacySettings";
+import NotificationSettings from "@/components/settings/NotificationSettings";
+import AccountSettings from "@/components/settings/AccountSettings";
 
 export default function Settings() {
+  const [activeTab, setActiveTab] = useState("privacy");
+
   return (
     <AppLayout title="Settings">
       <div className="p-6">
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <SettingsIcon className="h-5 w-5" />
-              Settings
-            </CardTitle>
-            <CardDescription>
-              Manage your account settings and preferences
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <div className="text-center py-12">
-              <SettingsIcon className="h-16 w-16 text-muted-foreground mx-auto mb-4" />
-              <h3 className="text-lg font-semibold mb-2">Settings Panel</h3>
-              <p className="text-muted-foreground mb-4">
-                Advanced settings will be available in a future update.
-              </p>
-              <Button variant="outline" onClick={() => window.location.href = '/dashboard'}>
-                <ArrowLeft className="h-4 w-4 mr-2" />
-                Back to Dashboard
-              </Button>
-            </div>
-          </CardContent>
-        </Card>
+        <div className="mb-6">
+          <h1 className="text-2xl font-bold text-foreground">Settings</h1>
+          <p className="text-muted-foreground">
+            Manage your account settings, privacy, and notifications
+          </p>
+        </div>
+
+        <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
+          <TabsList className="grid w-full grid-cols-3">
+            <TabsTrigger value="privacy" className="flex items-center gap-2">
+              <Shield className="h-4 w-4" />
+              Privacy
+            </TabsTrigger>
+            <TabsTrigger value="notifications" className="flex items-center gap-2">
+              <Bell className="h-4 w-4" />
+              Notifications
+            </TabsTrigger>
+            <TabsTrigger value="account" className="flex items-center gap-2">
+              <User className="h-4 w-4" />
+              Account
+            </TabsTrigger>
+          </TabsList>
+
+          <TabsContent value="privacy">
+            <PrivacySettings />
+          </TabsContent>
+
+          <TabsContent value="notifications">
+            <NotificationSettings />
+          </TabsContent>
+
+          <TabsContent value="account">
+            <AccountSettings />
+          </TabsContent>
+        </Tabs>
       </div>
     </AppLayout>
   );
