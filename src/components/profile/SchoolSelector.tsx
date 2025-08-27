@@ -114,9 +114,6 @@ const SchoolSelector = ({ selectedSchoolId, onSchoolSelect }: SchoolSelectorProp
                       {selectedSchool.verified && (
                         <Badge variant="default">Verified</Badge>
                       )}
-                      {selectedSchool.user_submitted && selectedSchool.submission_status === 'pending' && (
-                        <Badge variant="secondary">Pending Review</Badge>
-                      )}
                     </div>
                     {selectedSchool.location && (
                       <div className="flex items-center mt-1 text-sm text-muted-foreground">
@@ -177,9 +174,6 @@ const SchoolSelector = ({ selectedSchoolId, onSchoolSelect }: SchoolSelectorProp
                             {school.verified && (
                               <Badge variant="default" className="text-xs">Verified</Badge>
                             )}
-                            {school.user_submitted && school.submission_status === 'pending' && (
-                              <Badge variant="secondary" className="text-xs">Pending Review</Badge>
-                            )}
                           </div>
                           {school.location && (
                             <div className="flex items-center mt-1 text-xs text-muted-foreground">
@@ -199,7 +193,7 @@ const SchoolSelector = ({ selectedSchoolId, onSchoolSelect }: SchoolSelectorProp
               <Card className="absolute z-10 w-full mt-1">
                 <CardContent className="p-4 text-center space-y-3">
                   <p className="text-sm text-muted-foreground">
-                    No schools found. Try a different search term or add your school.
+                    Can't find your school? You can add it to our database.
                   </p>
                   <AddSchoolDialog onSchoolAdded={handleSchoolSelect} />
                 </CardContent>
