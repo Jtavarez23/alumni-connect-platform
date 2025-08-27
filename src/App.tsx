@@ -12,6 +12,8 @@ import Dashboard from "./pages/Dashboard";
 import Yearbooks from "./pages/Yearbooks";
 import Alumni from "./pages/Alumni";
 import Network from "./pages/Network";
+import Profile from "./pages/Profile";
+import Settings from "./pages/Settings";
 import ForgotPassword from "./pages/ForgotPassword";
 import NotFound from "./pages/NotFound";
 import ProtectedRoute from "./components/ProtectedRoute";
@@ -49,6 +51,16 @@ const App = () => (
             <Route path="/network" element={
               <ProtectedRoute>
                 <Network />
+              </ProtectedRoute>
+            } />
+            <Route path="/profile" element={
+              <ProtectedRoute>
+                <Profile />
+              </ProtectedRoute>
+            } />
+            <Route path="/settings" element={
+              <ProtectedRoute>
+                <Settings />
               </ProtectedRoute>
             } />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}

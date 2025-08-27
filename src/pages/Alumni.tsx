@@ -1,30 +1,38 @@
 import { useEffect, useState } from "react";
-import { useAuth } from "@/contexts/AuthContext";
-import { Navigate } from "react-router-dom";
-import { supabase } from "@/integrations/supabase/client";
+import { useNavigate } from "react-router-dom";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
-import { Search, UserPlus, Users, ArrowLeft } from "lucide-react";
-import { useToast } from "@/hooks/use-toast";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Skeleton } from "@/components/ui/skeleton";
+import { AppLayout } from "@/components/layout/AppLayout";
+import { useAuth } from "@/contexts/AuthContext";
+import { supabase } from "@/integrations/supabase/client";
+import { ArrowLeft, Search, MapPin, Calendar, GraduationCap, Check, Clock, UserPlus, Shield } from "lucide-react";
 
 interface Profile {
   id: string;
   first_name: string;
   last_name: string;
-  avatar_url: string | null;
-  graduation_year: number | null;
+  email: string;
+  avatar_url?: string;
+  school_id?: string;
+  graduation_year?: number;
   verification_status: string;
-  school_id: string;
+  schools?: {
+    name: string;
+    type: string;
+    location: any;
+  };
 }
 
 interface School {
   id: string;
   name: string;
   type: string;
+  location: any;
 }
 
 interface Friendship {
@@ -32,60 +40,77 @@ interface Friendship {
   requester_id: string;
   addressee_id: string;
   status: string;
+  created_at: string;
+  updated_at: string;
+  verification_method?: string;
 }
 
 const Alumni = () => {
-  const { user, profile, loading } = useAuth();
-  const { toast } = useToast();
+  const { user, profile } = useAuth();
+  const navigate = useNavigate();
   const [alumni, setAlumni] = useState<Profile[]>([]);
   const [friendships, setFriendships] = useState<Friendship[]>([]);
   const [schools, setSchools] = useState<School[]>([]);
+  const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
-  const [selectedSchool, setSelectedSchool] = useState<string>("all");
-  const [selectedYear, setSelectedYear] = useState<string>("all");
-  const [isLoading, setIsLoading] = useState(true);
+  const [selectedSchoolId, setSelectedSchoolId] = useState<string>("");
+  const [selectedYear, setSelectedYear] = useState<string>("");
 
   useEffect(() => {
-    if (profile) {
+    if (user && profile?.school_id) {
       loadData();
     }
-  }, [profile]);
+  }, [user, profile]);
 
   const loadData = async () => {
-    setIsLoading(true);
-    await Promise.all([
-      fetchAlumni(),
-      fetchFriendships(),
-      fetchSchools()
-    ]);
-    setIsLoading(false);
+    await Promise.all([fetchAlumni(), fetchFriendships(), fetchSchools()]);
+    setLoading(false);
   };
 
   const fetchAlumni = async () => {
-    const { data } = await supabase
-      .from('profiles')
-      .select('id, first_name, last_name, avatar_url, graduation_year, verification_status, school_id')
-      .neq('id', user?.id);
-    
-    if (data) setAlumni(data);
+    try {
+      const { data, error } = await supabase
+        .from('profiles')
+        .select(`
+          *,
+          schools(name, type, location)
+        `)
+        .neq('id', user?.id)
+        .order('first_name');
+
+      if (error) throw error;
+      setAlumni(data || []);
+    } catch (error) {
+      console.error('Error fetching alumni:', error);
+    }
   };
 
   const fetchFriendships = async () => {
-    const { data } = await supabase
-      .from('friendships')
-      .select('*')
-      .or(`requester_id.eq.${user?.id},addressee_id.eq.${user?.id}`);
-    
-    if (data) setFriendships(data);
+    try {
+      const { data, error } = await supabase
+        .from('friendships')
+        .select('*')
+        .or(`requester_id.eq.${user?.id},addressee_id.eq.${user?.id}`);
+
+      if (error) throw error;
+      setFriendships(data || []);
+    } catch (error) {
+      console.error('Error fetching friendships:', error);
+    }
   };
 
   const fetchSchools = async () => {
-    const { data } = await supabase
-      .from('schools')
-      .select('id, name, type')
-      .eq('submission_status', 'approved');
-    
-    if (data) setSchools(data);
+    try {
+      const { data, error } = await supabase
+        .from('schools')
+        .select('*')
+        .order('name');
+
+      if (error) throw error;
+      setSchools(data || []);
+    } catch (error) {
+      console.error('Error fetching schools:', error);
+    }
   };
 
   const sendFriendRequest = async (addresseeId: string) => {
@@ -99,19 +124,9 @@ const Alumni = () => {
         });
 
       if (error) throw error;
-
-      toast({
-        title: "Friend request sent!",
-        description: "Your request is now pending approval.",
-      });
-
       await fetchFriendships();
     } catch (error) {
-      toast({
-        title: "Error",
-        description: "Failed to send friend request. Please try again.",
-        variant: "destructive",
-      });
+      console.error('Error sending friend request:', error);
     }
   };
 
@@ -120,32 +135,28 @@ const Alumni = () => {
       (f.requester_id === user?.id && f.addressee_id === alumniId) ||
       (f.addressee_id === user?.id && f.requester_id === alumniId)
     );
-    
+
     if (!friendship) return 'none';
-    if (friendship.status === 'accepted') return 'friends';
+    if (friendship.status === 'accepted') return 'connected';
     if (friendship.requester_id === user?.id) return 'sent';
     return 'received';
   };
 
-  const getInitials = (firstName: string, lastName: string) => {
-    return `${firstName?.[0] || ""}${lastName?.[0] || ""}`.toUpperCase();
-  };
-
-  const getSchoolName = (schoolId: string) => {
-    const school = schools.find(s => s.id === schoolId);
-    return school?.name || "Unknown School";
-  };
-
-  const filteredAlumni = alumni.filter(alumni => {
-    const matchesSearch = 
-      alumni.first_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      alumni.last_name.toLowerCase().includes(searchTerm.toLowerCase());
+  const filteredAlumni = alumni.filter(person => {
+    const matchesSearch = !searchTerm || 
+      person.first_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      person.last_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      person.email.toLowerCase().includes(searchTerm.toLowerCase());
     
-    const matchesSchool = selectedSchool === "all" || alumni.school_id === selectedSchool;
-    const matchesYear = selectedYear === "all" || alumni.graduation_year?.toString() === selectedYear;
+    const matchesSchool = !selectedSchoolId || person.school_id === selectedSchoolId;
+    const matchesYear = !selectedYear || person.graduation_year?.toString() === selectedYear;
     
     return matchesSearch && matchesSchool && matchesYear;
   });
+
+  const getInitials = (firstName?: string, lastName?: string) => {
+    return `${firstName?.[0] || ''}${lastName?.[0] || ''}`.toUpperCase();
+  };
 
   const graduationYears = Array.from(
     new Set(alumni.map(a => a.graduation_year).filter(Boolean))
@@ -160,170 +171,137 @@ const Alumni = () => {
   }
 
   if (!user || !profile?.school_id) {
-    return <Navigate to="/dashboard" replace />;
+    return (
+      <AppLayout title="Alumni Directory">
+        <div className="p-6 text-center">
+          <p>Please complete your profile to access the alumni directory.</p>
+          <Button onClick={() => navigate('/dashboard')}>Go to Dashboard</Button>
+        </div>
+      </AppLayout>
+    );
   }
 
   return (
-    <div className="min-h-screen bg-background">
-      <div className="container mx-auto px-4 py-8">
-        {/* Header */}
-        <div className="flex items-center gap-4 mb-8">
-          <Button 
-            variant="ghost" 
-            onClick={() => window.history.back()}
-            className="gap-2"
-          >
-            <ArrowLeft className="h-4 w-4" />
-            Back
-          </Button>
-          <div>
-            <h1 className="text-3xl font-bold text-foreground flex items-center gap-2">
-              <Users className="h-8 w-8 text-primary" />
-              Find Alumni
-            </h1>
-            <p className="text-muted-foreground">
-              Connect with classmates and expand your network
-            </p>
-          </div>
-        </div>
-
-        {/* Filters */}
-        <Card className="mb-8">
-          <CardHeader>
-            <CardTitle>Search & Filter</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="grid md:grid-cols-3 gap-4">
+    <AppLayout title="Alumni Directory">
+      <div className="p-6">
+        {/* Search and Filters */}
+        <Card className="mb-6">
+          <CardContent className="p-6">
+            <div className="space-y-4">
               <div className="relative">
-                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-4 h-4" />
                 <Input
-                  placeholder="Search by name..."
+                  placeholder="Search by name or email..."
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
                   className="pl-10"
                 />
               </div>
-              
-              <Select value={selectedSchool} onValueChange={setSelectedSchool}>
-                <SelectTrigger>
-                  <SelectValue placeholder="Select school" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">All Schools</SelectItem>
-                  {schools.map(school => (
-                    <SelectItem key={school.id} value={school.id}>
-                      {school.name}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-
-              <Select value={selectedYear} onValueChange={setSelectedYear}>
-                <SelectTrigger>
-                  <SelectValue placeholder="Graduation year" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">All Years</SelectItem>
-                  {graduationYears.map(year => (
-                    <SelectItem key={year} value={year!.toString()}>
-                      {year}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <Select value={selectedSchoolId} onValueChange={setSelectedSchoolId}>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Filter by school" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="">All Schools</SelectItem>
+                    {schools.map((school) => (
+                      <SelectItem key={school.id} value={school.id}>
+                        {school.name}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+                <Select value={selectedYear} onValueChange={setSelectedYear}>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Filter by graduation year" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="">All Years</SelectItem>
+                    {graduationYears.map((year) => (
+                      <SelectItem key={year} value={year!.toString()}>
+                        {year}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
             </div>
           </CardContent>
         </Card>
 
         {/* Alumni Grid */}
-        {isLoading ? (
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {[...Array(6)].map((_, i) => (
-              <Card key={i} className="animate-pulse">
-                <CardContent className="p-6">
-                  <div className="flex items-center gap-4">
-                    <div className="h-16 w-16 bg-muted rounded-full"></div>
-                    <div className="space-y-2 flex-1">
-                      <div className="h-4 bg-muted rounded w-3/4"></div>
-                      <div className="h-3 bg-muted rounded w-1/2"></div>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-            ))}
+        {filteredAlumni.length === 0 ? (
+          <div className="text-center py-12">
+            <Users className="h-16 w-16 text-muted-foreground mx-auto mb-4" />
+            <h3 className="text-lg font-semibold mb-2">No alumni found</h3>
+            <p className="text-muted-foreground">
+              Try adjusting your search criteria
+            </p>
           </div>
-        ) : filteredAlumni.length === 0 ? (
-          <Card>
-            <CardContent className="p-8 text-center">
-              <Users className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
-              <h3 className="text-lg font-medium mb-2">No alumni found</h3>
-              <p className="text-muted-foreground">
-                Try adjusting your search filters or check back later for new members.
-              </p>
-            </CardContent>
-          </Card>
         ) : (
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {filteredAlumni.map(alumni => {
-              const friendshipStatus = getFriendshipStatus(alumni.id);
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {filteredAlumni.map((person) => {
+              const friendshipStatus = getFriendshipStatus(person.id);
               
               return (
-                <Card key={alumni.id} className="hover:shadow-md transition-shadow">
+                <Card key={person.id} className="hover:shadow-md transition-shadow">
                   <CardContent className="p-6">
                     <div className="flex items-center gap-4 mb-4">
                       <Avatar className="h-16 w-16">
-                        <AvatarImage src={alumni.avatar_url || ""} />
+                        <AvatarImage src={person.avatar_url} />
                         <AvatarFallback className="text-lg">
-                          {getInitials(alumni.first_name, alumni.last_name)}
+                          {getInitials(person.first_name, person.last_name)}
                         </AvatarFallback>
                       </Avatar>
-                      <div className="flex-1">
-                        <h3 className="font-semibold text-lg">
-                          {alumni.first_name} {alumni.last_name}
+                      <div className="flex-1 min-w-0">
+                        <h3 className="font-semibold text-lg truncate">
+                          {person.first_name} {person.last_name}
                         </h3>
-                        <p className="text-sm text-muted-foreground">
-                          {getSchoolName(alumni.school_id)}
-                        </p>
-                        <div className="flex items-center gap-2 mt-1">
-                          {alumni.graduation_year && (
-                            <Badge variant="outline" className="text-xs">
-                              Class of {alumni.graduation_year}
-                            </Badge>
-                          )}
-                          <Badge 
-                            variant={alumni.verification_status === 'verified' ? 'default' : 'secondary'}
-                            className="text-xs capitalize"
-                          >
-                            {alumni.verification_status}
+                        <div className="flex items-center gap-1 text-sm text-muted-foreground">
+                          <Badge variant={person.verification_status === 'verified' ? 'default' : 'secondary'}>
+                            {person.verification_status === 'verified' && <Shield className="h-3 w-3 mr-1" />}
+                            {person.verification_status}
                           </Badge>
                         </div>
                       </div>
                     </div>
+                    
+                    <div className="space-y-2 mb-4">
+                      {person.schools && (
+                        <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                          <GraduationCap className="h-4 w-4" />
+                          <span className="truncate">{person.schools.name}</span>
+                        </div>
+                      )}
+                      {person.graduation_year && (
+                        <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                          <Calendar className="h-4 w-4" />
+                          <span>Class of {person.graduation_year}</span>
+                        </div>
+                      )}
+                    </div>
 
-                    <div className="w-full">
+                    <div className="flex gap-2">
                       {friendshipStatus === 'none' && (
                         <Button 
-                          onClick={() => sendFriendRequest(alumni.id)}
-                          className="w-full gap-2"
+                          onClick={() => sendFriendRequest(person.id)}
+                          className="flex-1"
                           size="sm"
                         >
-                          <UserPlus className="h-4 w-4" />
+                          <UserPlus className="h-4 w-4 mr-2" />
                           Send Request
                         </Button>
                       )}
                       {friendshipStatus === 'sent' && (
-                        <Button variant="secondary" disabled className="w-full" size="sm">
+                        <Button variant="outline" disabled className="flex-1" size="sm">
+                          <Clock className="h-4 w-4 mr-2" />
                           Request Sent
                         </Button>
                       )}
-                      {friendshipStatus === 'received' && (
-                        <Button variant="outline" className="w-full" size="sm">
-                          Accept Request
-                        </Button>
-                      )}
-                      {friendshipStatus === 'friends' && (
-                        <Button variant="success" disabled className="w-full" size="sm">
-                          ✓ Connected
+                      {friendshipStatus === 'connected' && (
+                        <Button variant="outline" className="flex-1" size="sm">
+                          <Check className="h-4 w-4 mr-2" />
+                          Connected
                         </Button>
                       )}
                     </div>
@@ -334,7 +312,7 @@ const Alumni = () => {
           </div>
         )}
       </div>
-    </div>
+    </AppLayout>
   );
 };
 

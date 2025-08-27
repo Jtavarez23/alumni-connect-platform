@@ -10,7 +10,7 @@ import { Settings, GraduationCap, Users, BookOpen } from "lucide-react";
 import ProfileSetupDialog from "@/components/profile/ProfileSetupDialog";
 import ProfileEditDialog from "@/components/profile/ProfileEditDialog";
 import { ActivityFeed } from "@/components/activity/ActivityFeed";
-import { NotificationBadge } from "@/components/activity/NotificationBadge";
+import { AppLayout } from "@/components/layout/AppLayout";
 
 interface School {
   id: string;
@@ -70,27 +70,16 @@ const Dashboard = () => {
   const isProfileComplete = profile?.school_id && profile?.graduation_year;
 
   return (
-    <div className="min-h-screen bg-background">
-      <div className="container mx-auto px-4 py-8">
-        {/* Header */}
-        <div className="flex items-center justify-between mb-8">
-          <div>
-            <h1 className="text-3xl font-bold text-foreground">Welcome back!</h1>
-            <p className="text-muted-foreground">
-              {profile?.first_name ? `Hi ${profile.first_name}` : "Complete your profile to get started"}
-            </p>
-          </div>
-          <div className="flex items-center gap-2">
-            <NotificationBadge />
-            <Button 
-              variant="outline" 
-              onClick={() => setShowProfileEdit(true)}
-              className="gap-2"
-            >
-              <Settings className="h-4 w-4" />
-              Settings
-            </Button>
-          </div>
+    <AppLayout title="Dashboard">
+      <div className="p-6">
+        {/* Welcome Message */}
+        <div className="mb-8">
+          <h1 className="text-3xl font-bold text-foreground mb-2">
+            Welcome back, {profile?.first_name || 'there'}! 👋
+          </h1>
+          <p className="text-muted-foreground">
+            Here's what's happening in your network today.
+          </p>
         </div>
 
         {/* Profile Status Card */}
@@ -200,28 +189,26 @@ const Dashboard = () => {
 
         {/* Recent Activity */}
         <ActivityFeed />
+
+        {/* Profile Setup and Edit Dialogs */}
+        <ProfileSetupDialog 
+          open={showProfileSetup} 
+          onOpenChange={setShowProfileSetup}
+          onComplete={() => {
+            setShowProfileSetup(false);
+            window.location.reload();
+          }}
+        />
+        <ProfileEditDialog 
+          open={showProfileEdit} 
+          onOpenChange={setShowProfileEdit}
+          onComplete={() => {
+            setShowProfileEdit(false);
+            window.location.reload();
+          }}
+        />
       </div>
-
-      {/* Profile Setup Dialog */}
-      <ProfileSetupDialog 
-        open={showProfileSetup} 
-        onOpenChange={setShowProfileSetup}
-        onComplete={() => {
-          setShowProfileSetup(false);
-          window.location.reload(); // Refresh to update profile data
-        }}
-      />
-
-      {/* Profile Edit Dialog */}
-      <ProfileEditDialog 
-        open={showProfileEdit} 
-        onOpenChange={setShowProfileEdit}
-        onComplete={() => {
-          setShowProfileEdit(false);
-          window.location.reload(); // Refresh to update profile data
-        }}
-      />
-    </div>
+    </AppLayout>
   );
 };
 

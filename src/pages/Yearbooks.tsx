@@ -10,6 +10,7 @@ import { BookOpen, Search, Upload, Users, Calendar } from "lucide-react";
 import { toast } from "sonner";
 import { YearbookUploadDialog } from "@/components/yearbook/YearbookUploadDialog";
 import { YearbookViewer } from "@/components/yearbook/YearbookViewer";
+import { AppLayout } from "@/components/layout/AppLayout";
 
 interface YearbookEdition {
   id: string;
@@ -82,26 +83,21 @@ export default function Yearbooks() {
   }
 
   return (
-    <div className="min-h-screen bg-background">
-      {/* Header */}
-      <div className="border-b bg-card">
-        <div className="container mx-auto px-4 py-6">
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-            <div>
-              <h1 className="text-3xl font-bold text-foreground">Yearbooks</h1>
-              <p className="text-muted-foreground mt-1">
-                Browse and explore school yearbooks and memories
-              </p>
-            </div>
-            <Button onClick={() => setShowUploadDialog(true)} className="w-fit">
-              <Upload className="w-4 h-4 mr-2" />
-              Upload Yearbook
-            </Button>
+    <AppLayout title="Yearbooks">
+      <div className="p-6">
+        {/* Header */}
+        <div className="flex items-center justify-between mb-6">
+          <div>
+            <p className="text-muted-foreground">
+              Browse yearbooks from schools and discover your classmates
+            </p>
           </div>
+          <Button onClick={() => setShowUploadDialog(true)}>
+            <Upload className="mr-2 h-4 w-4" />
+            Upload Yearbook
+          </Button>
         </div>
-      </div>
 
-      <div className="container mx-auto px-4 py-8">
         {/* Search */}
         <div className="relative mb-8">
           <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-4 h-4" />
@@ -194,16 +190,17 @@ export default function Yearbooks() {
             ))}
           </div>
         )}
-      </div>
 
-      <YearbookUploadDialog
-        open={showUploadDialog}
-        onClose={() => setShowUploadDialog(false)}
-        onSuccess={() => {
-          setShowUploadDialog(false);
-          fetchYearbooks();
-        }}
-      />
-    </div>
+        {/* Upload Dialog */}
+        <YearbookUploadDialog 
+          open={showUploadDialog} 
+          onClose={() => setShowUploadDialog(false)}
+          onSuccess={() => {
+            setShowUploadDialog(false);
+            fetchYearbooks();
+          }}
+        />
+      </div>
+    </AppLayout>
   );
 }

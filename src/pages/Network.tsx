@@ -1,24 +1,43 @@
 import { useEffect, useState } from "react";
-import { useAuth } from "@/contexts/AuthContext";
-import { Navigate } from "react-router-dom";
-import { supabase } from "@/integrations/supabase/client";
+import { useNavigate } from "react-router-dom";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Users, UserCheck, UserX, ArrowLeft, MessageCircle } from "lucide-react";
-import { useToast } from "@/hooks/use-toast";
-import { notifyFriendAccepted } from "@/lib/notifications";
+import { Skeleton } from "@/components/ui/skeleton";
+import { AppLayout } from "@/components/layout/AppLayout";
+import { useAuth } from "@/contexts/AuthContext";
+import { supabase } from "@/integrations/supabase/client";
+import { createNotification } from "@/lib/notifications";
+import { 
+  ArrowLeft, 
+  MessageCircle, 
+  Check, 
+  X, 
+  Clock, 
+  Users, 
+  UserPlus,
+  MapPin,
+  Calendar,
+  GraduationCap,
+  Shield
+} from "lucide-react";
 
-interface NetworkProfile {
+interface Profile {
   id: string;
   first_name: string;
   last_name: string;
-  avatar_url: string | null;
-  graduation_year: number | null;
+  email: string;
+  avatar_url?: string;
+  school_id?: string;
+  graduation_year?: number;
   verification_status: string;
-  school_id: string;
+  schools?: {
+    name: string;
+    type: string;
+    location: any;
+  };
 }
 
 interface Friendship {
@@ -27,196 +46,263 @@ interface Friendship {
   addressee_id: string;
   status: string;
   created_at: string;
-  requester: NetworkProfile;
-  addressee: NetworkProfile;
+  updated_at: string;
+  verification_method?: string;
+  requester?: Profile;
+  addressee?: Profile;
 }
 
 const Network = () => {
-  const { user, profile, loading } = useAuth();
-  const { toast } = useToast();
-  const [friendships, setFriendships] = useState<Friendship[]>([]);
+  const { user, profile } = useAuth();
+  const navigate = useNavigate();
+  const [connections, setConnections] = useState<Friendship[]>([]);
+  const [pendingRequests, setPendingRequests] = useState<Friendship[]>([]);
+  const [sentRequests, setSentRequests] = useState<Friendship[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    if (profile) {
-      fetchFriendships();
+    if (user) {
+      loadFriendships();
     }
-  }, [profile]);
+  }, [user]);
 
-  const fetchFriendships = async () => {
-    setIsLoading(true);
-    const { data } = await supabase
-      .from('friendships')
-      .select(`
-        *,
-        requester:profiles!friendships_requester_id_fkey(
-          id, first_name, last_name, avatar_url, graduation_year, verification_status, school_id
-        ),
-        addressee:profiles!friendships_addressee_id_fkey(
-          id, first_name, last_name, avatar_url, graduation_year, verification_status, school_id
-        )
-      `)
-      .or(`requester_id.eq.${user?.id},addressee_id.eq.${user?.id}`)
-      .order('created_at', { ascending: false });
+  const loadFriendships = async () => {
+    if (!user) return;
+
+    try {
+      const { data, error } = await supabase
+        .from('friendships')
+        .select(`
+          *,
+          requester:profiles!friendships_requester_id_fkey(
+            id, first_name, last_name, email, avatar_url, school_id, graduation_year, verification_status,
+            schools(name, type, location)
+          ),
+          addressee:profiles!friendships_addressee_id_fkey(
+            id, first_name, last_name, email, avatar_url, school_id, graduation_year, verification_status,
+            schools(name, type, location)
+          )
+        `)
+        .or(`requester_id.eq.${user.id},addressee_id.eq.${user.id}`)
+        .order('created_at', { ascending: false });
+
+      if (error) throw error;
+
+      const accepted = data.filter(f => f.status === 'accepted');
+      const pending = data.filter(f => f.status === 'pending' && f.addressee_id === user.id);
+      const sent = data.filter(f => f.status === 'pending' && f.requester_id === user.id);
+
+      setConnections(accepted);
+      setPendingRequests(pending);
+      setSentRequests(sent);
+    } catch (error) {
+      console.error('Error loading friendships:', error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleAcceptRequest = async (friendshipId: string, requesterId: string) => {
+    try {
+      const { error } = await supabase
+        .from('friendships')
+        .update({ status: 'accepted', updated_at: new Date().toISOString() })
+        .eq('id', friendshipId);
+
+      if (error) throw error;
+
+      // Send notification to requester
+      await createNotification({
+        user_id: requesterId,
+        type: 'friend_accepted',
+        title: 'Friend Request Accepted',
+        message: `${profile?.first_name} ${profile?.last_name} accepted your friend request`,
+        related_user_id: user?.id
+      });
+
+      await loadFriendships();
+    } catch (error) {
+      console.error('Error accepting request:', error);
+    }
+  };
+
+  const handleRejectRequest = async (friendshipId: string) => {
+    try {
+      const { error } = await supabase
+        .from('friendships')
+        .update({ status: 'rejected', updated_at: new Date().toISOString() })
+        .eq('id', friendshipId);
+
+      if (error) throw error;
+      await loadFriendships();
+    } catch (error) {
+      console.error('Error rejecting request:', error);
+    }
+  };
+
+  const getInitials = (firstName?: string, lastName?: string) => {
+    return `${firstName?.[0] || ''}${lastName?.[0] || ''}`.toUpperCase();
+  };
+
+  const getOtherProfile = (friendship: Friendship): Profile | null => {
+    if (!user) return null;
     
-    if (data) setFriendships(data as Friendship[]);
-    setIsLoading(false);
-  };
-
-  const handleFriendRequest = async (friendshipId: string, action: 'accept' | 'reject') => {
-    try {
-      // Find the friendship to get requester info
-      const friendship = friendships.find(f => f.id === friendshipId);
-      
-      const { error } = await supabase
-        .from('friendships')
-        .update({ status: action === 'accept' ? 'accepted' : 'rejected' })
-        .eq('id', friendshipId);
-
-      if (error) throw error;
-
-      // Send notification if request was accepted
-      if (action === 'accept' && friendship && profile) {
-        await notifyFriendAccepted(
-          friendship.requester_id,
-          user!.id,
-          `${profile.first_name} ${profile.last_name}`
-        );
-      }
-
-      toast({
-        title: action === 'accept' ? "Friend request accepted!" : "Friend request declined",
-        description: action === 'accept' 
-          ? "You are now connected with this person." 
-          : "The request has been declined.",
-      });
-
-      await fetchFriendships();
-    } catch (error) {
-      toast({
-        title: "Error",
-        description: "Failed to update friend request. Please try again.",
-        variant: "destructive",
-      });
+    if (friendship.requester_id === user.id) {
+      return friendship.addressee || null;
+    } else {
+      return friendship.requester || null;
     }
   };
 
-  const removeFriend = async (friendshipId: string) => {
-    try {
-      const { error } = await supabase
-        .from('friendships')
-        .delete()
-        .eq('id', friendshipId);
+  const renderConnectionCard = (friendship: Friendship) => {
+    const otherProfile = getOtherProfile(friendship);
+    if (!otherProfile) return null;
 
-      if (error) throw error;
-
-      toast({
-        title: "Connection removed",
-        description: "You are no longer connected with this person.",
-      });
-
-      await fetchFriendships();
-    } catch (error) {
-      toast({
-        title: "Error",
-        description: "Failed to remove connection. Please try again.",
-        variant: "destructive",
-      });
-    }
-  };
-
-  const getInitials = (firstName: string, lastName: string) => {
-    return `${firstName?.[0] || ""}${lastName?.[0] || ""}`.toUpperCase();
-  };
-
-  const getOtherUser = (friendship: Friendship): NetworkProfile => {
-    return friendship.requester_id === user?.id ? friendship.addressee : friendship.requester;
-  };
-
-  const connections = friendships.filter(f => f.status === 'accepted');
-  const pendingRequests = friendships.filter(f => 
-    f.status === 'pending' && f.addressee_id === user?.id
-  );
-  const sentRequests = friendships.filter(f => 
-    f.status === 'pending' && f.requester_id === user?.id
-  );
-
-  if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
-      </div>
-    );
-  }
+      <Card key={friendship.id} className="p-4">
+        <div className="flex items-center gap-4">
+          <Avatar className="h-12 w-12">
+            <AvatarImage src={otherProfile.avatar_url} />
+            <AvatarFallback>
+              {getInitials(otherProfile.first_name, otherProfile.last_name)}
+            </AvatarFallback>
+          </Avatar>
+          
+          <div className="flex-1 min-w-0">
+            <h4 className="font-semibold truncate">
+              {otherProfile.first_name} {otherProfile.last_name}
+            </h4>
+            <div className="flex items-center gap-2 text-sm text-muted-foreground">
+              {otherProfile.schools && (
+                <>
+                  <GraduationCap className="h-3 w-3" />
+                  <span className="truncate">{otherProfile.schools.name}</span>
+                </>
+              )}
+              {otherProfile.graduation_year && (
+                <>
+                  <Calendar className="h-3 w-3 ml-2" />
+                  <span>{otherProfile.graduation_year}</span>
+                </>
+              )}
+            </div>
+          </div>
 
-  if (!user || !profile?.school_id) {
-    return <Navigate to="/dashboard" replace />;
-  }
-
-  return (
-    <div className="min-h-screen bg-background">
-      <div className="container mx-auto px-4 py-8">
-        {/* Header */}
-        <div className="flex items-center gap-4 mb-8">
-          <Button 
-            variant="ghost" 
-            onClick={() => window.history.back()}
-            className="gap-2"
-          >
-            <ArrowLeft className="h-4 w-4" />
-            Back
-          </Button>
-          <div>
-            <h1 className="text-3xl font-bold text-foreground flex items-center gap-2">
-              <Users className="h-8 w-8 text-primary" />
-              My Network
-            </h1>
-            <p className="text-muted-foreground">
-              Manage your connections and friend requests
-            </p>
+          <div className="flex items-center gap-2">
+            <Badge variant={otherProfile.verification_status === 'verified' ? 'default' : 'secondary'}>
+              {otherProfile.verification_status === 'verified' && <Shield className="h-3 w-3 mr-1" />}
+              {otherProfile.verification_status}
+            </Badge>
+            <Button variant="outline" size="sm">
+              <MessageCircle className="h-4 w-4" />
+            </Button>
           </div>
         </div>
+      </Card>
+    );
+  };
 
-        {/* Stats Cards */}
-        <div className="grid md:grid-cols-3 gap-6 mb-8">
+  const renderRequestCard = (friendship: Friendship, showActions: boolean = false) => {
+    const otherProfile = getOtherProfile(friendship);
+    if (!otherProfile) return null;
+
+    return (
+      <Card key={friendship.id} className="p-4">
+        <div className="flex items-center gap-4">
+          <Avatar className="h-12 w-12">
+            <AvatarImage src={otherProfile.avatar_url} />
+            <AvatarFallback>
+              {getInitials(otherProfile.first_name, otherProfile.last_name)}
+            </AvatarFallback>
+          </Avatar>
+          
+          <div className="flex-1 min-w-0">
+            <h4 className="font-semibold truncate">
+              {otherProfile.first_name} {otherProfile.last_name}
+            </h4>
+            <div className="flex items-center gap-2 text-sm text-muted-foreground">
+              {otherProfile.schools && (
+                <>
+                  <GraduationCap className="h-3 w-3" />
+                  <span className="truncate">{otherProfile.schools.name}</span>
+                </>
+              )}
+              {otherProfile.graduation_year && (
+                <>
+                  <Calendar className="h-3 w-3 ml-2" />
+                  <span>{otherProfile.graduation_year}</span>
+                </>
+              )}
+            </div>
+          </div>
+
+          <div className="flex items-center gap-2">
+            {showActions ? (
+              <>
+                <Button 
+                  size="sm" 
+                  onClick={() => handleAcceptRequest(friendship.id, friendship.requester_id)}
+                  className="bg-success hover:bg-success/90"
+                >
+                  <Check className="h-4 w-4" />
+                </Button>
+                <Button 
+                  variant="outline" 
+                  size="sm"
+                  onClick={() => handleRejectRequest(friendship.id)}
+                >
+                  <X className="h-4 w-4" />
+                </Button>
+              </>
+            ) : (
+              <div className="flex items-center gap-1 text-sm text-muted-foreground">
+                <Clock className="h-4 w-4" />
+                <span>Pending</span>
+              </div>
+            )}
+          </div>
+        </div>
+      </Card>
+    );
+  };
+
+  return (
+    <AppLayout title="My Network">
+      <div className="p-6">
+        {/* Network Overview */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
           <Card>
             <CardContent className="p-6">
-              <div className="flex items-center gap-4">
-                <div className="p-3 bg-primary/10 rounded-lg">
-                  <Users className="h-6 w-6 text-primary" />
-                </div>
+              <div className="flex items-center justify-between">
                 <div>
                   <p className="text-2xl font-bold">{connections.length}</p>
                   <p className="text-sm text-muted-foreground">Connections</p>
                 </div>
+                <Users className="h-8 w-8 text-primary" />
               </div>
             </CardContent>
           </Card>
-
+          
           <Card>
             <CardContent className="p-6">
-              <div className="flex items-center gap-4">
-                <div className="p-3 bg-warning/10 rounded-lg">
-                  <UserCheck className="h-6 w-6 text-warning" />
-                </div>
+              <div className="flex items-center justify-between">
                 <div>
                   <p className="text-2xl font-bold">{pendingRequests.length}</p>
                   <p className="text-sm text-muted-foreground">Pending Requests</p>
                 </div>
+                <UserPlus className="h-8 w-8 text-warning" />
               </div>
             </CardContent>
           </Card>
-
+          
           <Card>
             <CardContent className="p-6">
-              <div className="flex items-center gap-4">
-                <div className="p-3 bg-secondary/10 rounded-lg">
-                  <UserX className="h-6 w-6 text-secondary" />
-                </div>
+              <div className="flex items-center justify-between">
                 <div>
                   <p className="text-2xl font-bold">{sentRequests.length}</p>
                   <p className="text-sm text-muted-foreground">Sent Requests</p>
                 </div>
+                <Clock className="h-8 w-8 text-muted-foreground" />
               </div>
             </CardContent>
           </Card>
@@ -238,207 +324,104 @@ const Network = () => {
 
           <TabsContent value="connections" className="mt-6">
             {isLoading ? (
-              <div className="grid md:grid-cols-2 gap-4">
-                {[...Array(4)].map((_, i) => (
-                  <Card key={i} className="animate-pulse">
-                    <CardContent className="p-6">
-                      <div className="flex items-center gap-4">
-                        <div className="h-12 w-12 bg-muted rounded-full"></div>
-                        <div className="space-y-2 flex-1">
-                          <div className="h-4 bg-muted rounded w-3/4"></div>
-                          <div className="h-3 bg-muted rounded w-1/2"></div>
-                        </div>
+              <div className="space-y-4">
+                {[...Array(3)].map((_, i) => (
+                  <Card key={i} className="p-4">
+                    <div className="flex items-center gap-4">
+                      <Skeleton className="h-12 w-12 rounded-full" />
+                      <div className="flex-1">
+                        <Skeleton className="h-4 w-32 mb-2" />
+                        <Skeleton className="h-3 w-48" />
                       </div>
-                    </CardContent>
+                    </div>
                   </Card>
                 ))}
               </div>
             ) : connections.length === 0 ? (
-              <Card>
-                <CardContent className="p-8 text-center">
-                  <Users className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
-                  <h3 className="text-lg font-medium mb-2">No connections yet</h3>
-                  <p className="text-muted-foreground mb-4">
-                    Start building your network by finding and connecting with alumni.
-                  </p>
-                  <Button onClick={() => window.location.href = '/alumni'}>
-                    Find Alumni
-                  </Button>
-                </CardContent>
-              </Card>
+              <div className="text-center py-12">
+                <Users className="h-16 w-16 text-muted-foreground mx-auto mb-4" />
+                <h3 className="text-lg font-semibold mb-2">No connections yet</h3>
+                <p className="text-muted-foreground mb-4">
+                  Start connecting with alumni from your school
+                </p>
+                <Button onClick={() => navigate('/alumni')}>
+                  <UserPlus className="h-4 w-4 mr-2" />
+                  Find Alumni
+                </Button>
+              </div>
             ) : (
-              <div className="grid md:grid-cols-2 gap-4">
-                {connections.map(friendship => {
-                  const otherUser = getOtherUser(friendship);
-                  
-                  return (
-                    <Card key={friendship.id}>
-                      <CardContent className="p-6">
-                        <div className="flex items-center gap-4">
-                          <Avatar className="h-12 w-12">
-                            <AvatarImage src={otherUser.avatar_url || ""} />
-                            <AvatarFallback>
-                              {getInitials(otherUser.first_name, otherUser.last_name)}
-                            </AvatarFallback>
-                          </Avatar>
-                          <div className="flex-1">
-                            <h3 className="font-semibold">
-                              {otherUser.first_name} {otherUser.last_name}
-                            </h3>
-                            <div className="flex items-center gap-2 mt-1">
-                              {otherUser.graduation_year && (
-                                <Badge variant="outline" className="text-xs">
-                                  Class of {otherUser.graduation_year}
-                                </Badge>
-                              )}
-                              <Badge 
-                                variant={otherUser.verification_status === 'verified' ? 'default' : 'secondary'}
-                                className="text-xs capitalize"
-                              >
-                                {otherUser.verification_status}
-                              </Badge>
-                            </div>
-                          </div>
-                          <div className="flex gap-2">
-                            <Button variant="outline" size="sm" className="gap-2">
-                              <MessageCircle className="h-4 w-4" />
-                              Message
-                            </Button>
-                            <Button 
-                              variant="outline" 
-                              size="sm"
-                              onClick={() => removeFriend(friendship.id)}
-                            >
-                              Remove
-                            </Button>
-                          </div>
-                        </div>
-                      </CardContent>
-                    </Card>
-                  );
-                })}
+              <div className="space-y-4">
+                {connections.map(renderConnectionCard)}
               </div>
             )}
           </TabsContent>
 
           <TabsContent value="requests" className="mt-6">
-            {pendingRequests.length === 0 ? (
-              <Card>
-                <CardContent className="p-8 text-center">
-                  <UserCheck className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
-                  <h3 className="text-lg font-medium mb-2">No pending requests</h3>
-                  <p className="text-muted-foreground">
-                    You'll see friend requests from other alumni here.
-                  </p>
-                </CardContent>
-              </Card>
+            {isLoading ? (
+              <div className="space-y-4">
+                {[...Array(2)].map((_, i) => (
+                  <Card key={i} className="p-4">
+                    <div className="flex items-center gap-4">
+                      <Skeleton className="h-12 w-12 rounded-full" />
+                      <div className="flex-1">
+                        <Skeleton className="h-4 w-32 mb-2" />
+                        <Skeleton className="h-3 w-48" />
+                      </div>
+                      <div className="flex gap-2">
+                        <Skeleton className="h-8 w-8" />
+                        <Skeleton className="h-8 w-8" />
+                      </div>
+                    </div>
+                  </Card>
+                ))}
+              </div>
+            ) : pendingRequests.length === 0 ? (
+              <div className="text-center py-12">
+                <UserPlus className="h-16 w-16 text-muted-foreground mx-auto mb-4" />
+                <h3 className="text-lg font-semibold mb-2">No pending requests</h3>
+                <p className="text-muted-foreground">
+                  You don't have any friend requests at the moment
+                </p>
+              </div>
             ) : (
-              <div className="grid md:grid-cols-2 gap-4">
-                {pendingRequests.map(friendship => {
-                  const requester = friendship.requester;
-                  
-                  return (
-                    <Card key={friendship.id}>
-                      <CardContent className="p-6">
-                        <div className="flex items-center gap-4">
-                          <Avatar className="h-12 w-12">
-                            <AvatarImage src={requester.avatar_url || ""} />
-                            <AvatarFallback>
-                              {getInitials(requester.first_name, requester.last_name)}
-                            </AvatarFallback>
-                          </Avatar>
-                          <div className="flex-1">
-                            <h3 className="font-semibold">
-                              {requester.first_name} {requester.last_name}
-                            </h3>
-                            <p className="text-sm text-muted-foreground">
-                              Wants to connect with you
-                            </p>
-                            <div className="flex items-center gap-2 mt-1">
-                              {requester.graduation_year && (
-                                <Badge variant="outline" className="text-xs">
-                                  Class of {requester.graduation_year}
-                                </Badge>
-                              )}
-                            </div>
-                          </div>
-                          <div className="flex gap-2">
-                            <Button 
-                              size="sm"
-                              onClick={() => handleFriendRequest(friendship.id, 'accept')}
-                            >
-                              Accept
-                            </Button>
-                            <Button 
-                              variant="outline" 
-                              size="sm"
-                              onClick={() => handleFriendRequest(friendship.id, 'reject')}
-                            >
-                              Decline
-                            </Button>
-                          </div>
-                        </div>
-                      </CardContent>
-                    </Card>
-                  );
-                })}
+              <div className="space-y-4">
+                {pendingRequests.map(friendship => renderRequestCard(friendship, true))}
               </div>
             )}
           </TabsContent>
 
           <TabsContent value="sent" className="mt-6">
-            {sentRequests.length === 0 ? (
-              <Card>
-                <CardContent className="p-8 text-center">
-                  <UserX className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
-                  <h3 className="text-lg font-medium mb-2">No sent requests</h3>
-                  <p className="text-muted-foreground">
-                    Friend requests you send will appear here.
-                  </p>
-                </CardContent>
-              </Card>
+            {isLoading ? (
+              <div className="space-y-4">
+                {[...Array(2)].map((_, i) => (
+                  <Card key={i} className="p-4">
+                    <div className="flex items-center gap-4">
+                      <Skeleton className="h-12 w-12 rounded-full" />
+                      <div className="flex-1">
+                        <Skeleton className="h-4 w-32 mb-2" />
+                        <Skeleton className="h-3 w-48" />
+                      </div>
+                    </div>
+                  </Card>
+                ))}
+              </div>
+            ) : sentRequests.length === 0 ? (
+              <div className="text-center py-12">
+                <Clock className="h-16 w-16 text-muted-foreground mx-auto mb-4" />
+                <h3 className="text-lg font-semibold mb-2">No sent requests</h3>
+                <p className="text-muted-foreground">
+                  You haven't sent any friend requests yet
+                </p>
+              </div>
             ) : (
-              <div className="grid md:grid-cols-2 gap-4">
-                {sentRequests.map(friendship => {
-                  const addressee = friendship.addressee;
-                  
-                  return (
-                    <Card key={friendship.id}>
-                      <CardContent className="p-6">
-                        <div className="flex items-center gap-4">
-                          <Avatar className="h-12 w-12">
-                            <AvatarImage src={addressee.avatar_url || ""} />
-                            <AvatarFallback>
-                              {getInitials(addressee.first_name, addressee.last_name)}
-                            </AvatarFallback>
-                          </Avatar>
-                          <div className="flex-1">
-                            <h3 className="font-semibold">
-                              {addressee.first_name} {addressee.last_name}
-                            </h3>
-                            <p className="text-sm text-muted-foreground">
-                              Request pending
-                            </p>
-                            <div className="flex items-center gap-2 mt-1">
-                              {addressee.graduation_year && (
-                                <Badge variant="outline" className="text-xs">
-                                  Class of {addressee.graduation_year}
-                                </Badge>
-                              )}
-                            </div>
-                          </div>
-                          <Badge variant="secondary">Pending</Badge>
-                        </div>
-                      </CardContent>
-                    </Card>
-                  );
-                })}
+              <div className="space-y-4">
+                {sentRequests.map(friendship => renderRequestCard(friendship, false))}
               </div>
             )}
           </TabsContent>
         </Tabs>
       </div>
-    </div>
+    </AppLayout>
   );
 };
 
