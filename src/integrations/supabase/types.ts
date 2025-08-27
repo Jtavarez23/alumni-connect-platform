@@ -160,6 +160,161 @@ export type Database = {
         }
         Relationships: []
       }
+      student_tags: {
+        Row: {
+          created_at: string | null
+          id: string
+          tagged_by_id: string
+          tagged_profile_id: string
+          updated_at: string | null
+          verification_status: string | null
+          yearbook_entry_id: string
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          tagged_by_id: string
+          tagged_profile_id: string
+          updated_at?: string | null
+          verification_status?: string | null
+          yearbook_entry_id: string
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          tagged_by_id?: string
+          tagged_profile_id?: string
+          updated_at?: string | null
+          verification_status?: string | null
+          yearbook_entry_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "student_tags_tagged_by_id_fkey"
+            columns: ["tagged_by_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "student_tags_tagged_profile_id_fkey"
+            columns: ["tagged_profile_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "student_tags_yearbook_entry_id_fkey"
+            columns: ["yearbook_entry_id"]
+            isOneToOne: false
+            referencedRelation: "yearbook_entries"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      tag_suggestions: {
+        Row: {
+          confidence_score: number | null
+          created_at: string | null
+          expires_at: string | null
+          id: string
+          status: string | null
+          suggested_by_id: string | null
+          suggested_profile_id: string
+          suggestion_type: string | null
+          yearbook_entry_id: string
+        }
+        Insert: {
+          confidence_score?: number | null
+          created_at?: string | null
+          expires_at?: string | null
+          id?: string
+          status?: string | null
+          suggested_by_id?: string | null
+          suggested_profile_id: string
+          suggestion_type?: string | null
+          yearbook_entry_id: string
+        }
+        Update: {
+          confidence_score?: number | null
+          created_at?: string | null
+          expires_at?: string | null
+          id?: string
+          status?: string | null
+          suggested_by_id?: string | null
+          suggested_profile_id?: string
+          suggestion_type?: string | null
+          yearbook_entry_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "tag_suggestions_suggested_by_id_fkey"
+            columns: ["suggested_by_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "tag_suggestions_suggested_profile_id_fkey"
+            columns: ["suggested_profile_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "tag_suggestions_yearbook_entry_id_fkey"
+            columns: ["yearbook_entry_id"]
+            isOneToOne: false
+            referencedRelation: "yearbook_entries"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      tag_verifications: {
+        Row: {
+          created_at: string | null
+          id: string
+          is_verified: boolean
+          student_tag_id: string
+          verification_note: string | null
+          verification_type: string | null
+          verifier_id: string
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          is_verified: boolean
+          student_tag_id: string
+          verification_note?: string | null
+          verification_type?: string | null
+          verifier_id: string
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          is_verified?: boolean
+          student_tag_id?: string
+          verification_note?: string | null
+          verification_type?: string | null
+          verifier_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "tag_verifications_student_tag_id_fkey"
+            columns: ["student_tag_id"]
+            isOneToOne: false
+            referencedRelation: "student_tags"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "tag_verifications_verifier_id_fkey"
+            columns: ["verifier_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       yearbook_editions: {
         Row: {
           cover_image_url: string | null

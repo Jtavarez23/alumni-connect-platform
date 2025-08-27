@@ -5,8 +5,10 @@ import { Input } from "@/components/ui/input";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
-import { ArrowLeft, Search, User, Heart, MessageCircle } from "lucide-react";
+import { ArrowLeft, Search, User, Heart, MessageCircle, Tag } from "lucide-react";
 import { toast } from "sonner";
+import { StudentTagDialog } from "./StudentTagDialog";
+import { TaggedStudentsList } from "./TaggedStudentsList";
 
 interface YearbookEdition {
   id: string;
@@ -42,6 +44,7 @@ export function YearbookViewer({ yearbook, onBack }: YearbookViewerProps) {
   const [entries, setEntries] = useState<YearbookEntry[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
+  const [selectedEntryForTag, setSelectedEntryForTag] = useState<YearbookEntry | null>(null);
 
   useEffect(() => {
     fetchEntries();
@@ -156,9 +159,22 @@ export function YearbookViewer({ yearbook, onBack }: YearbookViewerProps) {
               {filteredEntries.map((entry) => (
                 <Card
                   key={entry.id}
-                  className="hover:shadow-md transition-shadow cursor-pointer group"
+                  className="hover:shadow-md transition-shadow cursor-pointer group relative"
                 >
                   <CardContent className="p-4 text-center">
+                    {/* Tag button */}
+                    <Button
+                      size="sm"
+                      variant="ghost"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setSelectedEntryForTag(entry);
+                      }}
+                      className="absolute top-2 right-2 h-6 w-6 p-0 opacity-0 group-hover:opacity-100 transition-opacity"
+                    >
+                      <Tag className="w-3 h-3" />
+                    </Button>
+
                     {/* Photo */}
                     <div className="w-20 h-20 mx-auto mb-3 rounded-full overflow-hidden bg-muted">
                       {entry.photo_url ? (
@@ -185,6 +201,16 @@ export function YearbookViewer({ yearbook, onBack }: YearbookViewerProps) {
                         Page {entry.page_number}
                       </p>
                     )}
+
+                    {/* Tagged students list */}
+                    <div className="mb-2">
+                      <TaggedStudentsList 
+                        yearbookEntryId={entry.id} 
+                        onTagUpdate={() => {
+                          // Could refresh specific entry data if needed
+                        }}
+                      />
+                    </div>
 
                     {/* Activities */}
                     {entry.activities && entry.activities.length > 0 && (
@@ -249,6 +275,19 @@ export function YearbookViewer({ yearbook, onBack }: YearbookViewerProps) {
           </>
         )}
       </div>
+
+      {/* Student Tag Dialog */}
+      {selectedEntryForTag && (
+        <StudentTagDialog
+          open={!!selectedEntryForTag}
+          onClose={() => setSelectedEntryForTag(null)}
+          yearbookEntryId={selectedEntryForTag.id}
+          studentName={selectedEntryForTag.student_name}
+          onTagged={() => {
+            // Could refresh the entries or show updated tag state
+          }}
+        />
+      )}
     </div>
   );
 }
