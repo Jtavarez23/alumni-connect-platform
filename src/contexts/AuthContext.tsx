@@ -17,6 +17,7 @@ interface AuthContextType {
   signInWithFacebook: () => Promise<void>
   signOut: () => Promise<void>
   updateProfile: (updates: Partial<Profile>) => Promise<void>
+  uploadAvatar: (file: File) => Promise<string>
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined)
@@ -155,6 +156,32 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
   }
 
+  const uploadAvatar = async (file: File): Promise<string> => {
+    try {
+      if (!user) throw new Error('No user logged in')
+
+      const fileExt = file.name.split('.').pop()
+      const fileName = `${user.id}/${Date.now()}.${fileExt}`
+
+      // Upload file to storage
+      const { data: uploadData, error: uploadError } = await supabase.storage
+        .from('profile-pictures')
+        .upload(fileName, file, { upsert: true })
+
+      if (uploadError) throw uploadError
+
+      // Get public URL
+      const { data: { publicUrl } } = supabase.storage
+        .from('profile-pictures')
+        .getPublicUrl(fileName)
+
+      return publicUrl
+    } catch (error: any) {
+      toast.error(error.message)
+      throw error
+    }
+  }
+
   const updateProfile = async (updates: Partial<Profile>) => {
     try {
       if (!user) throw new Error('No user logged in')
@@ -186,7 +213,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       signInWithGoogle,
       signInWithFacebook,
       signOut,
-      updateProfile
+      updateProfile,
+      uploadAvatar
     }}>
       {children}
     </AuthContext.Provider>

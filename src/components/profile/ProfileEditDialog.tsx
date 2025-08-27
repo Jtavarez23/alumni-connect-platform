@@ -5,8 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Upload } from "lucide-react";
+import AvatarUpload from "@/components/ui/avatar-upload";
 import SchoolSelector from "./SchoolSelector";
 import { useToast } from "@/hooks/use-toast";
 
@@ -17,7 +16,7 @@ interface ProfileEditDialogProps {
 }
 
 const ProfileEditDialog = ({ open, onOpenChange, onComplete }: ProfileEditDialogProps) => {
-  const { profile, updateProfile } = useAuth();
+  const { profile, updateProfile, uploadAvatar } = useAuth();
   const { toast } = useToast();
   const [loading, setLoading] = useState(false);
   
@@ -59,6 +58,15 @@ const ProfileEditDialog = ({ open, onOpenChange, onComplete }: ProfileEditDialog
     }
   };
 
+  const handleAvatarUpload = async (file: File) => {
+    try {
+      const avatarUrl = await uploadAvatar(file);
+      setFormData({...formData, avatar_url: avatarUrl});
+    } catch (error) {
+      // Error is already handled in uploadAvatar
+    }
+  };
+
   const getInitials = () => {
     return `${formData.first_name?.[0] || ""}${formData.last_name?.[0] || ""}`.toUpperCase();
   };
@@ -76,19 +84,12 @@ const ProfileEditDialog = ({ open, onOpenChange, onComplete }: ProfileEditDialog
         <div className="space-y-6">
           {/* Profile Photo */}
           <div className="flex justify-center">
-            <div className="relative">
-              <Avatar className="h-24 w-24">
-                <AvatarImage src={formData.avatar_url} />
-                <AvatarFallback className="text-2xl">{getInitials()}</AvatarFallback>
-              </Avatar>
-              <Button 
-                size="sm" 
-                variant="outline" 
-                className="absolute -bottom-2 -right-2 h-8 w-8 rounded-full p-0"
-              >
-                <Upload className="h-4 w-4" />
-              </Button>
-            </div>
+            <AvatarUpload
+              currentImageUrl={formData.avatar_url}
+              fallbackText={getInitials()}
+              onImageUploaded={handleAvatarUpload}
+              size="md"
+            />
           </div>
           
           {/* Basic Information */}

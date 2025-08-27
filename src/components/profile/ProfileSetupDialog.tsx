@@ -6,8 +6,8 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Upload, Search } from "lucide-react";
+import AvatarUpload from "@/components/ui/avatar-upload";
+import { Search } from "lucide-react";
 import SchoolSelector from "./SchoolSelector";
 import { useToast } from "@/hooks/use-toast";
 
@@ -18,7 +18,7 @@ interface ProfileSetupDialogProps {
 }
 
 const ProfileSetupDialog = ({ open, onOpenChange, onComplete }: ProfileSetupDialogProps) => {
-  const { profile, updateProfile } = useAuth();
+  const { profile, updateProfile, uploadAvatar } = useAuth();
   const { toast } = useToast();
   const [step, setStep] = useState(1);
   const [loading, setLoading] = useState(false);
@@ -72,6 +72,15 @@ const ProfileSetupDialog = ({ open, onOpenChange, onComplete }: ProfileSetupDial
     }
   };
 
+  const handleAvatarUpload = async (file: File) => {
+    try {
+      const avatarUrl = await uploadAvatar(file);
+      setFormData({...formData, avatar_url: avatarUrl});
+    } catch (error) {
+      // Error is already handled in uploadAvatar
+    }
+  };
+
   const getInitials = () => {
     return `${formData.first_name?.[0] || ""}${formData.last_name?.[0] || ""}`.toUpperCase();
   };
@@ -116,19 +125,12 @@ const ProfileSetupDialog = ({ open, onOpenChange, onComplete }: ProfileSetupDial
               </CardHeader>
               <CardContent className="space-y-4">
                 <div className="flex justify-center mb-6">
-                  <div className="relative">
-                    <Avatar className="h-24 w-24">
-                      <AvatarImage src={formData.avatar_url} />
-                      <AvatarFallback className="text-2xl">{getInitials()}</AvatarFallback>
-                    </Avatar>
-                    <Button 
-                      size="sm" 
-                      variant="outline" 
-                      className="absolute -bottom-2 -right-2 h-8 w-8 rounded-full p-0"
-                    >
-                      <Upload className="h-4 w-4" />
-                    </Button>
-                  </div>
+                  <AvatarUpload
+                    currentImageUrl={formData.avatar_url}
+                    fallbackText={getInitials()}
+                    onImageUploaded={handleAvatarUpload}
+                    size="md"
+                  />
                 </div>
                 
                 <div className="grid grid-cols-2 gap-4">
@@ -207,10 +209,12 @@ const ProfileSetupDialog = ({ open, onOpenChange, onComplete }: ProfileSetupDial
               </CardHeader>
               <CardContent className="space-y-4">
                 <div className="flex items-center space-x-4 p-4 bg-muted rounded-lg">
-                  <Avatar className="h-16 w-16">
-                    <AvatarImage src={formData.avatar_url} />
-                    <AvatarFallback className="text-lg">{getInitials()}</AvatarFallback>
-                  </Avatar>
+                  <AvatarUpload
+                    currentImageUrl={formData.avatar_url}
+                    fallbackText={getInitials()}
+                    onImageUploaded={handleAvatarUpload}
+                    size="sm"
+                  />
                   <div>
                     <h3 className="font-semibold text-lg">
                       {formData.first_name} {formData.last_name}
