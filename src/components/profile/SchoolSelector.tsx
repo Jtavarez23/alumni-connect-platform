@@ -7,6 +7,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Search, MapPin, GraduationCap } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import AddSchoolDialog from "./AddSchoolDialog";
 
 interface School {
   id: string;
@@ -14,6 +15,8 @@ interface School {
   type: string;
   location: any;
   verified: boolean;
+  user_submitted?: boolean;
+  submission_status?: string;
 }
 
 interface SchoolSelectorProps {
@@ -111,6 +114,9 @@ const SchoolSelector = ({ selectedSchoolId, onSchoolSelect }: SchoolSelectorProp
                       {selectedSchool.verified && (
                         <Badge variant="default">Verified</Badge>
                       )}
+                      {selectedSchool.user_submitted && selectedSchool.submission_status === 'pending' && (
+                        <Badge variant="secondary">Pending Review</Badge>
+                      )}
                     </div>
                     {selectedSchool.location && (
                       <div className="flex items-center mt-1 text-sm text-muted-foreground">
@@ -171,6 +177,9 @@ const SchoolSelector = ({ selectedSchoolId, onSchoolSelect }: SchoolSelectorProp
                             {school.verified && (
                               <Badge variant="default" className="text-xs">Verified</Badge>
                             )}
+                            {school.user_submitted && school.submission_status === 'pending' && (
+                              <Badge variant="secondary" className="text-xs">Pending Review</Badge>
+                            )}
                           </div>
                           {school.location && (
                             <div className="flex items-center mt-1 text-xs text-muted-foreground">
@@ -188,10 +197,11 @@ const SchoolSelector = ({ selectedSchoolId, onSchoolSelect }: SchoolSelectorProp
 
             {searchTerm.length >= 2 && schools.length === 0 && !loading && (
               <Card className="absolute z-10 w-full mt-1">
-                <CardContent className="p-4 text-center">
+                <CardContent className="p-4 text-center space-y-3">
                   <p className="text-sm text-muted-foreground">
-                    No schools found. Try a different search term.
+                    No schools found. Try a different search term or add your school.
                   </p>
+                  <AddSchoolDialog onSchoolAdded={handleSchoolSelect} />
                 </CardContent>
               </Card>
             )}

@@ -126,7 +126,10 @@ export type Database = {
           location: Json
           name: string
           slug: string
+          submission_status: string | null
+          submitted_by: string | null
           type: string
+          user_submitted: boolean | null
           verified: boolean | null
         }
         Insert: {
@@ -136,7 +139,10 @@ export type Database = {
           location: Json
           name: string
           slug: string
+          submission_status?: string | null
+          submitted_by?: string | null
           type: string
+          user_submitted?: boolean | null
           verified?: boolean | null
         }
         Update: {
@@ -146,7 +152,10 @@ export type Database = {
           location?: Json
           name?: string
           slug?: string
+          submission_status?: string | null
+          submitted_by?: string | null
           type?: string
+          user_submitted?: boolean | null
           verified?: boolean | null
         }
         Relationships: []
