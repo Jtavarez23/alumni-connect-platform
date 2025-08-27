@@ -10,6 +10,7 @@ import { AppLayout } from "@/components/layout/AppLayout";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
 import { createNotification } from "@/lib/notifications";
+import { MessageDialog } from "@/components/messaging/MessageDialog";
 import { 
   ArrowLeft, 
   MessageCircle, 
@@ -59,6 +60,8 @@ const Network = () => {
   const [pendingRequests, setPendingRequests] = useState<Friendship[]>([]);
   const [sentRequests, setSentRequests] = useState<Friendship[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [messageDialogOpen, setMessageDialogOpen] = useState(false);
+  const [selectedUser, setSelectedUser] = useState<Profile | null>(null);
 
   useEffect(() => {
     if (user) {
@@ -154,6 +157,11 @@ const Network = () => {
     }
   };
 
+  const handleOpenMessage = (profile: Profile) => {
+    setSelectedUser(profile);
+    setMessageDialogOpen(true);
+  };
+
   const renderConnectionCard = (friendship: Friendship) => {
     const otherProfile = getOtherProfile(friendship);
     if (!otherProfile) return null;
@@ -193,7 +201,11 @@ const Network = () => {
               {otherProfile.verification_status === 'verified' && <Shield className="h-3 w-3 mr-1" />}
               {otherProfile.verification_status}
             </Badge>
-            <Button variant="outline" size="sm">
+            <Button 
+              variant="outline" 
+              size="sm"
+              onClick={() => handleOpenMessage(otherProfile)}
+            >
               <MessageCircle className="h-4 w-4" />
             </Button>
           </div>
@@ -421,6 +433,18 @@ const Network = () => {
           </TabsContent>
         </Tabs>
       </div>
+
+      {/* Message Dialog */}
+      {selectedUser && (
+        <MessageDialog
+          isOpen={messageDialogOpen}
+          onClose={() => {
+            setMessageDialogOpen(false);
+            setSelectedUser(null);
+          }}
+          otherUser={selectedUser}
+        />
+      )}
     </AppLayout>
   );
 };

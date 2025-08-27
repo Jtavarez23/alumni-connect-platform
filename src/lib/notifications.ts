@@ -2,7 +2,7 @@ import { supabase } from "@/integrations/supabase/client";
 
 export interface CreateNotificationData {
   user_id: string;
-  type: 'friend_request' | 'friend_accepted' | 'tag_suggestion' | 'tag_verified' | 'yearbook_upload';
+  type: 'friend_request' | 'friend_accepted' | 'tag_suggestion' | 'tag_verified' | 'yearbook_upload' | 'new_message';
   title: string;
   message?: string;
   related_user_id?: string;
@@ -65,6 +65,17 @@ export const notifyTagVerified = (recipientId: string, tagId: string, verifierNa
     title: 'Tag verified',
     message: `${verifierName} confirmed your yearbook tag`,
     related_entity_id: tagId
+  });
+};
+
+export const notifyNewMessage = (recipientId: string, senderId: string, senderName: string, conversationId: string) => {
+  return createNotification({
+    user_id: recipientId,
+    type: 'new_message',
+    title: 'New message',
+    message: `${senderName} sent you a message`,
+    related_user_id: senderId,
+    related_entity_id: conversationId
   });
 };
 
