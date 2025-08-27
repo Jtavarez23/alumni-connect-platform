@@ -39,9 +39,9 @@ const Navigation = () => {
           <div className="hidden md:flex items-center space-x-4">
             {user ? (
               <>
-                <span className="text-sm text-muted-foreground">
-                  Welcome, {user.email}
-                </span>
+                <Button variant="ghost" asChild>
+                  <Link to="/dashboard">Dashboard</Link>
+                </Button>
                 <Button variant="ghost" onClick={signOut}>
                   Sign Out
                 </Button>
@@ -86,9 +86,9 @@ const Navigation = () => {
               <div className="flex flex-col space-y-2 px-4 pt-4 border-t">
                 {user ? (
                   <>
-                    <span className="text-sm text-muted-foreground px-4 py-2">
-                      Welcome, {user.email}
-                    </span>
+                    <Button variant="ghost" className="justify-start" asChild>
+                      <Link to="/dashboard">Dashboard</Link>
+                    </Button>
                     <Button variant="ghost" className="justify-start" onClick={signOut}>
                       Sign Out
                     </Button>

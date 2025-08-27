@@ -90,6 +90,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       })
       if (error) throw error
       toast.success('Check your email to confirm your account!')
+      // Redirect to dashboard after successful signup
+      window.location.href = '/dashboard'
     } catch (error: any) {
       toast.error(error.message)
       throw error
@@ -104,6 +106,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       })
       if (error) throw error
       toast.success('Welcome back!')
+      // Redirect to dashboard after successful login
+      window.location.href = '/dashboard'
     } catch (error: any) {
       toast.error(error.message)
       throw error
