@@ -169,6 +169,7 @@ export type Database = {
           school_id: string
           title: string | null
           upload_status: string | null
+          uploaded_by: string | null
           year: number
         }
         Insert: {
@@ -179,6 +180,7 @@ export type Database = {
           school_id: string
           title?: string | null
           upload_status?: string | null
+          uploaded_by?: string | null
           year: number
         }
         Update: {
@@ -189,6 +191,7 @@ export type Database = {
           school_id?: string
           title?: string | null
           upload_status?: string | null
+          uploaded_by?: string | null
           year?: number
         }
         Relationships: [
