@@ -14,7 +14,238 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      friendships: {
+        Row: {
+          addressee_id: string
+          created_at: string | null
+          id: string
+          requester_id: string
+          status: string | null
+          updated_at: string | null
+          verification_method: string | null
+        }
+        Insert: {
+          addressee_id: string
+          created_at?: string | null
+          id?: string
+          requester_id: string
+          status?: string | null
+          updated_at?: string | null
+          verification_method?: string | null
+        }
+        Update: {
+          addressee_id?: string
+          created_at?: string | null
+          id?: string
+          requester_id?: string
+          status?: string | null
+          updated_at?: string | null
+          verification_method?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "friendships_addressee_id_fkey"
+            columns: ["addressee_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "friendships_requester_id_fkey"
+            columns: ["requester_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      profiles: {
+        Row: {
+          avatar_url: string | null
+          bio: string | null
+          created_at: string | null
+          email: string
+          first_name: string
+          graduation_year: number | null
+          id: string
+          last_name: string
+          privacy_level: string | null
+          school_id: string | null
+          subscription_status: string | null
+          updated_at: string | null
+          username: string | null
+          verification_status: string | null
+        }
+        Insert: {
+          avatar_url?: string | null
+          bio?: string | null
+          created_at?: string | null
+          email: string
+          first_name: string
+          graduation_year?: number | null
+          id: string
+          last_name: string
+          privacy_level?: string | null
+          school_id?: string | null
+          subscription_status?: string | null
+          updated_at?: string | null
+          username?: string | null
+          verification_status?: string | null
+        }
+        Update: {
+          avatar_url?: string | null
+          bio?: string | null
+          created_at?: string | null
+          email?: string
+          first_name?: string
+          graduation_year?: number | null
+          id?: string
+          last_name?: string
+          privacy_level?: string | null
+          school_id?: string | null
+          subscription_status?: string | null
+          updated_at?: string | null
+          username?: string | null
+          verification_status?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "profiles_school_id_fkey"
+            columns: ["school_id"]
+            isOneToOne: false
+            referencedRelation: "schools"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      schools: {
+        Row: {
+          created_at: string | null
+          domain: string | null
+          id: string
+          location: Json
+          name: string
+          slug: string
+          type: string
+          verified: boolean | null
+        }
+        Insert: {
+          created_at?: string | null
+          domain?: string | null
+          id?: string
+          location: Json
+          name: string
+          slug: string
+          type: string
+          verified?: boolean | null
+        }
+        Update: {
+          created_at?: string | null
+          domain?: string | null
+          id?: string
+          location?: Json
+          name?: string
+          slug?: string
+          type?: string
+          verified?: boolean | null
+        }
+        Relationships: []
+      }
+      yearbook_editions: {
+        Row: {
+          cover_image_url: string | null
+          created_at: string | null
+          id: string
+          page_count: number | null
+          school_id: string
+          title: string | null
+          upload_status: string | null
+          year: number
+        }
+        Insert: {
+          cover_image_url?: string | null
+          created_at?: string | null
+          id?: string
+          page_count?: number | null
+          school_id: string
+          title?: string | null
+          upload_status?: string | null
+          year: number
+        }
+        Update: {
+          cover_image_url?: string | null
+          created_at?: string | null
+          id?: string
+          page_count?: number | null
+          school_id?: string
+          title?: string | null
+          upload_status?: string | null
+          year?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "yearbook_editions_school_id_fkey"
+            columns: ["school_id"]
+            isOneToOne: false
+            referencedRelation: "schools"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      yearbook_entries: {
+        Row: {
+          activities: string[] | null
+          created_at: string | null
+          edition_id: string
+          honors: string[] | null
+          id: string
+          page_number: number | null
+          photo_url: string | null
+          profile_id: string | null
+          quote: string | null
+          student_name: string
+        }
+        Insert: {
+          activities?: string[] | null
+          created_at?: string | null
+          edition_id: string
+          honors?: string[] | null
+          id?: string
+          page_number?: number | null
+          photo_url?: string | null
+          profile_id?: string | null
+          quote?: string | null
+          student_name: string
+        }
+        Update: {
+          activities?: string[] | null
+          created_at?: string | null
+          edition_id?: string
+          honors?: string[] | null
+          id?: string
+          page_number?: number | null
+          photo_url?: string | null
+          profile_id?: string | null
+          quote?: string | null
+          student_name?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "yearbook_entries_edition_id_fkey"
+            columns: ["edition_id"]
+            isOneToOne: false
+            referencedRelation: "yearbook_editions"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "yearbook_entries_profile_id_fkey"
+            columns: ["profile_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Views: {
       [_ in never]: never
