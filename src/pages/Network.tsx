@@ -9,6 +9,7 @@ import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Users, UserCheck, UserX, ArrowLeft, MessageCircle } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { notifyFriendAccepted } from "@/lib/notifications";
 
 interface NetworkProfile {
   id: string;
@@ -64,12 +65,24 @@ const Network = () => {
 
   const handleFriendRequest = async (friendshipId: string, action: 'accept' | 'reject') => {
     try {
+      // Find the friendship to get requester info
+      const friendship = friendships.find(f => f.id === friendshipId);
+      
       const { error } = await supabase
         .from('friendships')
         .update({ status: action === 'accept' ? 'accepted' : 'rejected' })
         .eq('id', friendshipId);
 
       if (error) throw error;
+
+      // Send notification if request was accepted
+      if (action === 'accept' && friendship && profile) {
+        await notifyFriendAccepted(
+          friendship.requester_id,
+          user!.id,
+          `${profile.first_name} ${profile.last_name}`
+        );
+      }
 
       toast({
         title: action === 'accept' ? "Friend request accepted!" : "Friend request declined",

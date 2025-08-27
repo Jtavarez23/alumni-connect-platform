@@ -460,9 +460,30 @@ export type Database = {
           id: string | null
           message: string | null
           read: boolean | null
-          related_user: Json | null
+          related_user_id: string | null
           title: string | null
           type: string | null
+          user_id: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string | null
+          message?: string | null
+          read?: boolean | null
+          related_user_id?: string | null
+          title?: string | null
+          type?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          id?: string | null
+          message?: string | null
+          read?: boolean | null
+          related_user_id?: string | null
+          title?: string | null
+          type?: string | null
+          user_id?: string | null
         }
         Relationships: []
       }

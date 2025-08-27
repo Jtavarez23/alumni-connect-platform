@@ -9,6 +9,8 @@ import { Badge } from "@/components/ui/badge";
 import { Settings, GraduationCap, Users, BookOpen } from "lucide-react";
 import ProfileSetupDialog from "@/components/profile/ProfileSetupDialog";
 import ProfileEditDialog from "@/components/profile/ProfileEditDialog";
+import { ActivityFeed } from "@/components/activity/ActivityFeed";
+import { NotificationBadge } from "@/components/activity/NotificationBadge";
 
 interface School {
   id: string;
@@ -78,14 +80,17 @@ const Dashboard = () => {
               {profile?.first_name ? `Hi ${profile.first_name}` : "Complete your profile to get started"}
             </p>
           </div>
-          <Button 
-            variant="outline" 
-            onClick={() => setShowProfileEdit(true)}
-            className="gap-2"
-          >
-            <Settings className="h-4 w-4" />
-            Settings
-          </Button>
+          <div className="flex items-center gap-2">
+            <NotificationBadge />
+            <Button 
+              variant="outline" 
+              onClick={() => setShowProfileEdit(true)}
+              className="gap-2"
+            >
+              <Settings className="h-4 w-4" />
+              Settings
+            </Button>
+          </div>
         </div>
 
         {/* Profile Status Card */}
@@ -194,22 +199,7 @@ const Dashboard = () => {
         </div>
 
         {/* Recent Activity */}
-        <Card>
-          <CardHeader>
-            <CardTitle>Recent Activity</CardTitle>
-            <CardDescription>
-              Your latest interactions and updates
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <div className="text-center py-8 text-muted-foreground">
-              <p>No recent activity</p>
-              <p className="text-sm mt-1">
-                Complete your profile to start connecting with classmates
-              </p>
-            </div>
-          </CardContent>
-        </Card>
+        <ActivityFeed />
       </div>
 
       {/* Profile Setup Dialog */}
