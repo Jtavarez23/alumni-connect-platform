@@ -5,7 +5,8 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
-import { Plus, MapPin, Search } from "lucide-react";
+import { Alert, AlertDescription } from "@/components/ui/alert";
+import { Plus, MapPin, Search, AlertCircle } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import mapboxgl from 'mapbox-gl';
@@ -15,8 +16,6 @@ interface AddSchoolDialogProps {
   onSchoolAdded: (school: any) => void;
 }
 
-const MAPBOX_TOKEN = "pk.eyJ1IjoibG92YWJsZSIsImEiOiJjbTYzcGQyeDgwNGg1MnFyN3RnOWV1bXl0In0.Y4nVQm1xEJR2mRJD_6qjSA";
-
 const AddSchoolDialog = ({ onSchoolAdded }: AddSchoolDialogProps) => {
   const [open, setOpen] = useState(false);
   const [name, setName] = useState("");
@@ -24,45 +23,114 @@ const AddSchoolDialog = ({ onSchoolAdded }: AddSchoolDialogProps) => {
   const [address, setAddress] = useState("");
   const [loading, setLoading] = useState(false);
   const [coordinates, setCoordinates] = useState<[number, number] | null>(null);
+  const [mapboxToken, setMapboxToken] = useState("");
+  const [mapError, setMapError] = useState<string | null>(null);
+  const [useManualCoords, setUseManualCoords] = useState(false);
+  const [manualLat, setManualLat] = useState("");
+  const [manualLng, setManualLng] = useState("");
   const mapContainer = useRef<HTMLDivElement>(null);
   const map = useRef<mapboxgl.Map | null>(null);
   const marker = useRef<mapboxgl.Marker | null>(null);
   const { toast } = useToast();
 
+  // Get Mapbox token when dialog opens
   useEffect(() => {
-    if (open && mapContainer.current && !map.current) {
-      mapboxgl.accessToken = MAPBOX_TOKEN;
-      
-      map.current = new mapboxgl.Map({
-        container: mapContainer.current,
-        style: 'mapbox://styles/mapbox/streets-v12',
-        center: [-80.1918, 25.7617], // Miami area default
-        zoom: 10
-      });
+    if (!open) return;
 
-      map.current.addControl(new mapboxgl.NavigationControl(), 'top-right');
-
-      map.current.on('click', (e) => {
-        const { lng, lat } = e.lngLat;
-        setCoordinates([lng, lat]);
+    const getMapboxToken = async () => {
+      try {
+        const { data, error } = await supabase.functions.invoke('get-mapbox-token');
         
-        if (marker.current) {
-          marker.current.remove();
+        if (data?.token && !error) {
+          setMapboxToken(data.token);
+          setMapError(null);
+        } else {
+          const storedToken = localStorage.getItem('mapbox_token');
+          if (storedToken) {
+            setMapboxToken(storedToken);
+            setMapError(null);
+          } else {
+            setMapError('Mapbox token required. Please enter your token below or use manual coordinates.');
+          }
         }
-        
-        marker.current = new mapboxgl.Marker()
-          .setLngLat([lng, lat])
-          .addTo(map.current!);
-      });
-    }
+      } catch (err) {
+        setMapError('Failed to get Mapbox token. Please enter your token or use manual coordinates.');
+      }
+    };
+
+    getMapboxToken();
   }, [open]);
+
+  // Initialize map when token is available
+  useEffect(() => {
+    if (open && mapContainer.current && mapboxToken && !map.current && !useManualCoords) {
+      try {
+        mapboxgl.accessToken = mapboxToken;
+        
+        map.current = new mapboxgl.Map({
+          container: mapContainer.current,
+          style: 'mapbox://styles/mapbox/streets-v12',
+          center: [-80.1918, 25.7617],
+          zoom: 10
+        });
+
+        map.current.addControl(new mapboxgl.NavigationControl(), 'top-right');
+
+        map.current.on('load', () => {
+          setMapError(null);
+        });
+
+        map.current.on('error', (e) => {
+          console.error('Map error:', e);
+          setMapError('Map failed to load. Please check your token or use manual coordinates.');
+        });
+
+        map.current.on('click', (e) => {
+          const { lng, lat } = e.lngLat;
+          setCoordinates([lng, lat]);
+          
+          if (marker.current) {
+            marker.current.remove();
+          }
+          
+          marker.current = new mapboxgl.Marker()
+            .setLngLat([lng, lat])
+            .addTo(map.current!);
+        });
+      } catch (error) {
+        console.error('Error initializing map:', error);
+        setMapError('Failed to initialize map. Please use manual coordinates.');
+      }
+    }
+
+    return () => {
+      if (map.current) {
+        map.current.remove();
+        map.current = null;
+      }
+      if (marker.current) {
+        marker.current.remove();
+        marker.current = null;
+      }
+    };
+  }, [open, mapboxToken, useManualCoords]);
 
   const searchAddress = async () => {
     if (!address.trim()) return;
     
+    const token = mapboxToken || localStorage.getItem('mapbox_token');
+    if (!token) {
+      toast({
+        title: "Token required",
+        description: "Mapbox token required for address search",
+        variant: "destructive"
+      });
+      return;
+    }
+    
     try {
       const response = await fetch(
-        `https://api.mapbox.com/geocoding/v5/mapbox.places/${encodeURIComponent(address)}.json?access_token=${MAPBOX_TOKEN}&limit=1`
+        `https://api.mapbox.com/geocoding/v5/mapbox.places/${encodeURIComponent(address)}.json?access_token=${token}&limit=1`
       );
       const data = await response.json();
       
@@ -97,13 +165,57 @@ const AddSchoolDialog = ({ onSchoolAdded }: AddSchoolDialogProps) => {
     }
   };
 
+  const handleTokenSubmit = () => {
+    if (mapboxToken.trim()) {
+      localStorage.setItem('mapbox_token', mapboxToken);
+      setMapError(null);
+      toast({
+        title: "Token saved",
+        description: "Map will reload with your token"
+      });
+    }
+  };
+
+  const handleManualCoords = () => {
+    const lat = parseFloat(manualLat);
+    const lng = parseFloat(manualLng);
+    
+    if (isNaN(lat) || isNaN(lng)) {
+      toast({
+        title: "Invalid coordinates",
+        description: "Please enter valid numbers",
+        variant: "destructive"
+      });
+      return;
+    }
+    
+    if (lat < -90 || lat > 90 || lng < -180 || lng > 180) {
+      toast({
+        title: "Coordinates out of range",
+        description: "Latitude must be -90 to 90, longitude -180 to 180",
+        variant: "destructive"
+      });
+      return;
+    }
+    
+    setCoordinates([lng, lat]);
+    toast({
+      title: "Coordinates set",
+      description: "Location has been set successfully"
+    });
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    if (!name.trim() || !type || !coordinates) {
+    const finalCoordinates = useManualCoords && manualLat && manualLng 
+      ? [parseFloat(manualLng), parseFloat(manualLat)] as [number, number]
+      : coordinates;
+    
+    if (!name.trim() || !type || !finalCoordinates) {
       toast({
         title: "Missing information",
-        description: "Please fill in all fields and select a location on the map",
+        description: "Please fill in all fields and select a location",
         variant: "destructive"
       });
       return;
@@ -119,7 +231,7 @@ const AddSchoolDialog = ({ onSchoolAdded }: AddSchoolDialogProps) => {
           type,
           slug: name.toLowerCase().replace(/[^a-z0-9]+/g, '-'),
           location: {
-            coordinates,
+            coordinates: finalCoordinates,
             address: address.trim() || null,
             city: null,
             state: null,
@@ -146,6 +258,9 @@ const AddSchoolDialog = ({ onSchoolAdded }: AddSchoolDialogProps) => {
       setType("");
       setAddress("");
       setCoordinates(null);
+      setManualLat("");
+      setManualLng("");
+      setUseManualCoords(false);
       
       if (marker.current) {
         marker.current.remove();
@@ -210,28 +325,95 @@ const AddSchoolDialog = ({ onSchoolAdded }: AddSchoolDialogProps) => {
                 onChange={(e) => setAddress(e.target.value)}
                 placeholder="Enter school address"
               />
-              <Button type="button" onClick={searchAddress} variant="outline" size="icon">
+              <Button 
+                type="button" 
+                onClick={searchAddress} 
+                variant="outline" 
+                size="icon"
+                disabled={!mapboxToken && !localStorage.getItem('mapbox_token')}
+              >
                 <Search className="h-4 w-4" />
               </Button>
             </div>
           </div>
 
-          <div>
-            <Label>Location on Map *</Label>
-            <p className="text-sm text-muted-foreground mb-2">
-              Click on the map to pin your school's location
-            </p>
-            <div 
-              ref={mapContainer} 
-              className="w-full h-64 rounded-lg border"
-            />
-            {coordinates && (
-              <div className="flex items-center mt-2 text-sm text-muted-foreground">
-                <MapPin className="h-3 w-3 mr-1" />
-                {coordinates[1].toFixed(6)}, {coordinates[0].toFixed(6)}
+          {mapError && (
+            <Alert>
+              <AlertCircle className="h-4 w-4" />
+              <AlertDescription>
+                {mapError}
+                <div className="mt-2 space-y-2">
+                  <div className="flex gap-2">
+                    <Input
+                      placeholder="Enter your Mapbox public token"
+                      value={mapboxToken}
+                      onChange={(e) => setMapboxToken(e.target.value)}
+                    />
+                    <Button type="button" onClick={handleTokenSubmit} size="sm">
+                      Save Token
+                    </Button>
+                  </div>
+                  <p className="text-xs text-muted-foreground">
+                    Get your free token at <a href="https://mapbox.com/" target="_blank" rel="noopener noreferrer" className="underline">mapbox.com</a>
+                  </p>
+                  <Button 
+                    type="button" 
+                    variant="outline" 
+                    size="sm" 
+                    onClick={() => setUseManualCoords(!useManualCoords)}
+                  >
+                    {useManualCoords ? 'Use Map' : 'Enter Coordinates Manually'}
+                  </Button>
+                </div>
+              </AlertDescription>
+            </Alert>
+          )}
+
+          {useManualCoords ? (
+            <div className="space-y-2">
+              <Label>Manual Coordinates *</Label>
+              <div className="grid grid-cols-2 gap-2">
+                <Input
+                  placeholder="Latitude"
+                  value={manualLat}
+                  onChange={(e) => setManualLat(e.target.value)}
+                  type="number"
+                  step="any"
+                />
+                <Input
+                  placeholder="Longitude"
+                  value={manualLng}
+                  onChange={(e) => setManualLng(e.target.value)}
+                  type="number"
+                  step="any"
+                />
               </div>
-            )}
-          </div>
+              <Button type="button" onClick={handleManualCoords} size="sm">
+                Set Coordinates
+              </Button>
+            </div>
+          ) : (
+            <div>
+              <Label>Location on Map *</Label>
+              <p className="text-sm text-muted-foreground mb-2">
+                Click on the map to pin your school's location
+              </p>
+              <div 
+                ref={mapContainer} 
+                className="w-full h-64 rounded-lg border"
+              />
+            </div>
+          )}
+
+          {(coordinates || (useManualCoords && manualLat && manualLng)) && (
+            <div className="flex items-center mt-2 text-sm text-muted-foreground">
+              <MapPin className="h-3 w-3 mr-1" />
+              {useManualCoords 
+                ? `${manualLat}, ${manualLng}` 
+                : `${coordinates![1].toFixed(6)}, ${coordinates![0].toFixed(6)}`
+              }
+            </div>
+          )}
 
           <div className="flex items-center space-x-2 p-3 bg-muted rounded-lg">
             <Badge variant="secondary">Pending Review</Badge>
@@ -244,7 +426,10 @@ const AddSchoolDialog = ({ onSchoolAdded }: AddSchoolDialogProps) => {
             <Button type="button" variant="outline" onClick={() => setOpen(false)}>
               Cancel
             </Button>
-            <Button type="submit" disabled={loading}>
+            <Button 
+              type="submit" 
+              disabled={loading || (!coordinates && !(useManualCoords && manualLat && manualLng))}
+            >
               {loading ? "Submitting..." : "Submit School"}
             </Button>
           </div>
