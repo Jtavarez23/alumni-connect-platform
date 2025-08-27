@@ -1,4 +1,5 @@
 import { Button } from "./ui/button";
+import { Link } from "react-router-dom";
 import heroYearbook from "@/assets/hero-yearbook.jpg";
 
 const HeroSection = () => {
@@ -17,16 +18,21 @@ const HeroSection = () => {
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start">
               <Button 
+                asChild
                 size="lg" 
                 className="text-lg px-8 py-6 hover-scale"
                 style={{ boxShadow: "var(--shadow-soft)" }}
               >
-                Find My Yearbook
+                <Link to="/signup">Find My Yearbook</Link>
               </Button>
               <Button 
                 variant="outline" 
                 size="lg" 
                 className="text-lg px-8 py-6 hover-scale border-primary text-primary hover:bg-primary hover:text-primary-foreground"
+                onClick={() => {
+                  const howItWorks = document.getElementById('how-it-works');
+                  howItWorks?.scrollIntoView({ behavior: 'smooth' });
+                }}
               >
                 See How It Works
               </Button>

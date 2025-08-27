@@ -1,9 +1,12 @@
 import { useState } from "react";
+import { Link } from "react-router-dom";
 import { Button } from "./button";
 import { Menu, X } from "lucide-react";
+import { useAuth } from "@/contexts/AuthContext";
 
 const Navigation = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const { user, signOut } = useAuth();
 
   const menuItems = ["Features", "Pricing", "Schools", "About"];
 
@@ -34,8 +37,25 @@ const Navigation = () => {
 
           {/* Desktop CTA Buttons */}
           <div className="hidden md:flex items-center space-x-4">
-            <Button variant="ghost">Log In</Button>
-            <Button>Sign Up</Button>
+            {user ? (
+              <>
+                <span className="text-sm text-muted-foreground">
+                  Welcome, {user.email}
+                </span>
+                <Button variant="ghost" onClick={signOut}>
+                  Sign Out
+                </Button>
+              </>
+            ) : (
+              <>
+                <Button variant="ghost" asChild>
+                  <Link to="/login">Log In</Link>
+                </Button>
+                <Button asChild>
+                  <Link to="/signup">Sign Up</Link>
+                </Button>
+              </>
+            )}
           </div>
 
           {/* Mobile Menu Button */}
@@ -64,8 +84,25 @@ const Navigation = () => {
                 </a>
               ))}
               <div className="flex flex-col space-y-2 px-4 pt-4 border-t">
-                <Button variant="ghost" className="justify-start">Log In</Button>
-                <Button className="justify-start">Sign Up</Button>
+                {user ? (
+                  <>
+                    <span className="text-sm text-muted-foreground px-4 py-2">
+                      Welcome, {user.email}
+                    </span>
+                    <Button variant="ghost" className="justify-start" onClick={signOut}>
+                      Sign Out
+                    </Button>
+                  </>
+                ) : (
+                  <>
+                    <Button variant="ghost" className="justify-start" asChild>
+                      <Link to="/login">Log In</Link>
+                    </Button>
+                    <Button className="justify-start" asChild>
+                      <Link to="/signup">Sign Up</Link>
+                    </Button>
+                  </>
+                )}
               </div>
             </div>
           </div>
