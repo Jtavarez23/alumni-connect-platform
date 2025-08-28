@@ -290,26 +290,26 @@ const Alumni = () => {
             </p>
           </div>
         ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 md:gap-6">
             {filteredAlumni.map((person) => {
               const friendshipStatus = getFriendshipStatus(person.id);
               
               return (
                 <Card key={person.id} className="hover:shadow-md transition-shadow">
-                  <CardContent className="p-6">
-                    <div className="flex items-center gap-4 mb-4">
-                      <Avatar className="h-16 w-16">
+                  <CardContent className="p-4 sm:p-6">
+                    <div className="flex flex-col sm:flex-row items-center sm:items-start gap-3 sm:gap-4 mb-4">
+                      <Avatar className="h-12 w-12 sm:h-16 sm:w-16 flex-shrink-0">
                         <AvatarImage src={person.avatar_url} />
-                        <AvatarFallback className="text-lg">
+                        <AvatarFallback className="text-sm sm:text-lg">
                           {getInitials(person.first_name, person.last_name)}
                         </AvatarFallback>
                       </Avatar>
-                      <div className="flex-1 min-w-0">
-                        <h3 className="font-semibold text-lg truncate">
+                      <div className="flex-1 min-w-0 text-center sm:text-left">
+                        <h3 className="font-semibold text-base sm:text-lg truncate">
                           {person.first_name} {person.last_name}
                         </h3>
-                        <div className="flex items-center gap-1 text-sm text-muted-foreground">
-                          <Badge variant={person.verification_status === 'verified' ? 'default' : 'secondary'}>
+                        <div className="flex items-center justify-center sm:justify-start gap-1 text-sm text-muted-foreground mt-1">
+                          <Badge variant={person.verification_status === 'verified' ? 'default' : 'secondary'} className="text-xs">
                             {person.verification_status === 'verified' && <Shield className="h-3 w-3 mr-1" />}
                             {person.verification_status}
                           </Badge>
@@ -321,29 +321,29 @@ const Alumni = () => {
                         {/* Show school history or current school */}
                         {person.school_history && person.school_history.length > 0 ? (
                           <div className="space-y-1">
-                            {person.school_history.slice(0, 2).map((sh, idx) => (
-                              <div key={idx} className="flex items-center gap-2 text-sm text-muted-foreground">
-                                <GraduationCap className="h-4 w-4" />
+                            {person.school_history.slice(0, 1).map((sh, idx) => (
+                              <div key={idx} className="flex items-center gap-2 text-xs sm:text-sm text-muted-foreground">
+                                <GraduationCap className="h-3 w-3 sm:h-4 sm:w-4 flex-shrink-0" />
                                 <span className="truncate">
                                   {sh.school?.name} ({sh.start_year}-{sh.end_year || 'present'})
                                 </span>
                               </div>
                             ))}
-                            {person.school_history.length > 2 && (
-                              <div className="text-xs text-muted-foreground">
-                                +{person.school_history.length - 2} more schools
+                            {person.school_history.length > 1 && (
+                              <div className="text-xs text-muted-foreground text-center sm:text-left">
+                                +{person.school_history.length - 1} more schools
                               </div>
                             )}
                           </div>
                         ) : person.schools && (
-                          <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                            <GraduationCap className="h-4 w-4" />
+                          <div className="flex items-center gap-2 text-xs sm:text-sm text-muted-foreground justify-center sm:justify-start">
+                            <GraduationCap className="h-3 w-3 sm:h-4 sm:w-4 flex-shrink-0" />
                             <span className="truncate">{person.schools.name}</span>
                           </div>
                         )}
                       {person.graduation_year && (
-                        <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                          <Calendar className="h-4 w-4" />
+                        <div className="flex items-center gap-2 text-xs sm:text-sm text-muted-foreground justify-center sm:justify-start">
+                          <Calendar className="h-3 w-3 sm:h-4 sm:w-4 flex-shrink-0" />
                           <span>Class of {person.graduation_year}</span>
                         </div>
                       )}
@@ -356,20 +356,20 @@ const Alumni = () => {
                           className="flex-1"
                           size="sm"
                         >
-                          <UserPlus className="h-4 w-4 mr-2" />
-                          Send Request
+                          <UserPlus className="h-3 w-3 sm:h-4 sm:w-4 mr-1 sm:mr-2" />
+                          <span className="text-xs sm:text-sm">Send Request</span>
                         </Button>
                       )}
                       {friendshipStatus === 'sent' && (
                         <Button variant="outline" disabled className="flex-1" size="sm">
-                          <Clock className="h-4 w-4 mr-2" />
-                          Request Sent
+                          <Clock className="h-3 w-3 sm:h-4 sm:w-4 mr-1 sm:mr-2" />
+                          <span className="text-xs sm:text-sm">Request Sent</span>
                         </Button>
                       )}
                       {friendshipStatus === 'connected' && (
                         <Button variant="outline" className="flex-1" size="sm">
-                          <Check className="h-4 w-4 mr-2" />
-                          Connected
+                          <Check className="h-3 w-3 sm:h-4 sm:w-4 mr-1 sm:mr-2" />
+                          <span className="text-xs sm:text-sm">Connected</span>
                         </Button>
                       )}
                     </div>

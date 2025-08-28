@@ -7,6 +7,7 @@ import { Toaster as HotToaster } from "react-hot-toast";
 import { AuthProvider } from "@/contexts/AuthContext";
 import { GamificationProvider } from "@/components/gamification/GamificationProvider";
 import { RealtimeProvider } from "@/components/realtime/RealtimeProvider";
+import ErrorBoundary from "@/components/ErrorBoundary";
 import Index from "./pages/Index";
 import Login from "./pages/Login";
 import Signup from "./pages/Signup";
@@ -26,11 +27,12 @@ import ProtectedRoute from "./components/ProtectedRoute";
 const queryClient = new QueryClient();
 
 const App = () => (
-  <QueryClientProvider client={queryClient}>
-    <AuthProvider>
-      <GamificationProvider>
-        <RealtimeProvider>
-          <TooltipProvider>
+  <ErrorBoundary>
+    <QueryClientProvider client={queryClient}>
+      <AuthProvider>
+        <GamificationProvider>
+          <RealtimeProvider>
+            <TooltipProvider>
           <Toaster />
           <Sonner />
           <HotToaster position="top-center" />
@@ -89,11 +91,12 @@ const App = () => (
               <Route path="*" element={<NotFound />} />
             </Routes>
           </BrowserRouter>
-        </TooltipProvider>
-        </RealtimeProvider>
-      </GamificationProvider>
-    </AuthProvider>
-  </QueryClientProvider>
+            </TooltipProvider>
+          </RealtimeProvider>
+        </GamificationProvider>
+      </AuthProvider>
+    </QueryClientProvider>
+  </ErrorBoundary>
 );
 
 export default App;
