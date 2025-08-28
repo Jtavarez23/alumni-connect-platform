@@ -92,6 +92,175 @@ export type Database = {
         }
         Relationships: []
       }
+      channel_members: {
+        Row: {
+          channel_id: string | null
+          id: string
+          joined_at: string | null
+          last_read_at: string | null
+          notifications_enabled: boolean | null
+          role: string | null
+          user_id: string | null
+        }
+        Insert: {
+          channel_id?: string | null
+          id?: string
+          joined_at?: string | null
+          last_read_at?: string | null
+          notifications_enabled?: boolean | null
+          role?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          channel_id?: string | null
+          id?: string
+          joined_at?: string | null
+          last_read_at?: string | null
+          notifications_enabled?: boolean | null
+          role?: string | null
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "channel_members_channel_id_fkey"
+            columns: ["channel_id"]
+            isOneToOne: false
+            referencedRelation: "class_channels"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "channel_members_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      channel_messages: {
+        Row: {
+          channel_id: string | null
+          content: string
+          created_at: string | null
+          edited_at: string | null
+          id: string
+          message_type: string | null
+          reactions: Json | null
+          reply_to_id: string | null
+          sender_id: string | null
+          thread_count: number | null
+          updated_at: string | null
+        }
+        Insert: {
+          channel_id?: string | null
+          content: string
+          created_at?: string | null
+          edited_at?: string | null
+          id?: string
+          message_type?: string | null
+          reactions?: Json | null
+          reply_to_id?: string | null
+          sender_id?: string | null
+          thread_count?: number | null
+          updated_at?: string | null
+        }
+        Update: {
+          channel_id?: string | null
+          content?: string
+          created_at?: string | null
+          edited_at?: string | null
+          id?: string
+          message_type?: string | null
+          reactions?: Json | null
+          reply_to_id?: string | null
+          sender_id?: string | null
+          thread_count?: number | null
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "channel_messages_channel_id_fkey"
+            columns: ["channel_id"]
+            isOneToOne: false
+            referencedRelation: "class_channels"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "channel_messages_reply_to_id_fkey"
+            columns: ["reply_to_id"]
+            isOneToOne: false
+            referencedRelation: "channel_messages"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "channel_messages_sender_id_fkey"
+            columns: ["sender_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      class_channels: {
+        Row: {
+          channel_type: string | null
+          created_at: string | null
+          created_by: string | null
+          description: string | null
+          graduation_year: number
+          id: string
+          is_private: boolean | null
+          last_message_at: string | null
+          member_count: number | null
+          name: string
+          school_id: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          channel_type?: string | null
+          created_at?: string | null
+          created_by?: string | null
+          description?: string | null
+          graduation_year: number
+          id?: string
+          is_private?: boolean | null
+          last_message_at?: string | null
+          member_count?: number | null
+          name: string
+          school_id?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          channel_type?: string | null
+          created_at?: string | null
+          created_by?: string | null
+          description?: string | null
+          graduation_year?: number
+          id?: string
+          is_private?: boolean | null
+          last_message_at?: string | null
+          member_count?: number | null
+          name?: string
+          school_id?: string | null
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "class_channels_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "class_channels_school_id_fkey"
+            columns: ["school_id"]
+            isOneToOne: false
+            referencedRelation: "schools"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       conversations: {
         Row: {
           created_at: string
