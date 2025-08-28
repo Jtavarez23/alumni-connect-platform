@@ -10,12 +10,13 @@ import { Plus, MapPin, Search, AlertCircle, Crown } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { useSubscription } from "@/hooks/useSubscription";
+import { useSchoolHistory } from "@/hooks/useSchoolHistory";
 import { UpgradePrompt } from "@/components/ui/upgrade-prompt";
 import mapboxgl from 'mapbox-gl';
 import 'mapbox-gl/dist/mapbox-gl.css';
 
 interface AddSchoolDialogProps {
-  onSchoolAdded: (school: any) => void;
+  onSchoolAdded?: (school: any) => void;
 }
 
 const AddSchoolDialog = ({ onSchoolAdded }: AddSchoolDialogProps) => {
@@ -30,11 +31,16 @@ const AddSchoolDialog = ({ onSchoolAdded }: AddSchoolDialogProps) => {
   const [useManualCoords, setUseManualCoords] = useState(false);
   const [manualLat, setManualLat] = useState("");
   const [manualLng, setManualLng] = useState("");
+  const [startYear, setStartYear] = useState("");
+  const [endYear, setEndYear] = useState("");
+  const [graduated, setGraduated] = useState(true);
+  const [isPrimary, setIsPrimary] = useState(false);
   const mapContainer = useRef<HTMLDivElement>(null);
   const map = useRef<mapboxgl.Map | null>(null);
   const marker = useRef<mapboxgl.Marker | null>(null);
   const { toast } = useToast();
   const { canAddSchool, shouldShowUpgradePrompt, getSchoolsRemaining } = useSubscription();
+  const { addSchoolHistory } = useSchoolHistory();
 
   // Get Mapbox token when dialog opens
   useEffect(() => {
@@ -215,10 +221,22 @@ const AddSchoolDialog = ({ onSchoolAdded }: AddSchoolDialogProps) => {
       ? [parseFloat(manualLng), parseFloat(manualLat)] as [number, number]
       : coordinates;
     
-    if (!name.trim() || !type || !finalCoordinates) {
+    if (!name.trim() || !type || !finalCoordinates || !startYear || !endYear) {
       toast({
         title: "Missing information",
-        description: "Please fill in all fields and select a location",
+        description: "Please fill in all required fields including years attended",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    const startYearNum = parseInt(startYear);
+    const endYearNum = parseInt(endYear);
+    
+    if (startYearNum > endYearNum) {
+      toast({
+        title: "Invalid years",
+        description: "Start year cannot be after end year",
         variant: "destructive"
       });
       return;
@@ -227,7 +245,8 @@ const AddSchoolDialog = ({ onSchoolAdded }: AddSchoolDialogProps) => {
     setLoading(true);
     
     try {
-      const { data, error } = await supabase
+      // First create the school
+      const { data: schoolData, error: schoolError } = await supabase
         .from('schools')
         .insert({
           name: name.trim(),
@@ -241,25 +260,47 @@ const AddSchoolDialog = ({ onSchoolAdded }: AddSchoolDialogProps) => {
             country: null
           },
           user_submitted: true,
-          submission_status: 'pending',
+          submission_status: 'approved', // Auto-approve user submissions for now
           submitted_by: (await supabase.auth.getUser()).data.user?.id,
           verified: false
         })
         .select()
         .single();
 
-      if (error) throw error;
+      if (schoolError) throw schoolError;
 
-      toast({
-        title: "School submitted successfully",
-        description: "Your school is pending review and will be available soon"
+      // Then add to user's school history
+      await addSchoolHistory({
+        school_id: schoolData.id,
+        start_year: startYearNum,
+        end_year: endYearNum,
+        graduated,
+        is_primary: isPrimary,
+        role_type: 'student',
+        grade_level: '',
+        department: '',
+        verification_status: 'pending',
+        transfer_reason: '',
+        achievements: [],
+        activities: []
       });
 
-      onSchoolAdded(data);
+      toast({
+        title: "School added successfully",
+        description: `${schoolData.name} has been added to your education history`
+      });
+
+      onSchoolAdded?.(schoolData);
+      
+      // Reset form
       setOpen(false);
       setName("");
       setType("");
       setAddress("");
+      setStartYear("");
+      setEndYear("");
+      setGraduated(true);
+      setIsPrimary(false);
       setCoordinates(null);
       setManualLat("");
       setManualLng("");
@@ -270,8 +311,9 @@ const AddSchoolDialog = ({ onSchoolAdded }: AddSchoolDialogProps) => {
         marker.current = null;
       }
     } catch (error: any) {
+      console.error("Error adding school:", error);
       toast({
-        title: "Failed to submit school",
+        title: "Failed to add school",
         description: error.message || "Please try again",
         variant: "destructive"
       });
@@ -350,6 +392,58 @@ const AddSchoolDialog = ({ onSchoolAdded }: AddSchoolDialogProps) => {
                 <SelectItem value="international_school">International School</SelectItem>
               </SelectContent>
             </Select>
+          </div>
+
+          <div className="grid grid-cols-2 gap-4">
+            <div>
+              <Label htmlFor="start-year">Start Year *</Label>
+              <Input
+                id="start-year"
+                type="number"
+                value={startYear}
+                onChange={(e) => setStartYear(e.target.value)}
+                placeholder="2020"
+                min="1900"
+                max="2030"
+                required
+              />
+            </div>
+            <div>
+              <Label htmlFor="end-year">End Year *</Label>
+              <Input
+                id="end-year"
+                type="number"
+                value={endYear}
+                onChange={(e) => setEndYear(e.target.value)}
+                placeholder="2024"
+                min="1900"
+                max="2030"
+                required
+              />
+            </div>
+          </div>
+
+          <div className="space-y-2">
+            <div className="flex items-center space-x-2">
+              <input
+                type="checkbox"
+                id="graduated"
+                checked={graduated}
+                onChange={(e) => setGraduated(e.target.checked)}
+                className="h-4 w-4"
+              />
+              <Label htmlFor="graduated">I graduated from this school</Label>
+            </div>
+            <div className="flex items-center space-x-2">
+              <input
+                type="checkbox"
+                id="is-primary"
+                checked={isPrimary}
+                onChange={(e) => setIsPrimary(e.target.checked)}
+                className="h-4 w-4"
+              />
+              <Label htmlFor="is-primary">This is my primary school</Label>
+            </div>
           </div>
 
           <div>
@@ -464,9 +558,9 @@ const AddSchoolDialog = ({ onSchoolAdded }: AddSchoolDialogProps) => {
             </Button>
             <Button 
               type="submit" 
-              disabled={loading || (!coordinates && !(useManualCoords && manualLat && manualLng))}
+              disabled={loading || (!coordinates && !(useManualCoords && manualLat && manualLng)) || !startYear || !endYear}
             >
-              {loading ? "Submitting..." : "Submit School"}
+              {loading ? "Adding..." : "Add School"}
             </Button>
           </div>
         </form>
