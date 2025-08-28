@@ -14,6 +14,84 @@ export type Database = {
   }
   public: {
     Tables: {
+      achievement_progress: {
+        Row: {
+          achievement_key: string
+          completed: boolean | null
+          completed_at: string | null
+          created_at: string | null
+          current_value: number | null
+          id: string
+          target_value: number
+          updated_at: string | null
+          user_id: string
+        }
+        Insert: {
+          achievement_key: string
+          completed?: boolean | null
+          completed_at?: string | null
+          created_at?: string | null
+          current_value?: number | null
+          id?: string
+          target_value: number
+          updated_at?: string | null
+          user_id: string
+        }
+        Update: {
+          achievement_key?: string
+          completed?: boolean | null
+          completed_at?: string | null
+          created_at?: string | null
+          current_value?: number | null
+          id?: string
+          target_value?: number
+          updated_at?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
+      badge_types: {
+        Row: {
+          category: string
+          color: string
+          created_at: string | null
+          description: string
+          icon: string
+          id: string
+          name: string
+          rarity: string
+          requirement_type: string
+          requirement_value: number | null
+          title: string
+        }
+        Insert: {
+          category: string
+          color?: string
+          created_at?: string | null
+          description: string
+          icon: string
+          id?: string
+          name: string
+          rarity?: string
+          requirement_type: string
+          requirement_value?: number | null
+          title: string
+        }
+        Update: {
+          category?: string
+          color?: string
+          created_at?: string | null
+          description?: string
+          icon?: string
+          id?: string
+          name?: string
+          rarity?: string
+          requirement_type?: string
+          requirement_value?: number | null
+          title?: string
+        }
+        Relationships: []
+      }
       conversations: {
         Row: {
           created_at: string
@@ -515,6 +593,89 @@ export type Database = {
           },
         ]
       }
+      user_badges: {
+        Row: {
+          badge_type_id: string
+          earned_at: string | null
+          id: string
+          progress_data: Json | null
+          user_id: string
+        }
+        Insert: {
+          badge_type_id: string
+          earned_at?: string | null
+          id?: string
+          progress_data?: Json | null
+          user_id: string
+        }
+        Update: {
+          badge_type_id?: string
+          earned_at?: string | null
+          id?: string
+          progress_data?: Json | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "user_badges_badge_type_id_fkey"
+            columns: ["badge_type_id"]
+            isOneToOne: false
+            referencedRelation: "badge_types"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      user_stats: {
+        Row: {
+          created_at: string | null
+          current_streak: number | null
+          id: string
+          last_activity_date: string | null
+          level: number | null
+          longest_streak: number | null
+          points: number | null
+          total_connections: number | null
+          total_messages: number | null
+          total_reactions: number | null
+          total_tags: number | null
+          total_yearbooks_viewed: number | null
+          updated_at: string | null
+          user_id: string
+        }
+        Insert: {
+          created_at?: string | null
+          current_streak?: number | null
+          id?: string
+          last_activity_date?: string | null
+          level?: number | null
+          longest_streak?: number | null
+          points?: number | null
+          total_connections?: number | null
+          total_messages?: number | null
+          total_reactions?: number | null
+          total_tags?: number | null
+          total_yearbooks_viewed?: number | null
+          updated_at?: string | null
+          user_id: string
+        }
+        Update: {
+          created_at?: string | null
+          current_streak?: number | null
+          id?: string
+          last_activity_date?: string | null
+          level?: number | null
+          longest_streak?: number | null
+          points?: number | null
+          total_connections?: number | null
+          total_messages?: number | null
+          total_reactions?: number | null
+          total_tags?: number | null
+          total_yearbooks_viewed?: number | null
+          updated_at?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
       yearbook_editions: {
         Row: {
           cover_image_url: string | null
@@ -650,7 +811,14 @@ export type Database = {
       }
     }
     Functions: {
-      [_ in never]: never
+      calculate_user_level: {
+        Args: { points: number }
+        Returns: number
+      }
+      update_user_stats_points: {
+        Args: { points_to_add: number; user_id: string }
+        Returns: undefined
+      }
     }
     Enums: {
       [_ in never]: never
