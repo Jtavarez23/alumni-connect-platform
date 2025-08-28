@@ -44,13 +44,13 @@ export const CreateThenVsNowDialog = ({ open, onOpenChange, onPostCreated }: Cre
 
   const uploadPhoto = async (file: File, filename: string) => {
     const { data, error } = await supabase.storage
-      .from('profile-pictures')
-      .upload(`then-vs-now/${filename}`, file);
+      .from('then-vs-now')
+      .upload(`${user!.id}/${filename}`, file);
 
     if (error) throw error;
 
     const { data: { publicUrl } } = supabase.storage
-      .from('profile-pictures')
+      .from('then-vs-now')
       .getPublicUrl(data.path);
 
     return publicUrl;

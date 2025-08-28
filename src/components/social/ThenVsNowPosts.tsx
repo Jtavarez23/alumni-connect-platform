@@ -18,12 +18,14 @@ interface ThenVsNowPost {
   caption?: string;
   visibility: string;
   created_at: string;
+  updated_at: string;
+  yearbook_entry_id?: string;
   profiles?: {
     first_name: string;
     last_name: string;
     avatar_url?: string;
     username?: string;
-  };
+  } | null;
 }
 
 export const ThenVsNowPosts = () => {
@@ -39,12 +41,36 @@ export const ThenVsNowPosts = () => {
 
   const fetchPosts = async () => {
     try {
-      // For now, show demo message since then_vs_now_posts table doesn't exist yet
-      const data = [];
-      const error = null;
+      const { data, error } = await supabase
+        .from('then_vs_now_posts')
+        .select(`
+          *,
+          profiles (
+            first_name,
+            last_name,
+            avatar_url,
+            username
+          )
+        `)
+        .order('created_at', { ascending: false });
 
       if (error) throw error;
-      setPosts(data || []);
+      
+      // Map the data to handle potential type issues
+      const mappedData: ThenVsNowPost[] = (data || []).map(post => ({
+        id: post.id,
+        user_id: post.user_id,
+        then_photo_url: post.then_photo_url,
+        now_photo_url: post.now_photo_url,
+        caption: post.caption,
+        visibility: post.visibility,
+        created_at: post.created_at,
+        updated_at: post.updated_at,
+        yearbook_entry_id: post.yearbook_entry_id,
+        profiles: Array.isArray(post.profiles) ? post.profiles[0] : post.profiles
+      }));
+      
+      setPosts(mappedData);
     } catch (error) {
       console.error('Error fetching then vs now posts:', error);
       toast({
