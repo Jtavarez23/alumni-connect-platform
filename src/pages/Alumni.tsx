@@ -11,9 +11,10 @@ import { AppLayout } from "@/components/layout/AppLayout";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
 import { useSchoolHistory } from "@/hooks/useSchoolHistory";
-import { useMultiSchoolAccess } from "@/hooks/useMultiSchoolAccess";
+import { useSubscription } from "@/hooks/useSubscription";
+import { UpgradePrompt } from "@/components/ui/upgrade-prompt";
 import SchoolSwitcher from "@/components/dashboard/SchoolSwitcher";
-import { ArrowLeft, Search, MapPin, Calendar, GraduationCap, Check, Clock, UserPlus, Shield, Users } from "lucide-react";
+import { ArrowLeft, Search, MapPin, Calendar, GraduationCap, Check, Clock, UserPlus, Shield, Users, Crown } from "lucide-react";
 
 interface Profile {
   id: string;
@@ -62,7 +63,7 @@ const Alumni = () => {
   const { user, profile } = useAuth();
   const navigate = useNavigate();
   const { schoolHistory } = useSchoolHistory();
-  const { accessibleSchools } = useMultiSchoolAccess();
+  const { isFreeTier, isPremium, canNetworkWithUser, getNetworkableSchools, getYearRangeForNetworking } = useSubscription();
   const [alumni, setAlumni] = useState<Profile[]>([]);
   const [friendships, setFriendships] = useState<Friendship[]>([]);
   const [schools, setSchools] = useState<School[]>([]);
@@ -70,13 +71,13 @@ const Alumni = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedSchoolId, setSelectedSchoolId] = useState<string>("all");
   const [selectedYear, setSelectedYear] = useState<string>("all");
-  const [contextSchool, setContextSchool] = useState<any>(null);
+  const [restrictedUsersCount, setRestrictedUsersCount] = useState(0);
 
   useEffect(() => {
     if (user && schoolHistory.length > 0) {
       loadData();
     }
-  }, [user, schoolHistory, contextSchool]);
+  }, [user, schoolHistory]);
 
   const loadData = async () => {
     await Promise.all([fetchAlumni(), fetchFriendships(), fetchSchools()]);
@@ -85,9 +86,15 @@ const Alumni = () => {
 
   const fetchAlumni = async () => {
     try {
-      // Get user's accessible school IDs
-      const accessibleSchoolIds = accessibleSchools.map(s => s.id);
+      // Get user's networkable school IDs based on subscription
+      const networkableSchools = getNetworkableSchools();
+      const networkableSchoolIds = networkableSchools.map(s => s.school_id);
       
+      if (networkableSchoolIds.length === 0) {
+        setAlumni([]);
+        return;
+      }
+
       const { data, error } = await supabase
         .from('profiles')
         .select(`
@@ -105,24 +112,31 @@ const Alumni = () => {
 
       if (error) throw error;
       
-      // Filter alumni based on accessible schools or context
+      // Filter alumni based on subscription restrictions
       let filteredAlumni = data || [];
+      let restrictedCount = 0;
       
-      if (contextSchool) {
-        // Show only alumni from the selected school context
-        filteredAlumni = filteredAlumni.filter(alumnus => 
-          alumnus.school_id === contextSchool.id ||
-          alumnus.school_history?.some((sh: any) => sh.school_id === contextSchool.id)
-        );
-      } else if (accessibleSchoolIds.length > 0) {
-        // Show alumni from accessible schools
-        filteredAlumni = filteredAlumni.filter(alumnus =>
-          accessibleSchoolIds.includes(alumnus.school_id!) ||
-          alumnus.school_history?.some((sh: any) => accessibleSchoolIds.includes(sh.school_id))
-        );
-      }
+      // Filter based on networkable schools
+      filteredAlumni = filteredAlumni.filter(alumnus => {
+        const hasAccessibleSchool = networkableSchoolIds.includes(alumnus.school_id!) ||
+          alumnus.school_history?.some((sh: any) => networkableSchoolIds.includes(sh.school_id));
+        
+        if (!hasAccessibleSchool) return false;
+
+        // For free users, apply additional networking restrictions
+        if (isFreeTier) {
+          const canNetwork = canNetworkWithUser(alumnus);
+          if (!canNetwork) {
+            restrictedCount++;
+            return false;
+          }
+        }
+
+        return true;
+      });
       
       setAlumni(filteredAlumni);
+      setRestrictedUsersCount(restrictedCount);
     } catch (error) {
       console.error('Error fetching alumni:', error);
     }
@@ -144,15 +158,16 @@ const Alumni = () => {
 
   const fetchSchools = async () => {
     try {
-      // Use accessible schools instead of all schools
-      setSchools(accessibleSchools.map(s => ({
-        id: s.id,
-        name: s.name,
-        type: s.type,
-        location: s.location
+      // Use networkable schools based on subscription
+      const networkableSchools = getNetworkableSchools();
+      setSchools(networkableSchools.map(sh => ({
+        id: sh.school_id,
+        name: sh.school?.name || 'Unknown School',
+        type: sh.school?.type || 'Unknown',
+        location: sh.school?.location || {}
       })));
     } catch (error) {
-      console.error('Error fetching schools:', error);
+      console.error('Error setting schools:', error);
     }
   };
 
@@ -205,6 +220,8 @@ const Alumni = () => {
     new Set(alumni.map(a => a.graduation_year).filter(Boolean))
   ).sort((a, b) => b! - a!);
 
+  const yearRange = getYearRangeForNetworking();
+
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
@@ -227,13 +244,29 @@ const Alumni = () => {
   return (
     <AppLayout title="Alumni Directory">
       <div className="p-6">
-        {/* School Context Switcher */}
-        <div className="mb-6">
-          <SchoolSwitcher 
-            selectedSchool={contextSchool}
-            onSchoolSelect={setContextSchool}
-          />
-        </div>
+        {/* Subscription Status Banner */}
+        {isFreeTier && (
+          <Card className="mb-6 border-warning bg-warning/5">
+            <CardContent className="p-4">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-3">
+                  <div className="p-2 bg-warning/10 rounded-full">
+                    <Crown className="h-5 w-5 text-warning" />
+                  </div>
+                  <div>
+                    <h3 className="font-semibold text-warning-foreground">Free Tier Limitations</h3>
+                    <p className="text-sm text-muted-foreground">
+                      You can only network with alumni from your graduation year. 
+                      {restrictedUsersCount > 0 && ` ${restrictedUsersCount} more alumni available with Premium.`}
+                      {yearRange && ` Showing alumni from ${yearRange.minYear} only.`}
+                    </p>
+                  </div>
+                </div>
+                <UpgradePrompt compact onUpgrade={() => navigate('/settings')} />
+              </div>
+            </CardContent>
+          </Card>
+        )}
 
         {/* Search and Filters */}
         <Card className="mb-6">
@@ -271,6 +304,9 @@ const Alumni = () => {
                     {graduationYears.map((year) => (
                       <SelectItem key={year} value={year!.toString()}>
                         {year}
+                        {isFreeTier && yearRange && year === yearRange.minYear && (
+                          <Badge variant="secondary" className="ml-2">Your Year</Badge>
+                        )}
                       </SelectItem>
                     ))}
                   </SelectContent>
@@ -285,9 +321,15 @@ const Alumni = () => {
           <div className="text-center py-12">
             <Users className="h-16 w-16 text-muted-foreground mx-auto mb-4" />
             <h3 className="text-lg font-semibold mb-2">No alumni found</h3>
-            <p className="text-muted-foreground">
-              Try adjusting your search criteria
+            <p className="text-muted-foreground mb-4">
+              {isFreeTier 
+                ? "No alumni from your graduation year found. Upgrade to Premium to see alumni from all years."
+                : "Try adjusting your search criteria"
+              }
             </p>
+            {isFreeTier && (
+              <UpgradePrompt onUpgrade={() => navigate('/settings')} />
+            )}
           </div>
         ) : (
           <div className="grid grid-cols-1 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 md:gap-6">
@@ -345,6 +387,9 @@ const Alumni = () => {
                         <div className="flex items-center gap-2 text-xs sm:text-sm text-muted-foreground justify-center sm:justify-start">
                           <Calendar className="h-3 w-3 sm:h-4 sm:w-4 flex-shrink-0" />
                           <span>Class of {person.graduation_year}</span>
+                          {isFreeTier && yearRange && person.graduation_year === yearRange.minYear && (
+                            <Badge variant="outline" className="text-xs ml-1">Same Year</Badge>
+                          )}
                         </div>
                       )}
                     </div>
@@ -377,6 +422,16 @@ const Alumni = () => {
                 </Card>
               );
             })}
+          </div>
+        )}
+
+        {/* Premium Upgrade Prompt */}
+        {isFreeTier && restrictedUsersCount > 0 && (
+          <div className="mt-8">
+            <UpgradePrompt 
+              feature="unlimited networking"
+              onUpgrade={() => navigate('/settings')}
+            />
           </div>
         )}
       </div>

@@ -12,7 +12,8 @@ import { supabase } from "@/integrations/supabase/client";
 import { createNotification } from "@/lib/notifications";
 import { MessageDialog } from "@/components/messaging/MessageDialog";
 import { useSchoolHistory } from "@/hooks/useSchoolHistory";
-import { useMultiSchoolAccess } from "@/hooks/useMultiSchoolAccess";
+import { useSubscription } from "@/hooks/useSubscription";
+import { UpgradePrompt } from "@/components/ui/upgrade-prompt";
 import SchoolSwitcher from "@/components/dashboard/SchoolSwitcher";
 import { 
   ArrowLeft, 
@@ -25,7 +26,8 @@ import {
   MapPin,
   Calendar,
   GraduationCap,
-  Shield
+  Shield,
+  Crown
 } from "lucide-react";
 
 interface Profile {
@@ -70,7 +72,7 @@ const Network = () => {
   const { user, profile } = useAuth();
   const navigate = useNavigate();
   const { schoolHistory } = useSchoolHistory();
-  const { accessibleSchools } = useMultiSchoolAccess();
+  const { isFreeTier, isPremium, canNetworkWithUser, getNetworkableSchools } = useSubscription();
   const [connections, setConnections] = useState<Friendship[]>([]);
   const [pendingRequests, setPendingRequests] = useState<Friendship[]>([]);
   const [sentRequests, setSentRequests] = useState<Friendship[]>([]);
@@ -119,9 +121,22 @@ const Network = () => {
 
       if (error) throw error;
 
-      const accepted = data.filter(f => f.status === 'accepted');
-      const pending = data.filter(f => f.status === 'pending' && f.addressee_id === user.id);
-      const sent = data.filter(f => f.status === 'pending' && f.requester_id === user.id);
+      // Filter friendships based on subscription restrictions
+      const filteredData = data.filter(friendship => {
+        const otherProfile = getOtherProfile(friendship);
+        if (!otherProfile) return false;
+        
+        // For free users, only show connections they can actually network with
+        if (isFreeTier) {
+          return canNetworkWithUser(otherProfile);
+        }
+        
+        return true;
+      });
+
+      const accepted = filteredData.filter(f => f.status === 'accepted');
+      const pending = filteredData.filter(f => f.status === 'pending' && f.addressee_id === user.id);
+      const sent = filteredData.filter(f => f.status === 'pending' && f.requester_id === user.id);
 
       setConnections(accepted);
       setPendingRequests(pending);
@@ -309,6 +324,28 @@ const Network = () => {
   return (
     <AppLayout title="My Network">
       <div className="p-6">
+        {/* Subscription Status Banner */}
+        {isFreeTier && (
+          <Card className="mb-6 border-warning bg-warning/5">
+            <CardContent className="p-4">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-3">
+                  <div className="p-2 bg-warning/10 rounded-full">
+                    <Crown className="h-5 w-5 text-warning" />
+                  </div>
+                  <div>
+                    <h3 className="font-semibold text-warning-foreground">Free Tier Network</h3>
+                    <p className="text-sm text-muted-foreground">
+                      Your network is limited to alumni from your graduation year. Upgrade to connect with alumni from all years.
+                    </p>
+                  </div>
+                </div>
+                <UpgradePrompt compact onUpgrade={() => navigate('/settings')} />
+              </div>
+            </CardContent>
+          </Card>
+        )}
+
         {/* School Context Switcher */}
         <div className="mb-6">
           <SchoolSwitcher 
@@ -325,6 +362,9 @@ const Network = () => {
                 <div>
                   <p className="text-2xl font-bold">{connections.length}</p>
                   <p className="text-sm text-muted-foreground">Connections</p>
+                  {isFreeTier && (
+                    <p className="text-xs text-warning">Same year only</p>
+                  )}
                 </div>
                 <Users className="h-8 w-8 text-primary" />
               </div>
@@ -390,7 +430,10 @@ const Network = () => {
                 <Users className="h-16 w-16 text-muted-foreground mx-auto mb-4" />
                 <h3 className="text-lg font-semibold mb-2">No connections yet</h3>
                 <p className="text-muted-foreground mb-4">
-                  Start connecting with alumni from your school
+                  {isFreeTier 
+                    ? "Start connecting with alumni from your graduation year"
+                    : "Start connecting with alumni from your school"
+                  }
                 </p>
                 <Button onClick={() => navigate('/alumni')}>
                   <UserPlus className="h-4 w-4 mr-2" />
@@ -468,6 +511,16 @@ const Network = () => {
             )}
           </TabsContent>
         </Tabs>
+
+        {/* Premium Upgrade Prompt */}
+        {isFreeTier && (connections.length > 0 || pendingRequests.length > 0 || sentRequests.length > 0) && (
+          <div className="mt-8">
+            <UpgradePrompt 
+              feature="unlimited cross-year networking"
+              onUpgrade={() => navigate('/settings')}
+            />
+          </div>
+        )}
       </div>
 
       {/* Message Dialog */}
