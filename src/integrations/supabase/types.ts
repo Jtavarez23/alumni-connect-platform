@@ -987,6 +987,102 @@ export type Database = {
           },
         ]
       }
+      yearbook_party_participants: {
+        Row: {
+          id: string
+          is_online: boolean | null
+          joined_at: string | null
+          last_seen_at: string | null
+          room_id: string | null
+          user_id: string | null
+        }
+        Insert: {
+          id?: string
+          is_online?: boolean | null
+          joined_at?: string | null
+          last_seen_at?: string | null
+          room_id?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          id?: string
+          is_online?: boolean | null
+          joined_at?: string | null
+          last_seen_at?: string | null
+          room_id?: string | null
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "yearbook_party_participants_room_id_fkey"
+            columns: ["room_id"]
+            isOneToOne: false
+            referencedRelation: "yearbook_party_rooms"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "yearbook_party_participants_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      yearbook_party_rooms: {
+        Row: {
+          created_at: string | null
+          current_page: number | null
+          description: string | null
+          host_id: string | null
+          id: string
+          is_active: boolean | null
+          max_participants: number | null
+          name: string
+          updated_at: string | null
+          yearbook_edition_id: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          current_page?: number | null
+          description?: string | null
+          host_id?: string | null
+          id?: string
+          is_active?: boolean | null
+          max_participants?: number | null
+          name: string
+          updated_at?: string | null
+          yearbook_edition_id?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          current_page?: number | null
+          description?: string | null
+          host_id?: string | null
+          id?: string
+          is_active?: boolean | null
+          max_participants?: number | null
+          name?: string
+          updated_at?: string | null
+          yearbook_edition_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "yearbook_party_rooms_host_id_fkey"
+            columns: ["host_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "yearbook_party_rooms_yearbook_edition_id_fkey"
+            columns: ["yearbook_edition_id"]
+            isOneToOne: false
+            referencedRelation: "yearbook_editions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Views: {
       activity_feed: {
