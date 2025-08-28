@@ -5,6 +5,8 @@ import { Badge } from "@/components/ui/badge";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { ChevronDown, GraduationCap, MapPin } from "lucide-react";
 import { useSchoolHistory, type SchoolHistory } from "@/hooks/useSchoolHistory";
+import { useSchoolAlumniStats } from "@/hooks/useSchoolAlumniStats";
+import { SchoolAlumniStats } from "@/components/school/SchoolAlumniStats";
 
 interface SchoolSwitcherProps {
   selectedSchool: SchoolHistory | null;
@@ -13,6 +15,7 @@ interface SchoolSwitcherProps {
 
 const SchoolSwitcher: React.FC<SchoolSwitcherProps> = ({ selectedSchool, onSchoolSelect }) => {
   const { schoolHistory } = useSchoolHistory();
+  const { getStatsForSchool } = useSchoolAlumniStats();
   const [open, setOpen] = useState(false);
 
   const getLocationDisplay = (location: any) => {
@@ -45,6 +48,17 @@ const SchoolSwitcher: React.FC<SchoolSwitcherProps> = ({ selectedSchool, onSchoo
                 <div className="flex items-center mt-1 text-sm text-muted-foreground">
                   <MapPin className="h-3 w-3 mr-1" />
                   {getLocationDisplay(school.school.location)}
+                </div>
+              )}
+              {school.school?.id && (
+                <div className="mt-2">
+                  <SchoolAlumniStats
+                    schoolId={school.school.id}
+                    currentCount={getStatsForSchool(school.school.id)?.currentAlumniCount || 0}
+                    recentCount={getStatsForSchool(school.school.id)?.recentConnections24h || 0}
+                    growthPercentage={getStatsForSchool(school.school.id)?.growthPercentage}
+                    size="sm"
+                  />
                 </div>
               )}
             </div>
@@ -97,26 +111,35 @@ const SchoolSwitcher: React.FC<SchoolSwitcherProps> = ({ selectedSchool, onSchoo
                 All Schools
               </Button>
               {schoolHistory.map((school) => (
-                <Button
-                  key={school.id}
-                  variant={selectedSchool?.id === school.id ? "secondary" : "ghost"}
-                  className="w-full justify-start mb-1"
-                  onClick={() => {
-                    onSchoolSelect(school);
-                    setOpen(false);
-                  }}
-                >
-                  <div className="flex items-center space-x-2 w-full">
-                    <GraduationCap className="h-4 w-4 text-primary flex-shrink-0" />
-                    <div className="text-left flex-1 min-w-0">
-                      <div className="font-medium truncate">{school.school?.name}</div>
-                      <div className="flex items-center space-x-2 text-xs text-muted-foreground">
-                        <span>{school.start_year} - {school.end_year || "Present"}</span>
-                        {school.is_primary && <Badge variant="default" className="text-xs">Primary</Badge>}
+                  <Button
+                    key={school.id}
+                    variant={selectedSchool?.id === school.id ? "secondary" : "ghost"}
+                    className="w-full justify-start mb-1 h-auto p-3"
+                    onClick={() => {
+                      onSchoolSelect(school);
+                      setOpen(false);
+                    }}
+                  >
+                    <div className="flex items-center space-x-2 w-full">
+                      <GraduationCap className="h-4 w-4 text-primary flex-shrink-0" />
+                      <div className="text-left flex-1 min-w-0 space-y-1">
+                        <div className="font-medium truncate">{school.school?.name}</div>
+                        <div className="flex items-center space-x-2 text-xs text-muted-foreground">
+                          <span>{school.start_year} - {school.end_year || "Present"}</span>
+                          {school.is_primary && <Badge variant="default" className="text-xs">Primary</Badge>}
+                        </div>
+                        {school.school?.id && (
+                          <SchoolAlumniStats
+                            schoolId={school.school.id}
+                            currentCount={getStatsForSchool(school.school.id)?.currentAlumniCount || 0}
+                            recentCount={getStatsForSchool(school.school.id)?.recentConnections24h || 0}
+                            size="sm"
+                            showGrowth={false}
+                          />
+                        )}
                       </div>
                     </div>
-                  </div>
-                </Button>
+                  </Button>
               ))}
             </div>
           </PopoverContent>
