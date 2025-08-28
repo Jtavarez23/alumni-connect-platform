@@ -1328,6 +1328,13 @@ export type Database = {
         }
         Relationships: [
           {
+            foreignKeyName: "fk_then_vs_now_posts_user_id"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
             foreignKeyName: "then_vs_now_posts_yearbook_entry_id_fkey"
             columns: ["yearbook_entry_id"]
             isOneToOne: false

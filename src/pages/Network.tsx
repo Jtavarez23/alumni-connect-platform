@@ -11,6 +11,9 @@ import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
 import { createNotification } from "@/lib/notifications";
 import { MessageDialog } from "@/components/messaging/MessageDialog";
+import { useSchoolHistory } from "@/hooks/useSchoolHistory";
+import { useMultiSchoolAccess } from "@/hooks/useMultiSchoolAccess";
+import SchoolSwitcher from "@/components/dashboard/SchoolSwitcher";
 import { 
   ArrowLeft, 
   MessageCircle, 
@@ -39,6 +42,16 @@ interface Profile {
     type: string;
     location: any;
   };
+  school_history?: Array<{
+    school_id: string;
+    start_year: number;
+    end_year?: number;
+    school?: {
+      name: string;
+      type: string;
+      location: any;
+    };
+  }>;
 }
 
 interface Friendship {
@@ -56,12 +69,15 @@ interface Friendship {
 const Network = () => {
   const { user, profile } = useAuth();
   const navigate = useNavigate();
+  const { schoolHistory } = useSchoolHistory();
+  const { accessibleSchools } = useMultiSchoolAccess();
   const [connections, setConnections] = useState<Friendship[]>([]);
   const [pendingRequests, setPendingRequests] = useState<Friendship[]>([]);
   const [sentRequests, setSentRequests] = useState<Friendship[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [messageDialogOpen, setMessageDialogOpen] = useState(false);
   const [selectedUser, setSelectedUser] = useState<Profile | null>(null);
+  const [contextSchool, setContextSchool] = useState<any>(null);
 
   useEffect(() => {
     if (user) {
@@ -79,11 +95,23 @@ const Network = () => {
           *,
           requester:profiles!friendships_requester_id_fkey(
             id, first_name, last_name, email, avatar_url, school_id, graduation_year, verification_status,
-            schools(name, type, location)
+            schools(name, type, location),
+            school_history(
+              school_id,
+              start_year,
+              end_year,
+              school:schools(name, type, location)
+            )
           ),
           addressee:profiles!friendships_addressee_id_fkey(
             id, first_name, last_name, email, avatar_url, school_id, graduation_year, verification_status,
-            schools(name, type, location)
+            schools(name, type, location),
+            school_history(
+              school_id,
+              start_year,
+              end_year,
+              school:schools(name, type, location)
+            )
           )
         `)
         .or(`requester_id.eq.${user.id},addressee_id.eq.${user.id}`)
@@ -281,6 +309,14 @@ const Network = () => {
   return (
     <AppLayout title="My Network">
       <div className="p-6">
+        {/* School Context Switcher */}
+        <div className="mb-6">
+          <SchoolSwitcher 
+            selectedSchool={contextSchool}
+            onSchoolSelect={setContextSchool}
+          />
+        </div>
+
         {/* Network Overview */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
           <Card>

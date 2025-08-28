@@ -10,6 +10,9 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { AppLayout } from "@/components/layout/AppLayout";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
+import { useSchoolHistory } from "@/hooks/useSchoolHistory";
+import { useMultiSchoolAccess } from "@/hooks/useMultiSchoolAccess";
+import SchoolSwitcher from "@/components/dashboard/SchoolSwitcher";
 import { ArrowLeft, Search, MapPin, Calendar, GraduationCap, Check, Clock, UserPlus, Shield, Users } from "lucide-react";
 
 interface Profile {
@@ -26,6 +29,16 @@ interface Profile {
     type: string;
     location: any;
   };
+  school_history?: Array<{
+    school_id: string;
+    start_year: number;
+    end_year?: number;
+    school?: {
+      name: string;
+      type: string;
+      location: any;
+    };
+  }>;
 }
 
 interface School {
@@ -48,6 +61,8 @@ interface Friendship {
 const Alumni = () => {
   const { user, profile } = useAuth();
   const navigate = useNavigate();
+  const { schoolHistory } = useSchoolHistory();
+  const { accessibleSchools } = useMultiSchoolAccess();
   const [alumni, setAlumni] = useState<Profile[]>([]);
   const [friendships, setFriendships] = useState<Friendship[]>([]);
   const [schools, setSchools] = useState<School[]>([]);
@@ -55,12 +70,13 @@ const Alumni = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedSchoolId, setSelectedSchoolId] = useState<string>("all");
   const [selectedYear, setSelectedYear] = useState<string>("all");
+  const [contextSchool, setContextSchool] = useState<any>(null);
 
   useEffect(() => {
-    if (user && profile?.school_id) {
+    if (user && schoolHistory.length > 0) {
       loadData();
     }
-  }, [user, profile]);
+  }, [user, schoolHistory, contextSchool]);
 
   const loadData = async () => {
     await Promise.all([fetchAlumni(), fetchFriendships(), fetchSchools()]);
@@ -69,17 +85,44 @@ const Alumni = () => {
 
   const fetchAlumni = async () => {
     try {
+      // Get user's accessible school IDs
+      const accessibleSchoolIds = accessibleSchools.map(s => s.id);
+      
       const { data, error } = await supabase
         .from('profiles')
         .select(`
           *,
-          schools(name, type, location)
+          schools(name, type, location),
+          school_history(
+            school_id,
+            start_year,
+            end_year,
+            school:schools(name, type, location)
+          )
         `)
         .neq('id', user?.id)
         .order('first_name');
 
       if (error) throw error;
-      setAlumni(data || []);
+      
+      // Filter alumni based on accessible schools or context
+      let filteredAlumni = data || [];
+      
+      if (contextSchool) {
+        // Show only alumni from the selected school context
+        filteredAlumni = filteredAlumni.filter(alumnus => 
+          alumnus.school_id === contextSchool.id ||
+          alumnus.school_history?.some((sh: any) => sh.school_id === contextSchool.id)
+        );
+      } else if (accessibleSchoolIds.length > 0) {
+        // Show alumni from accessible schools
+        filteredAlumni = filteredAlumni.filter(alumnus =>
+          accessibleSchoolIds.includes(alumnus.school_id!) ||
+          alumnus.school_history?.some((sh: any) => accessibleSchoolIds.includes(sh.school_id))
+        );
+      }
+      
+      setAlumni(filteredAlumni);
     } catch (error) {
       console.error('Error fetching alumni:', error);
     }
@@ -101,13 +144,13 @@ const Alumni = () => {
 
   const fetchSchools = async () => {
     try {
-      const { data, error } = await supabase
-        .from('schools')
-        .select('*')
-        .order('name');
-
-      if (error) throw error;
-      setSchools(data || []);
+      // Use accessible schools instead of all schools
+      setSchools(accessibleSchools.map(s => ({
+        id: s.id,
+        name: s.name,
+        type: s.type,
+        location: s.location
+      })));
     } catch (error) {
       console.error('Error fetching schools:', error);
     }
@@ -170,11 +213,11 @@ const Alumni = () => {
     );
   }
 
-  if (!user || !profile?.school_id) {
+  if (!user || schoolHistory.length === 0) {
     return (
       <AppLayout title="Alumni Directory">
         <div className="p-6 text-center">
-          <p>Please complete your profile to access the alumni directory.</p>
+          <p>Please add schools to your education history to access the alumni directory.</p>
           <Button onClick={() => navigate('/dashboard')}>Go to Dashboard</Button>
         </div>
       </AppLayout>
@@ -184,6 +227,14 @@ const Alumni = () => {
   return (
     <AppLayout title="Alumni Directory">
       <div className="p-6">
+        {/* School Context Switcher */}
+        <div className="mb-6">
+          <SchoolSwitcher 
+            selectedSchool={contextSchool}
+            onSchoolSelect={setContextSchool}
+          />
+        </div>
+
         {/* Search and Filters */}
         <Card className="mb-6">
           <CardContent className="p-6">
@@ -267,12 +318,29 @@ const Alumni = () => {
                     </div>
                     
                     <div className="space-y-2 mb-4">
-                      {person.schools && (
-                        <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                          <GraduationCap className="h-4 w-4" />
-                          <span className="truncate">{person.schools.name}</span>
-                        </div>
-                      )}
+                        {/* Show school history or current school */}
+                        {person.school_history && person.school_history.length > 0 ? (
+                          <div className="space-y-1">
+                            {person.school_history.slice(0, 2).map((sh, idx) => (
+                              <div key={idx} className="flex items-center gap-2 text-sm text-muted-foreground">
+                                <GraduationCap className="h-4 w-4" />
+                                <span className="truncate">
+                                  {sh.school?.name} ({sh.start_year}-{sh.end_year || 'present'})
+                                </span>
+                              </div>
+                            ))}
+                            {person.school_history.length > 2 && (
+                              <div className="text-xs text-muted-foreground">
+                                +{person.school_history.length - 2} more schools
+                              </div>
+                            )}
+                          </div>
+                        ) : person.schools && (
+                          <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                            <GraduationCap className="h-4 w-4" />
+                            <span className="truncate">{person.schools.name}</span>
+                          </div>
+                        )}
                       {person.graduation_year && (
                         <div className="flex items-center gap-2 text-sm text-muted-foreground">
                           <Calendar className="h-4 w-4" />

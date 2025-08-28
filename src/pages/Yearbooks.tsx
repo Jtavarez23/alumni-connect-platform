@@ -11,6 +11,9 @@ import { toast } from "sonner";
 import { YearbookUploadDialog } from "@/components/yearbook/YearbookUploadDialog";
 import { YearbookViewer } from "@/components/yearbook/YearbookViewer";
 import { AppLayout } from "@/components/layout/AppLayout";
+import { useSchoolHistory } from "@/hooks/useSchoolHistory";
+import { useMultiSchoolAccess } from "@/hooks/useMultiSchoolAccess";
+import SchoolSwitcher from "@/components/dashboard/SchoolSwitcher";
 
 interface YearbookEdition {
   id: string;
@@ -29,21 +32,27 @@ interface YearbookEdition {
 
 export default function Yearbooks() {
   const { user } = useAuth();
+  const { schoolHistory } = useSchoolHistory();
+  const { accessibleSchools } = useMultiSchoolAccess();
   const [yearbooks, setYearbooks] = useState<YearbookEdition[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedYearbook, setSelectedYearbook] = useState<YearbookEdition | null>(null);
   const [showUploadDialog, setShowUploadDialog] = useState(false);
+  const [contextSchool, setContextSchool] = useState<any>(null);
 
   useEffect(() => {
-    if (user) {
+    if (user && schoolHistory.length > 0) {
       fetchYearbooks();
     }
-  }, [user]);
+  }, [user, schoolHistory, contextSchool, accessibleSchools]);
 
   const fetchYearbooks = async () => {
     try {
-      const { data, error } = await supabase
+      // Get accessible school IDs
+      const accessibleSchoolIds = accessibleSchools.map(s => s.id);
+      
+      let query = supabase
         .from("yearbook_editions")
         .select(`
           *,
@@ -53,8 +62,16 @@ export default function Yearbooks() {
             location
           )
         `)
-        .eq("upload_status", "completed")
-        .order("year", { ascending: false });
+        .eq("upload_status", "completed");
+
+      // Filter by context school or accessible schools
+      if (contextSchool) {
+        query = query.eq("school_id", contextSchool.id);
+      } else if (accessibleSchoolIds.length > 0) {
+        query = query.in("school_id", accessibleSchoolIds);
+      }
+
+      const { data, error } = await query.order("year", { ascending: false });
 
       if (error) throw error;
       setYearbooks(data || []);
@@ -85,11 +102,19 @@ export default function Yearbooks() {
   return (
     <AppLayout title="Yearbooks">
       <div className="p-6">
+        {/* School Context Switcher */}
+        <div className="mb-6">
+          <SchoolSwitcher 
+            selectedSchool={contextSchool}
+            onSchoolSelect={setContextSchool}
+          />
+        </div>
+
         {/* Header */}
         <div className="flex items-center justify-between mb-6">
           <div>
             <p className="text-muted-foreground">
-              Browse yearbooks from schools and discover your classmates
+              Browse yearbooks from {contextSchool ? contextSchool.name : 'your schools'} and discover your classmates
             </p>
           </div>
           <Button onClick={() => setShowUploadDialog(true)}>
