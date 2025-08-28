@@ -14,6 +14,7 @@ import Dashboard from "./pages/Dashboard";
 import Yearbooks from "./pages/Yearbooks";
 import Alumni from "./pages/Alumni";
 import Network from "./pages/Network";
+import Channels from "./pages/Channels";
 import Profile from "./pages/Profile";
 import Settings from "./pages/Settings";
 import ForgotPassword from "./pages/ForgotPassword";
@@ -55,6 +56,11 @@ const App = () => (
               <Route path="/network" element={
                 <ProtectedRoute>
                   <Network />
+                </ProtectedRoute>
+              } />
+              <Route path="/channels" element={
+                <ProtectedRoute>
+                  <Channels />
                 </ProtectedRoute>
               } />
               <Route path="/profile" element={
