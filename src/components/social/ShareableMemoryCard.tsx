@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Share2, Instagram, Facebook, Twitter, LinkedIn, Download, Copy } from "lucide-react";
+import { Share2, Instagram, Facebook, Twitter, Linkedin, Download, Copy } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
@@ -192,7 +192,7 @@ export function ShareableMemoryCard({ title, school, year, photos, className }: 
                 onClick={() => generateShareCard('linkedin')}
                 disabled={isGenerating}
               >
-                <LinkedIn className="w-4 h-4 text-blue-700" />
+                <Linkedin className="w-4 h-4 text-blue-700" />
                 LinkedIn
               </Button>
               

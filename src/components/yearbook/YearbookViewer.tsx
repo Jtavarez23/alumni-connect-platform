@@ -9,6 +9,8 @@ import { ArrowLeft, Search, User, Heart, MessageCircle, Tag } from "lucide-react
 import { toast } from "sonner";
 import { StudentTagDialog } from "./StudentTagDialog";
 import { TaggedStudentsList } from "./TaggedStudentsList";
+import { ReactionSystem } from "../social/ReactionSystem";
+import { ShareableMemoryCard } from "../social/ShareableMemoryCard";
 
 interface YearbookEdition {
   id: string;
@@ -153,6 +155,16 @@ export function YearbookViewer({ yearbook, onBack }: YearbookViewerProps) {
               <p className="text-sm text-muted-foreground">
                 {filteredEntries.length} {filteredEntries.length === 1 ? 'student' : 'students'} found
               </p>
+              <ShareableMemoryCard
+                title="Found my yearbook squad!"
+                school={yearbook.schools.name}
+                year={yearbook.year}
+                photos={filteredEntries.slice(0, 4).map(entry => ({
+                  url: entry.photo_url || '',
+                  name: entry.student_name,
+                  avatar: entry.photo_url || ''
+                }))}
+              />
             </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
@@ -257,17 +269,22 @@ export function YearbookViewer({ yearbook, onBack }: YearbookViewerProps) {
                       </p>
                     )}
 
-                    {/* Connection Status */}
-                    {entry.profile_id && (
-                      <div className="mt-3 pt-2 border-t border-border flex gap-2 justify-center">
-                        <Button size="sm" variant="ghost" className="h-8 px-2">
-                          <Heart className="w-3 h-3" />
-                        </Button>
-                        <Button size="sm" variant="ghost" className="h-8 px-2">
-                          <MessageCircle className="w-3 h-3" />
-                        </Button>
-                      </div>
-                    )}
+                    {/* Social Interactions */}
+                    <div className="mt-3 pt-2 border-t border-border">
+                      <ReactionSystem 
+                        entityId={entry.id} 
+                        entityType="yearbook_entry"
+                        className="justify-center mb-2"
+                      />
+                      
+                      {entry.profile_id && (
+                        <div className="flex gap-2 justify-center">
+                          <Button size="sm" variant="ghost" className="h-8 px-2">
+                            <MessageCircle className="w-3 h-3" />
+                          </Button>
+                        </div>
+                      )}
+                    </div>
                   </CardContent>
                 </Card>
               ))}

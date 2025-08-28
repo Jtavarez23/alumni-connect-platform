@@ -75,26 +75,38 @@ export function MemoryStories() {
           title,
           message,
           created_at,
-          related_user_id,
-          profiles:related_user_id (
-            first_name,
-            last_name,
-            avatar_url,
-            school_id,
-            schools:school_id (
-              name
-            )
-          )
+          related_user_id
         `)
         .order('created_at', { ascending: false })
         .limit(10);
 
       if (error) throw error;
 
+      // Fetch related user profiles separately
+      const userIds = (recentActivity || [])
+        .map(activity => activity.related_user_id)
+        .filter(Boolean);
+
+      const { data: userProfiles } = await supabase
+        .from('profiles')
+        .select(`
+          id,
+          first_name,
+          last_name,
+          avatar_url,
+          school_id
+        `)
+        .in('id', userIds);
+
+      const { data: schools } = await supabase
+        .from('schools')
+        .select('id, name')
+        .in('id', (userProfiles || []).map(p => p.school_id).filter(Boolean));
+
       // Transform notifications into memory stories
       const transformedStories: MemoryStory[] = (recentActivity || []).map(activity => {
-        const user = activity.profiles;
-        const school = user?.schools;
+        const user = userProfiles?.find(p => p.id === activity.related_user_id);
+        const school = schools?.find(s => s.id === user?.school_id);
         
         return {
           id: activity.id,

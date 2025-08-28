@@ -127,6 +127,45 @@ export type Database = {
           },
         ]
       }
+      mystery_lookups: {
+        Row: {
+          clues: Json | null
+          created_at: string | null
+          expires_at: string | null
+          graduation_year: number | null
+          id: string
+          looker_id: string
+          mutual_friends_count: number | null
+          revealed: boolean | null
+          school_name: string
+          target_user_id: string
+        }
+        Insert: {
+          clues?: Json | null
+          created_at?: string | null
+          expires_at?: string | null
+          graduation_year?: number | null
+          id?: string
+          looker_id: string
+          mutual_friends_count?: number | null
+          revealed?: boolean | null
+          school_name: string
+          target_user_id: string
+        }
+        Update: {
+          clues?: Json | null
+          created_at?: string | null
+          expires_at?: string | null
+          graduation_year?: number | null
+          id?: string
+          looker_id?: string
+          mutual_friends_count?: number | null
+          revealed?: boolean | null
+          school_name?: string
+          target_user_id?: string
+        }
+        Relationships: []
+      }
       notifications: {
         Row: {
           created_at: string | null
@@ -248,6 +287,36 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      reactions: {
+        Row: {
+          created_at: string | null
+          entity_id: string
+          entity_type: string
+          id: string
+          reaction_type: string
+          updated_at: string | null
+          user_id: string
+        }
+        Insert: {
+          created_at?: string | null
+          entity_id: string
+          entity_type: string
+          id?: string
+          reaction_type: string
+          updated_at?: string | null
+          user_id: string
+        }
+        Update: {
+          created_at?: string | null
+          entity_id?: string
+          entity_type?: string
+          id?: string
+          reaction_type?: string
+          updated_at?: string | null
+          user_id?: string
+        }
+        Relationships: []
       }
       schools: {
         Row: {

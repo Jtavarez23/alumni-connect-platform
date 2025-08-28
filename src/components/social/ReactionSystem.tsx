@@ -64,18 +64,19 @@ export function ReactionSystem({ entityId, entityType, className }: ReactionSyst
           id,
           user_id,
           reaction_type,
-          created_at,
-          profiles:user_id (
-            id,
-            first_name,
-            last_name,
-            avatar_url
-          )
+          created_at
         `)
         .eq('entity_id', entityId)
         .eq('entity_type', entityType);
 
       if (error) throw error;
+
+      // Fetch user profiles separately
+      const userIds = [...new Set(data?.map(r => r.user_id) || [])];
+      const { data: userProfiles } = await supabase
+        .from('profiles')
+        .select('id, first_name, last_name, avatar_url')
+        .in('id', userIds);
 
       // Group reactions by type
       const reactionMap = new Map<string, ReactionCount>();
@@ -83,6 +84,8 @@ export function ReactionSystem({ entityId, entityType, className }: ReactionSyst
 
       data?.forEach((reaction) => {
         const type = reaction.reaction_type;
+        const userProfile = userProfiles?.find(p => p.id === reaction.user_id);
+        
         if (!reactionMap.has(type)) {
           reactionMap.set(type, { reaction_type: type, count: 0, users: [] });
         }
@@ -91,9 +94,9 @@ export function ReactionSystem({ entityId, entityType, className }: ReactionSyst
         reactionCount.count++;
         reactionCount.users.push({
           id: reaction.user_id,
-          first_name: reaction.profiles?.first_name || '',
-          last_name: reaction.profiles?.last_name || '',
-          avatar_url: reaction.profiles?.avatar_url
+          first_name: userProfile?.first_name || '',
+          last_name: userProfile?.last_name || '',
+          avatar_url: userProfile?.avatar_url
         });
 
         if (reaction.user_id === user?.id) {

@@ -11,6 +11,8 @@ import ProfileSetupDialog from "@/components/profile/ProfileSetupDialog";
 import ProfileEditDialog from "@/components/profile/ProfileEditDialog";
 import { ActivityFeed } from "@/components/activity/ActivityFeed";
 import { AppLayout } from "@/components/layout/AppLayout";
+import { MemoryStories } from "@/components/social/MemoryStories";
+import { MysteryFeature } from "@/components/social/MysteryFeature";
 
 interface School {
   id: string;
@@ -186,6 +188,12 @@ const Dashboard = () => {
             </CardContent>
           </Card>
         </div>
+
+        {/* Memory Stories */}
+        <MemoryStories />
+        
+        {/* Mystery Feature */}
+        <MysteryFeature />
 
         {/* Recent Activity */}
         <ActivityFeed />
