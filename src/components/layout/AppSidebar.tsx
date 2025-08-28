@@ -3,6 +3,7 @@ import {
   Book, 
   Users, 
   Network as NetworkIcon, 
+  MessageCircle,
   Hash,
   User,
   Settings,
@@ -31,6 +32,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 const mainNavItems = [
   { title: "Dashboard", url: "/dashboard", icon: Home },
   { title: "Yearbooks", url: "/yearbooks", icon: Book },
+  { title: "Messages", url: "/messages", icon: MessageCircle },
   { title: "Channels", url: "/channels", icon: Hash },
   { title: "Social Hub", url: "/social", icon: Camera },
   { title: "Alumni", url: "/alumni", icon: Users },
