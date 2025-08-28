@@ -8,8 +8,10 @@ import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Textarea } from "@/components/ui/textarea";
-import { Plus, GraduationCap, MapPin, Edit, Trash2 } from "lucide-react";
+import { Plus, GraduationCap, MapPin, Edit, Trash2, Crown } from "lucide-react";
 import { useSchoolHistory, SchoolHistory } from "@/hooks/useSchoolHistory";
+import { useSubscription } from "@/hooks/useSubscription";
+import { UpgradePrompt } from "@/components/ui/upgrade-prompt";
 import SchoolSelector from "./SchoolSelector";
 
 interface MultiSchoolSelectorProps {
@@ -18,6 +20,7 @@ interface MultiSchoolSelectorProps {
 
 const MultiSchoolSelector = ({ onSchoolHistoryChange }: MultiSchoolSelectorProps) => {
   const { schoolHistory, addSchoolHistory, updateSchoolHistory, deleteSchoolHistory, loading } = useSchoolHistory();
+  const { canAddSchool, shouldShowUpgradePrompt, getSchoolsRemaining } = useSubscription();
   const [dialogOpen, setDialogOpen] = useState(false);
   const [editingSchool, setEditingSchool] = useState<SchoolHistory | null>(null);
   const [formData, setFormData] = useState<{
@@ -67,6 +70,9 @@ const MultiSchoolSelector = ({ onSchoolHistoryChange }: MultiSchoolSelectorProps
   };
 
   const handleAddSchool = () => {
+    if (!canAddSchool()) {
+      return;
+    }
     resetForm();
     setDialogOpen(true);
   };
@@ -129,9 +135,28 @@ const MultiSchoolSelector = ({ onSchoolHistoryChange }: MultiSchoolSelectorProps
         <Label className="text-base font-medium">Education History</Label>
         <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
           <DialogTrigger asChild>
-            <Button variant="outline" size="sm" onClick={handleAddSchool}>
-              <Plus className="h-4 w-4 mr-2" />
-              Add School
+            <Button 
+              variant="outline" 
+              size="sm" 
+              onClick={handleAddSchool}
+              disabled={!canAddSchool()}
+            >
+              {canAddSchool() ? (
+                <>
+                  <Plus className="h-4 w-4 mr-2" />
+                  Add School
+                  {getSchoolsRemaining() < Infinity && (
+                    <Badge variant="secondary" className="ml-2">
+                      {getSchoolsRemaining()} left
+                    </Badge>
+                  )}
+                </>
+              ) : (
+                <>
+                  <Crown className="h-4 w-4 mr-2" />
+                  Premium Required
+                </>
+              )}
             </Button>
           </DialogTrigger>
           <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
@@ -269,6 +294,10 @@ const MultiSchoolSelector = ({ onSchoolHistoryChange }: MultiSchoolSelectorProps
         </Dialog>
       </div>
 
+      {shouldShowUpgradePrompt() && schoolHistory.length > 0 && (
+        <UpgradePrompt feature="unlimited schools" />
+      )}
+
       {schoolHistory.length === 0 ? (
         <Card>
           <CardContent className="p-6 text-center">
@@ -276,7 +305,7 @@ const MultiSchoolSelector = ({ onSchoolHistoryChange }: MultiSchoolSelectorProps
             <p className="text-muted-foreground mb-4">
               No schools in your education history yet.
             </p>
-            <Button onClick={handleAddSchool}>
+            <Button onClick={handleAddSchool} disabled={!canAddSchool()}>
               <Plus className="h-4 w-4 mr-2" />
               Add Your First School
             </Button>

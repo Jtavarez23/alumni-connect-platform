@@ -6,9 +6,11 @@ import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
 import { Alert, AlertDescription } from "@/components/ui/alert";
-import { Plus, MapPin, Search, AlertCircle } from "lucide-react";
+import { Plus, MapPin, Search, AlertCircle, Crown } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
+import { useSubscription } from "@/hooks/useSubscription";
+import { UpgradePrompt } from "@/components/ui/upgrade-prompt";
 import mapboxgl from 'mapbox-gl';
 import 'mapbox-gl/dist/mapbox-gl.css';
 
@@ -32,6 +34,7 @@ const AddSchoolDialog = ({ onSchoolAdded }: AddSchoolDialogProps) => {
   const map = useRef<mapboxgl.Map | null>(null);
   const marker = useRef<mapboxgl.Marker | null>(null);
   const { toast } = useToast();
+  const { canAddSchool, shouldShowUpgradePrompt, getSchoolsRemaining } = useSubscription();
 
   // Get Mapbox token when dialog opens
   useEffect(() => {
@@ -277,12 +280,36 @@ const AddSchoolDialog = ({ onSchoolAdded }: AddSchoolDialogProps) => {
     }
   };
 
+  const handleOpenDialog = () => {
+    if (!canAddSchool()) {
+      return;
+    }
+    setOpen(true);
+  };
+
+  if (shouldShowUpgradePrompt()) {
+    return (
+      <div className="space-y-4">
+        <Button variant="outline" className="w-full" disabled>
+          <Crown className="h-4 w-4 mr-2" />
+          Add New School (Premium Required)
+        </Button>
+        <UpgradePrompt feature="unlimited schools" compact />
+      </div>
+    );
+  }
+
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <Button variant="outline" className="w-full">
+        <Button variant="outline" className="w-full" onClick={handleOpenDialog}>
           <Plus className="h-4 w-4 mr-2" />
           Add New School
+          {!canAddSchool() && (
+            <Badge variant="secondary" className="ml-2">
+              {getSchoolsRemaining()} left
+            </Badge>
+          )}
         </Button>
       </DialogTrigger>
       <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
@@ -309,9 +336,18 @@ const AddSchoolDialog = ({ onSchoolAdded }: AddSchoolDialogProps) => {
                 <SelectValue placeholder="Select school type" />
               </SelectTrigger>
               <SelectContent>
+                <SelectItem value="elementary_school">Elementary School</SelectItem>
+                <SelectItem value="middle_school">Middle School / Junior High</SelectItem>
                 <SelectItem value="high_school">High School</SelectItem>
+                <SelectItem value="community_college">Community College</SelectItem>
                 <SelectItem value="college">College</SelectItem>
                 <SelectItem value="university">University</SelectItem>
+                <SelectItem value="graduate_school">Graduate School</SelectItem>
+                <SelectItem value="trade_school">Trade School / Vocational School</SelectItem>
+                <SelectItem value="private_school">Private School</SelectItem>
+                <SelectItem value="charter_school">Charter School</SelectItem>
+                <SelectItem value="online_school">Online School</SelectItem>
+                <SelectItem value="international_school">International School</SelectItem>
               </SelectContent>
             </Select>
           </div>
