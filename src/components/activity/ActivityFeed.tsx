@@ -156,9 +156,9 @@ export function ActivityFeed() {
   useEffect(() => {
     fetchActivities();
 
-    // Subscribe to real-time updates
+    // Subscribe to real-time updates for notifications
     const channel = supabase
-      .channel('notifications')
+      .channel('notifications-live')
       .on(
         'postgres_changes',
         {
@@ -166,10 +166,49 @@ export function ActivityFeed() {
           schema: 'public',
           table: 'notifications'
         },
-        (payload) => {
+        async (payload) => {
           const newActivity = payload.new as ActivityItem;
+          
+          // Fetch related user data if needed
+          if (newActivity.related_user_id) {
+            const { data: userProfile } = await supabase
+              .from('profiles')
+              .select('id, first_name, last_name, avatar_url')
+              .eq('id', newActivity.related_user_id)
+              .single();
+            
+            if (userProfile) {
+              newActivity.related_user = userProfile;
+            }
+          }
+          
           setActivities(prev => [newActivity, ...prev.slice(0, 9)]);
           setUnreadCount(prev => prev + 1);
+          
+          // Show toast for important notifications
+          if (['friend_request', 'friend_accepted', 'tag_verified'].includes(newActivity.type)) {
+            toast({
+              title: newActivity.title,
+              description: newActivity.message,
+              variant: "default",
+            });
+          }
+        }
+      )
+      .on(
+        'postgres_changes',
+        {
+          event: 'UPDATE',
+          schema: 'public',
+          table: 'notifications'
+        },
+        (payload) => {
+          const updatedActivity = payload.new as ActivityItem;
+          setActivities(prev => 
+            prev.map(activity => 
+              activity.id === updatedActivity.id ? updatedActivity : activity
+            )
+          );
         }
       )
       .subscribe();
@@ -177,7 +216,7 @@ export function ActivityFeed() {
     return () => {
       supabase.removeChannel(channel);
     };
-  }, []);
+  }, [toast]);
 
   if (loading) {
     return (

@@ -286,7 +286,15 @@ export function useGamification() {
 
       if (error) throw error;
 
-      // Show badge notification
+      // Show badge celebration
+      const badgeType = badgeTypes.find(b => b.id === badgeTypeId);
+      if (badgeType) {
+        // Trigger celebration component
+        window.dispatchEvent(new CustomEvent('badgeEarned', { 
+          detail: badgeType 
+        }));
+      }
+
       toast({
         title: "New Badge Earned! 🏆",
         description: `You earned the "${badgeTitle}" badge!`,

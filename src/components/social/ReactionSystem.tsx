@@ -5,6 +5,7 @@ import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover
 import { useAuth } from "@/contexts/AuthContext";
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
+import { useGamificationContext } from "@/components/gamification/GamificationProvider";
 
 const REACTIONS = [
   { emoji: "😍", label: "Aww", key: "aww" },
@@ -48,12 +49,34 @@ interface ReactionCount {
 
 export function ReactionSystem({ entityId, entityType, className }: ReactionSystemProps) {
   const { user } = useAuth();
+  const { updateActivity, awardPoints } = useGamificationContext();
   const [reactions, setReactions] = useState<ReactionCount[]>([]);
   const [userReaction, setUserReaction] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     fetchReactions();
+
+    // Subscribe to real-time reaction updates
+    const channel = supabase
+      .channel(`reactions:${entityId}`)
+      .on(
+        'postgres_changes',
+        {
+          event: '*',
+          schema: 'public',
+          table: 'reactions',
+          filter: `entity_id=eq.${entityId}`
+        },
+        () => {
+          fetchReactions();
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
   }, [entityId]);
 
   const fetchReactions = async () => {
@@ -145,6 +168,12 @@ export function ReactionSystem({ entityId, entityType, className }: ReactionSyst
 
         if (error) throw error;
         setUserReaction(reactionType);
+        
+        // Award points and update activity for new reactions
+        if (userReaction !== reactionType) {
+          await updateActivity('reaction');
+          await awardPoints(2, 'reacting to content');
+        }
       }
 
       fetchReactions();

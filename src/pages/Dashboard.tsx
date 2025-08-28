@@ -14,6 +14,7 @@ import { AppLayout } from "@/components/layout/AppLayout";
 import { MemoryStories } from "@/components/social/MemoryStories";
 import { MysteryFeature } from "@/components/social/MysteryFeature";
 import { GamificationWidget } from "@/components/gamification/GamificationWidget";
+import { LiveActivityIndicator } from "@/components/realtime/LiveActivityIndicator";
 
 interface School {
   id: string;
@@ -76,13 +77,16 @@ const Dashboard = () => {
     <AppLayout title="Dashboard">
       <div className="p-6">
         {/* Welcome Message */}
-        <div className="mb-8">
-          <h1 className="text-3xl font-bold text-foreground mb-2">
-            Welcome back, {profile?.first_name || 'there'}! 👋
-          </h1>
-          <p className="text-muted-foreground">
-            Here's what's happening in your network today.
-          </p>
+        <div className="mb-8 flex items-center justify-between">
+          <div>
+            <h1 className="text-3xl font-bold text-foreground mb-2">
+              Welcome back, {profile?.first_name || 'there'}! 👋
+            </h1>
+            <p className="text-muted-foreground">
+              Here's what's happening in your network today.
+            </p>
+          </div>
+          <LiveActivityIndicator className="hidden md:flex" />
         </div>
 
         {/* Profile Status Card */}
