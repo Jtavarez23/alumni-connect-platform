@@ -22,6 +22,7 @@ import Profile from "./pages/Profile";
 import Settings from "./pages/Settings";
 import ForgotPassword from "./pages/ForgotPassword";
 import NotFound from "./pages/NotFound";
+import SchoolPage from "./pages/SchoolPage";
 import ProtectedRoute from "./components/ProtectedRoute";
 
 const queryClient = new QueryClient();
@@ -85,6 +86,11 @@ const App = () => (
               <Route path="/settings" element={
                 <ProtectedRoute>
                   <Settings />
+                </ProtectedRoute>
+              } />
+              <Route path="/school/:slug" element={
+                <ProtectedRoute>
+                  <SchoolPage />
                 </ProtectedRoute>
               } />
               {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}

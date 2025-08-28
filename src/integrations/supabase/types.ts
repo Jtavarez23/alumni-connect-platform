@@ -751,6 +751,68 @@ export type Database = {
           },
         ]
       }
+      school_clubs: {
+        Row: {
+          advisor_name: string | null
+          category: string | null
+          contact_info: string | null
+          created_at: string | null
+          created_by: string | null
+          description: string | null
+          founded_year: number | null
+          id: string
+          is_active: boolean | null
+          logo_url: string | null
+          meeting_schedule: string | null
+          member_count: number | null
+          name: string
+          school_id: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          advisor_name?: string | null
+          category?: string | null
+          contact_info?: string | null
+          created_at?: string | null
+          created_by?: string | null
+          description?: string | null
+          founded_year?: number | null
+          id?: string
+          is_active?: boolean | null
+          logo_url?: string | null
+          meeting_schedule?: string | null
+          member_count?: number | null
+          name: string
+          school_id?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          advisor_name?: string | null
+          category?: string | null
+          contact_info?: string | null
+          created_at?: string | null
+          created_by?: string | null
+          description?: string | null
+          founded_year?: number | null
+          id?: string
+          is_active?: boolean | null
+          logo_url?: string | null
+          meeting_schedule?: string | null
+          member_count?: number | null
+          name?: string
+          school_id?: string | null
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "school_clubs_school_id_fkey"
+            columns: ["school_id"]
+            isOneToOne: false
+            referencedRelation: "schools"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       school_districts: {
         Row: {
           country: string
@@ -978,6 +1040,59 @@ export type Database = {
           },
         ]
       }
+      school_photos: {
+        Row: {
+          academic_year: string | null
+          category: string | null
+          created_at: string | null
+          description: string | null
+          id: string
+          is_featured: boolean | null
+          photo_url: string
+          school_id: string | null
+          title: string
+          updated_at: string | null
+          upload_date: string | null
+          uploaded_by: string | null
+        }
+        Insert: {
+          academic_year?: string | null
+          category?: string | null
+          created_at?: string | null
+          description?: string | null
+          id?: string
+          is_featured?: boolean | null
+          photo_url: string
+          school_id?: string | null
+          title: string
+          updated_at?: string | null
+          upload_date?: string | null
+          uploaded_by?: string | null
+        }
+        Update: {
+          academic_year?: string | null
+          category?: string | null
+          created_at?: string | null
+          description?: string | null
+          id?: string
+          is_featured?: boolean | null
+          photo_url?: string
+          school_id?: string | null
+          title?: string
+          updated_at?: string | null
+          upload_date?: string | null
+          uploaded_by?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "school_photos_school_id_fkey"
+            columns: ["school_id"]
+            isOneToOne: false
+            referencedRelation: "schools"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       school_verifications: {
         Row: {
           created_at: string | null
@@ -1044,9 +1159,11 @@ export type Database = {
           accreditation: string[] | null
           address_line_1: string | null
           address_line_2: string | null
+          banner_image_url: string | null
           city: string | null
           country: string | null
           created_at: string | null
+          description: string | null
           district_id: string | null
           domain: string | null
           enrollment_size: number | null
@@ -1057,12 +1174,14 @@ export type Database = {
           mascot: string | null
           name: string
           phone_number: string | null
+          principal_name: string | null
           school_colors: string[] | null
           school_level: string | null
           slug: string
           state: string | null
           submission_status: string | null
           submitted_by: string | null
+          total_students: number | null
           type: string
           user_submitted: boolean | null
           verified: boolean | null
@@ -1073,9 +1192,11 @@ export type Database = {
           accreditation?: string[] | null
           address_line_1?: string | null
           address_line_2?: string | null
+          banner_image_url?: string | null
           city?: string | null
           country?: string | null
           created_at?: string | null
+          description?: string | null
           district_id?: string | null
           domain?: string | null
           enrollment_size?: number | null
@@ -1086,12 +1207,14 @@ export type Database = {
           mascot?: string | null
           name: string
           phone_number?: string | null
+          principal_name?: string | null
           school_colors?: string[] | null
           school_level?: string | null
           slug: string
           state?: string | null
           submission_status?: string | null
           submitted_by?: string | null
+          total_students?: number | null
           type: string
           user_submitted?: boolean | null
           verified?: boolean | null
@@ -1102,9 +1225,11 @@ export type Database = {
           accreditation?: string[] | null
           address_line_1?: string | null
           address_line_2?: string | null
+          banner_image_url?: string | null
           city?: string | null
           country?: string | null
           created_at?: string | null
+          description?: string | null
           district_id?: string | null
           domain?: string | null
           enrollment_size?: number | null
@@ -1115,12 +1240,14 @@ export type Database = {
           mascot?: string | null
           name?: string
           phone_number?: string | null
+          principal_name?: string | null
           school_colors?: string[] | null
           school_level?: string | null
           slug?: string
           state?: string | null
           submission_status?: string | null
           submitted_by?: string | null
+          total_students?: number | null
           type?: string
           user_submitted?: boolean | null
           verified?: boolean | null
