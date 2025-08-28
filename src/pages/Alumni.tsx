@@ -53,8 +53,8 @@ const Alumni = () => {
   const [schools, setSchools] = useState<School[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
-  const [selectedSchoolId, setSelectedSchoolId] = useState<string>("");
-  const [selectedYear, setSelectedYear] = useState<string>("");
+  const [selectedSchoolId, setSelectedSchoolId] = useState<string>("all");
+  const [selectedYear, setSelectedYear] = useState<string>("all");
 
   useEffect(() => {
     if (user && profile?.school_id) {
@@ -148,8 +148,8 @@ const Alumni = () => {
       person.last_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
       person.email.toLowerCase().includes(searchTerm.toLowerCase());
     
-    const matchesSchool = !selectedSchoolId || person.school_id === selectedSchoolId;
-    const matchesYear = !selectedYear || person.graduation_year?.toString() === selectedYear;
+    const matchesSchool = selectedSchoolId === "all" || person.school_id === selectedSchoolId;
+    const matchesYear = selectedYear === "all" || person.graduation_year?.toString() === selectedYear;
     
     return matchesSearch && matchesSchool && matchesYear;
   });
@@ -203,7 +203,7 @@ const Alumni = () => {
                     <SelectValue placeholder="Filter by school" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="">All Schools</SelectItem>
+                    <SelectItem value="all">All Schools</SelectItem>
                     {schools.map((school) => (
                       <SelectItem key={school.id} value={school.id}>
                         {school.name}
@@ -216,7 +216,7 @@ const Alumni = () => {
                     <SelectValue placeholder="Filter by graduation year" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="">All Years</SelectItem>
+                    <SelectItem value="all">All Years</SelectItem>
                     {graduationYears.map((year) => (
                       <SelectItem key={year} value={year!.toString()}>
                         {year}
