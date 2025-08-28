@@ -288,6 +288,75 @@ export type Database = {
         }
         Relationships: []
       }
+      cross_school_events: {
+        Row: {
+          created_at: string | null
+          created_by: string | null
+          description: string | null
+          end_date: string | null
+          event_type: string | null
+          id: string
+          location: string | null
+          max_participants: number | null
+          name: string
+          organizer_school_id: string | null
+          participating_schools: string[] | null
+          registration_required: boolean | null
+          start_date: string
+          updated_at: string | null
+          visibility: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          created_by?: string | null
+          description?: string | null
+          end_date?: string | null
+          event_type?: string | null
+          id?: string
+          location?: string | null
+          max_participants?: number | null
+          name: string
+          organizer_school_id?: string | null
+          participating_schools?: string[] | null
+          registration_required?: boolean | null
+          start_date: string
+          updated_at?: string | null
+          visibility?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          created_by?: string | null
+          description?: string | null
+          end_date?: string | null
+          event_type?: string | null
+          id?: string
+          location?: string | null
+          max_participants?: number | null
+          name?: string
+          organizer_school_id?: string | null
+          participating_schools?: string[] | null
+          registration_required?: boolean | null
+          start_date?: string
+          updated_at?: string | null
+          visibility?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "cross_school_events_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "cross_school_events_organizer_school_id_fkey"
+            columns: ["organizer_school_id"]
+            isOneToOne: false
+            referencedRelation: "schools"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       friendships: {
         Row: {
           addressee_id: string
@@ -624,47 +693,449 @@ export type Database = {
         }
         Relationships: []
       }
-      schools: {
+      school_administrators: {
+        Row: {
+          appointed_at: string | null
+          appointed_by: string | null
+          created_at: string | null
+          id: string
+          permissions: string[] | null
+          role: string | null
+          school_id: string | null
+          status: string | null
+          user_id: string | null
+        }
+        Insert: {
+          appointed_at?: string | null
+          appointed_by?: string | null
+          created_at?: string | null
+          id?: string
+          permissions?: string[] | null
+          role?: string | null
+          school_id?: string | null
+          status?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          appointed_at?: string | null
+          appointed_by?: string | null
+          created_at?: string | null
+          id?: string
+          permissions?: string[] | null
+          role?: string | null
+          school_id?: string | null
+          status?: string | null
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "school_administrators_appointed_by_fkey"
+            columns: ["appointed_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "school_administrators_school_id_fkey"
+            columns: ["school_id"]
+            isOneToOne: false
+            referencedRelation: "schools"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "school_administrators_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      school_districts: {
+        Row: {
+          country: string
+          created_at: string | null
+          district_code: string | null
+          id: string
+          name: string
+          state: string
+          superintendent: string | null
+          updated_at: string | null
+          website_url: string | null
+        }
+        Insert: {
+          country?: string
+          created_at?: string | null
+          district_code?: string | null
+          id?: string
+          name: string
+          state: string
+          superintendent?: string | null
+          updated_at?: string | null
+          website_url?: string | null
+        }
+        Update: {
+          country?: string
+          created_at?: string | null
+          district_code?: string | null
+          id?: string
+          name?: string
+          state?: string
+          superintendent?: string | null
+          updated_at?: string | null
+          website_url?: string | null
+        }
+        Relationships: []
+      }
+      school_history: {
+        Row: {
+          achievements: string[] | null
+          activities: string[] | null
+          created_at: string | null
+          department: string | null
+          end_year: number | null
+          grade_level: string | null
+          graduated: boolean | null
+          id: string
+          is_primary: boolean | null
+          role_type: string | null
+          school_id: string | null
+          start_year: number
+          transfer_reason: string | null
+          updated_at: string | null
+          user_id: string | null
+          verification_status: string | null
+        }
+        Insert: {
+          achievements?: string[] | null
+          activities?: string[] | null
+          created_at?: string | null
+          department?: string | null
+          end_year?: number | null
+          grade_level?: string | null
+          graduated?: boolean | null
+          id?: string
+          is_primary?: boolean | null
+          role_type?: string | null
+          school_id?: string | null
+          start_year: number
+          transfer_reason?: string | null
+          updated_at?: string | null
+          user_id?: string | null
+          verification_status?: string | null
+        }
+        Update: {
+          achievements?: string[] | null
+          activities?: string[] | null
+          created_at?: string | null
+          department?: string | null
+          end_year?: number | null
+          grade_level?: string | null
+          graduated?: boolean | null
+          id?: string
+          is_primary?: boolean | null
+          role_type?: string | null
+          school_id?: string | null
+          start_year?: number
+          transfer_reason?: string | null
+          updated_at?: string | null
+          user_id?: string | null
+          verification_status?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "school_history_school_id_fkey"
+            columns: ["school_id"]
+            isOneToOne: false
+            referencedRelation: "schools"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "school_history_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      school_invitations: {
         Row: {
           created_at: string | null
-          domain: string | null
+          expires_at: string | null
+          from_school_id: string | null
           id: string
+          invitation_type: string | null
+          invited_by: string | null
+          message: string | null
+          responded_at: string | null
+          responded_by: string | null
+          status: string | null
+          to_school_id: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          expires_at?: string | null
+          from_school_id?: string | null
+          id?: string
+          invitation_type?: string | null
+          invited_by?: string | null
+          message?: string | null
+          responded_at?: string | null
+          responded_by?: string | null
+          status?: string | null
+          to_school_id?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          expires_at?: string | null
+          from_school_id?: string | null
+          id?: string
+          invitation_type?: string | null
+          invited_by?: string | null
+          message?: string | null
+          responded_at?: string | null
+          responded_by?: string | null
+          status?: string | null
+          to_school_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "school_invitations_from_school_id_fkey"
+            columns: ["from_school_id"]
+            isOneToOne: false
+            referencedRelation: "schools"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "school_invitations_invited_by_fkey"
+            columns: ["invited_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "school_invitations_responded_by_fkey"
+            columns: ["responded_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "school_invitations_to_school_id_fkey"
+            columns: ["to_school_id"]
+            isOneToOne: false
+            referencedRelation: "schools"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      school_partnerships: {
+        Row: {
+          created_at: string | null
+          description: string | null
+          established_date: string | null
+          id: string
+          partnership_type: string | null
+          school_1_id: string | null
+          school_2_id: string | null
+          status: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          description?: string | null
+          established_date?: string | null
+          id?: string
+          partnership_type?: string | null
+          school_1_id?: string | null
+          school_2_id?: string | null
+          status?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          description?: string | null
+          established_date?: string | null
+          id?: string
+          partnership_type?: string | null
+          school_1_id?: string | null
+          school_2_id?: string | null
+          status?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "school_partnerships_school_1_id_fkey"
+            columns: ["school_1_id"]
+            isOneToOne: false
+            referencedRelation: "schools"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "school_partnerships_school_2_id_fkey"
+            columns: ["school_2_id"]
+            isOneToOne: false
+            referencedRelation: "schools"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      school_verifications: {
+        Row: {
+          created_at: string | null
+          expires_at: string | null
+          id: string
+          school_id: string | null
+          user_id: string | null
+          verification_data: Json | null
+          verification_level: string | null
+          verification_type: string | null
+          verified_at: string | null
+          verified_by: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          expires_at?: string | null
+          id?: string
+          school_id?: string | null
+          user_id?: string | null
+          verification_data?: Json | null
+          verification_level?: string | null
+          verification_type?: string | null
+          verified_at?: string | null
+          verified_by?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          expires_at?: string | null
+          id?: string
+          school_id?: string | null
+          user_id?: string | null
+          verification_data?: Json | null
+          verification_level?: string | null
+          verification_type?: string | null
+          verified_at?: string | null
+          verified_by?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "school_verifications_school_id_fkey"
+            columns: ["school_id"]
+            isOneToOne: false
+            referencedRelation: "schools"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "school_verifications_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "school_verifications_verified_by_fkey"
+            columns: ["verified_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      schools: {
+        Row: {
+          accreditation: string[] | null
+          address_line_1: string | null
+          address_line_2: string | null
+          city: string | null
+          country: string | null
+          created_at: string | null
+          district_id: string | null
+          domain: string | null
+          enrollment_size: number | null
+          founding_year: number | null
+          id: string
+          is_public: boolean | null
           location: Json
+          mascot: string | null
           name: string
+          phone_number: string | null
+          school_colors: string[] | null
+          school_level: string | null
           slug: string
+          state: string | null
           submission_status: string | null
           submitted_by: string | null
           type: string
           user_submitted: boolean | null
           verified: boolean | null
+          website_url: string | null
+          zip_code: string | null
         }
         Insert: {
+          accreditation?: string[] | null
+          address_line_1?: string | null
+          address_line_2?: string | null
+          city?: string | null
+          country?: string | null
           created_at?: string | null
+          district_id?: string | null
           domain?: string | null
+          enrollment_size?: number | null
+          founding_year?: number | null
           id?: string
+          is_public?: boolean | null
           location: Json
+          mascot?: string | null
           name: string
+          phone_number?: string | null
+          school_colors?: string[] | null
+          school_level?: string | null
           slug: string
+          state?: string | null
           submission_status?: string | null
           submitted_by?: string | null
           type: string
           user_submitted?: boolean | null
           verified?: boolean | null
+          website_url?: string | null
+          zip_code?: string | null
         }
         Update: {
+          accreditation?: string[] | null
+          address_line_1?: string | null
+          address_line_2?: string | null
+          city?: string | null
+          country?: string | null
           created_at?: string | null
+          district_id?: string | null
           domain?: string | null
+          enrollment_size?: number | null
+          founding_year?: number | null
           id?: string
+          is_public?: boolean | null
           location?: Json
+          mascot?: string | null
           name?: string
+          phone_number?: string | null
+          school_colors?: string[] | null
+          school_level?: string | null
           slug?: string
+          state?: string | null
           submission_status?: string | null
           submitted_by?: string | null
           type?: string
           user_submitted?: boolean | null
           verified?: boolean | null
+          website_url?: string | null
+          zip_code?: string | null
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "schools_district_id_fkey"
+            columns: ["district_id"]
+            isOneToOne: false
+            referencedRelation: "school_districts"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       student_tags: {
         Row: {
