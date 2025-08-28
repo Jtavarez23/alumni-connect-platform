@@ -7,7 +7,8 @@ import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { usePartyRoom } from "@/hooks/usePartyRoom";
 import { YearbookViewer } from "./YearbookViewer";
-import { Users, Crown, LogOut, ArrowLeft } from "lucide-react";
+import { PartyRoomChat } from "./PartyRoomChat";
+import { Users, Crown, LogOut, ArrowLeft, MessageCircle } from "lucide-react";
 import { toast } from "sonner";
 
 interface YearbookEdition {
@@ -38,6 +39,7 @@ export function PartyYearbookViewer({ roomId, onLeave }: PartyYearbookViewerProp
   const { room, participants, loading, isHost, updateCurrentPage, leaveRoom } = usePartyRoom(roomId);
   const [yearbook, setYearbook] = useState<YearbookEdition | null>(null);
   const [showYearbook, setShowYearbook] = useState(true);
+  const [showChat, setShowChat] = useState(false);
 
   useEffect(() => {
     if (room?.yearbook_edition_id) {
@@ -201,6 +203,13 @@ export function PartyYearbookViewer({ roomId, onLeave }: PartyYearbookViewerProp
           />
         </div>
       )}
+
+      {/* Live Chat */}
+      <PartyRoomChat
+        roomId={roomId}
+        isOpen={showChat}
+        onToggle={() => setShowChat(!showChat)}
+      />
     </div>
   );
 }

@@ -374,6 +374,65 @@ export type Database = {
           },
         ]
       }
+      mystery_game_sessions: {
+        Row: {
+          clues_revealed: number | null
+          completed_at: string | null
+          created_at: string | null
+          expires_at: string | null
+          game_status: string | null
+          graduation_year: number
+          id: string
+          max_clues: number | null
+          school_id: string
+          score: number | null
+          started_at: string | null
+          target_user_id: string
+          updated_at: string | null
+          user_id: string
+        }
+        Insert: {
+          clues_revealed?: number | null
+          completed_at?: string | null
+          created_at?: string | null
+          expires_at?: string | null
+          game_status?: string | null
+          graduation_year: number
+          id?: string
+          max_clues?: number | null
+          school_id: string
+          score?: number | null
+          started_at?: string | null
+          target_user_id: string
+          updated_at?: string | null
+          user_id: string
+        }
+        Update: {
+          clues_revealed?: number | null
+          completed_at?: string | null
+          created_at?: string | null
+          expires_at?: string | null
+          game_status?: string | null
+          graduation_year?: number
+          id?: string
+          max_clues?: number | null
+          school_id?: string
+          score?: number | null
+          started_at?: string | null
+          target_user_id?: string
+          updated_at?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "mystery_game_sessions_school_id_fkey"
+            columns: ["school_id"]
+            isOneToOne: false
+            referencedRelation: "schools"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       mystery_lookups: {
         Row: {
           clues: Json | null
