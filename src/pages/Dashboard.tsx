@@ -1,7 +1,6 @@
 import { useEffect, useState } from "react";
 import { useAuth } from "@/contexts/AuthContext";
 import { Navigate } from "react-router-dom";
-import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -15,44 +14,29 @@ import { MemoryStories } from "@/components/social/MemoryStories";
 import { MysteryFeature } from "@/components/social/MysteryFeature";
 import { GamificationWidget } from "@/components/gamification/GamificationWidget";
 import { LiveActivityIndicator } from "@/components/realtime/LiveActivityIndicator";
-
-interface School {
-  id: string;
-  name: string;
-  type: string;
-  location: any;
-}
+import { useSchoolHistory, SchoolHistory } from "@/hooks/useSchoolHistory";
+import SchoolSwitcher from "@/components/dashboard/SchoolSwitcher";
 
 const Dashboard = () => {
   const { user, profile, loading } = useAuth();
-  const [school, setSchool] = useState<School | null>(null);
+  const { schoolHistory, getPrimarySchool } = useSchoolHistory();
+  const [selectedSchool, setSelectedSchool] = useState<SchoolHistory | null>(null);
   const [showProfileSetup, setShowProfileSetup] = useState(false);
   const [showProfileEdit, setShowProfileEdit] = useState(false);
 
   useEffect(() => {
-    if (profile && profile.school_id) {
-      fetchSchool();
-    }
-  }, [profile]);
-
-  useEffect(() => {
     // Show profile setup if user hasn't completed their profile
-    if (profile && (!profile.school_id || !profile.graduation_year)) {
+    if (profile && schoolHistory.length === 0) {
       setShowProfileSetup(true);
     }
-  }, [profile]);
+  }, [profile, schoolHistory]);
 
-  const fetchSchool = async () => {
-    if (!profile?.school_id) return;
-    
-    const { data } = await supabase
-      .from('schools')
-      .select('*')
-      .eq('id', profile.school_id)
-      .single();
-    
-    if (data) setSchool(data);
-  };
+  useEffect(() => {
+    // Set primary school as default selection
+    if (!selectedSchool && schoolHistory.length > 0) {
+      setSelectedSchool(getPrimarySchool() || schoolHistory[0]);
+    }
+  }, [schoolHistory, selectedSchool, getPrimarySchool]);
 
   if (loading) {
     return (
@@ -71,7 +55,7 @@ const Dashboard = () => {
     return `${profile.first_name?.[0] || ""}${profile.last_name?.[0] || ""}`.toUpperCase();
   };
 
-  const isProfileComplete = profile?.school_id && profile?.graduation_year;
+  const isProfileComplete = schoolHistory.length > 0;
 
   return (
     <AppLayout title="Dashboard">
@@ -113,27 +97,28 @@ const Dashboard = () => {
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="grid md:grid-cols-2 gap-4">
-              <div>
-                <p className="text-sm text-muted-foreground">School</p>
-                <p className="font-medium">
-                  {school ? school.name : "Not selected"}
-                </p>
+            {schoolHistory.length > 0 ? (
+              <div className="space-y-4">
+                <div>
+                  <p className="text-sm text-muted-foreground mb-2">Current School Context</p>
+                  <SchoolSwitcher 
+                    selectedSchool={selectedSchool}
+                    onSchoolSelect={setSelectedSchool}
+                  />
+                </div>
+                {schoolHistory.length > 1 && (
+                  <p className="text-sm text-muted-foreground">
+                    You have {schoolHistory.length} schools in your education history.
+                  </p>
+                )}
               </div>
-              <div>
-                <p className="text-sm text-muted-foreground">Graduation Year</p>
-                <p className="font-medium">
-                  {profile?.graduation_year || "Not specified"}
-                </p>
-              </div>
-            </div>
-            {!isProfileComplete && (
-              <div className="mt-4 p-4 bg-muted rounded-lg">
+            ) : (
+              <div className="p-4 bg-muted rounded-lg">
                 <p className="text-sm text-muted-foreground mb-2">
-                  Complete your profile to access all features
+                  Add your schools to access all features
                 </p>
                 <Button onClick={() => setShowProfileSetup(true)}>
-                  Complete Profile
+                  Add Schools
                 </Button>
               </div>
             )}

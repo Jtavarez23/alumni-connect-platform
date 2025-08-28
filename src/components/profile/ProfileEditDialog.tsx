@@ -6,7 +6,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import AvatarUpload from "@/components/ui/avatar-upload";
-import SchoolSelector from "./SchoolSelector";
+import MultiSchoolSelector from "./MultiSchoolSelector";
 import { useToast } from "@/hooks/use-toast";
 
 interface ProfileEditDialogProps {
@@ -24,8 +24,6 @@ const ProfileEditDialog = ({ open, onOpenChange, onComplete }: ProfileEditDialog
     first_name: profile?.first_name || "",
     last_name: profile?.last_name || "",
     bio: profile?.bio || "",
-    school_id: profile?.school_id || "",
-    graduation_year: profile?.graduation_year || new Date().getFullYear(),
     avatar_url: profile?.avatar_url || ""
   });
 
@@ -126,27 +124,8 @@ const ProfileEditDialog = ({ open, onOpenChange, onComplete }: ProfileEditDialog
             />
           </div>
 
-          {/* School Selection */}
-          <div>
-            <Label>School</Label>
-            <SchoolSelector
-              selectedSchoolId={formData.school_id}
-              onSchoolSelect={(schoolId) => setFormData({...formData, school_id: schoolId})}
-            />
-          </div>
-          
-          {/* Graduation Year */}
-          <div>
-            <Label htmlFor="graduation_year">Graduation Year</Label>
-            <Input
-              id="graduation_year"
-              type="number"
-              value={formData.graduation_year}
-              onChange={(e) => setFormData({...formData, graduation_year: parseInt(e.target.value)})}
-              min={1950}
-              max={new Date().getFullYear() + 10}
-            />
-          </div>
+          {/* Multi-School Education History */}
+          <MultiSchoolSelector onSchoolHistoryChange={onComplete} />
 
           {/* Action Buttons */}
           <div className="flex justify-end space-x-2">

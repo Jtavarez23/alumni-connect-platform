@@ -8,7 +8,8 @@ import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import AvatarUpload from "@/components/ui/avatar-upload";
 import { Search } from "lucide-react";
-import SchoolSelector from "./SchoolSelector";
+import MultiSchoolSelector from "./MultiSchoolSelector";
+import { useSchoolHistory } from "@/hooks/useSchoolHistory";
 import { useToast } from "@/hooks/use-toast";
 
 interface ProfileSetupDialogProps {
@@ -19,6 +20,7 @@ interface ProfileSetupDialogProps {
 
 const ProfileSetupDialog = ({ open, onOpenChange, onComplete }: ProfileSetupDialogProps) => {
   const { profile, updateProfile, uploadAvatar } = useAuth();
+  const { schoolHistory } = useSchoolHistory();
   const { toast } = useToast();
   const [step, setStep] = useState(1);
   const [loading, setLoading] = useState(false);
@@ -27,8 +29,6 @@ const ProfileSetupDialog = ({ open, onOpenChange, onComplete }: ProfileSetupDial
     first_name: profile?.first_name || "",
     last_name: profile?.last_name || "",
     bio: profile?.bio || "",
-    school_id: profile?.school_id || "",
-    graduation_year: profile?.graduation_year || new Date().getFullYear(),
     avatar_url: profile?.avatar_url || ""
   });
 
@@ -41,10 +41,10 @@ const ProfileSetupDialog = ({ open, onOpenChange, onComplete }: ProfileSetupDial
       });
       return;
     }
-    if (step === 2 && !formData.school_id) {
+    if (step === 2 && schoolHistory.length === 0) {
       toast({
-        title: "Please select a school",
-        description: "School selection is required to continue",
+        title: "Please add at least one school",
+        description: "School information is required to continue",
         variant: "destructive"
       });
       return;
@@ -172,28 +172,13 @@ const ProfileSetupDialog = ({ open, onOpenChange, onComplete }: ProfileSetupDial
           {step === 2 && (
             <Card>
               <CardHeader>
-                <CardTitle>School Information</CardTitle>
+                <CardTitle>Education History</CardTitle>
                 <CardDescription>
-                  Select your school and graduation year
+                  Add your schools and education background
                 </CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">
-                <SchoolSelector
-                  selectedSchoolId={formData.school_id}
-                  onSchoolSelect={(schoolId) => setFormData({...formData, school_id: schoolId})}
-                />
-                
-                <div>
-                  <Label htmlFor="graduation_year">Graduation Year *</Label>
-                  <Input
-                    id="graduation_year"
-                    type="number"
-                    value={formData.graduation_year}
-                    onChange={(e) => setFormData({...formData, graduation_year: parseInt(e.target.value)})}
-                    min={1950}
-                    max={new Date().getFullYear() + 10}
-                  />
-                </div>
+                <MultiSchoolSelector onSchoolHistoryChange={() => {}} />
               </CardContent>
             </Card>
           )}
@@ -219,7 +204,9 @@ const ProfileSetupDialog = ({ open, onOpenChange, onComplete }: ProfileSetupDial
                     <h3 className="font-semibold text-lg">
                       {formData.first_name} {formData.last_name}
                     </h3>
-                    <p className="text-muted-foreground">Class of {formData.graduation_year}</p>
+                    <p className="text-muted-foreground">
+                      {schoolHistory.length} school{schoolHistory.length !== 1 ? 's' : ''} added
+                    </p>
                   </div>
                 </div>
                 
