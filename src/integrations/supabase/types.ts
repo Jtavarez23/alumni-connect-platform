@@ -1183,6 +1183,10 @@ export type Database = {
         Args: { points: number }
         Returns: number
       }
+      get_current_user_school_id: {
+        Args: Record<PropertyKey, never>
+        Returns: string
+      }
       update_user_stats_points: {
         Args: { points_to_add: number; user_id: string }
         Returns: undefined
