@@ -13,6 +13,7 @@ import { ActivityFeed } from "@/components/activity/ActivityFeed";
 import { AppLayout } from "@/components/layout/AppLayout";
 import { MemoryStories } from "@/components/social/MemoryStories";
 import { MysteryFeature } from "@/components/social/MysteryFeature";
+import { GamificationWidget } from "@/components/gamification/GamificationWidget";
 
 interface School {
   id: string;
@@ -135,8 +136,12 @@ const Dashboard = () => {
           </CardContent>
         </Card>
 
-        {/* Quick Actions */}
-        <div className="grid md:grid-cols-3 gap-6 mb-8">
+        {/* Main Content Grid */}
+        <div className="grid lg:grid-cols-3 gap-6 mb-8">
+          {/* Left Column - Quick Actions */}
+          <div className="lg:col-span-2 space-y-6">
+            {/* Quick Actions */}
+            <div className="grid md:grid-cols-3 gap-6">
           <Card className="hover:shadow-md transition-shadow cursor-pointer" onClick={() => window.location.href = '/yearbooks'}>
             <CardHeader className="pb-3">
               <CardTitle className="flex items-center gap-2 text-lg">
@@ -187,16 +192,23 @@ const Dashboard = () => {
               </Button>
             </CardContent>
           </Card>
+            </div>
+
+            {/* Memory Stories */}
+            <MemoryStories />
+            
+            {/* Mystery Feature */}
+            <MysteryFeature />
+
+            {/* Recent Activity */}
+            <ActivityFeed />
+          </div>
+
+          {/* Right Column - Gamification */}
+          <div className="lg:col-span-1">
+            <GamificationWidget />
+          </div>
         </div>
-
-        {/* Memory Stories */}
-        <MemoryStories />
-        
-        {/* Mystery Feature */}
-        <MysteryFeature />
-
-        {/* Recent Activity */}
-        <ActivityFeed />
 
         {/* Profile Setup and Edit Dialogs */}
         <ProfileSetupDialog 

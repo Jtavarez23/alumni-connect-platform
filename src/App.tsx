@@ -5,6 +5,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { Toaster as HotToaster } from "react-hot-toast";
 import { AuthProvider } from "@/contexts/AuthContext";
+import { GamificationProvider } from "@/components/gamification/GamificationProvider";
 import Index from "./pages/Index";
 import Login from "./pages/Login";
 import Signup from "./pages/Signup";
@@ -23,7 +24,8 @@ const queryClient = new QueryClient();
 const App = () => (
   <QueryClientProvider client={queryClient}>
     <AuthProvider>
-      <TooltipProvider>
+      <GamificationProvider>
+        <TooltipProvider>
         <Toaster />
         <Sonner />
         <HotToaster position="top-center" />
@@ -68,6 +70,7 @@ const App = () => (
           </Routes>
         </BrowserRouter>
       </TooltipProvider>
+      </GamificationProvider>
     </AuthProvider>
   </QueryClientProvider>
 );
