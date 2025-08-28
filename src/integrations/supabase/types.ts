@@ -762,6 +762,50 @@ export type Database = {
           },
         ]
       }
+      then_vs_now_posts: {
+        Row: {
+          caption: string | null
+          created_at: string | null
+          id: string
+          now_photo_url: string
+          then_photo_url: string
+          updated_at: string | null
+          user_id: string
+          visibility: string | null
+          yearbook_entry_id: string | null
+        }
+        Insert: {
+          caption?: string | null
+          created_at?: string | null
+          id?: string
+          now_photo_url: string
+          then_photo_url: string
+          updated_at?: string | null
+          user_id: string
+          visibility?: string | null
+          yearbook_entry_id?: string | null
+        }
+        Update: {
+          caption?: string | null
+          created_at?: string | null
+          id?: string
+          now_photo_url?: string
+          then_photo_url?: string
+          updated_at?: string | null
+          user_id?: string
+          visibility?: string | null
+          yearbook_entry_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "then_vs_now_posts_yearbook_entry_id_fkey"
+            columns: ["yearbook_entry_id"]
+            isOneToOne: false
+            referencedRelation: "yearbook_entries"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       user_badges: {
         Row: {
           badge_type_id: string

@@ -15,6 +15,7 @@ import Yearbooks from "./pages/Yearbooks";
 import Alumni from "./pages/Alumni";
 import Network from "./pages/Network";
 import Channels from "./pages/Channels";
+import Social from "./pages/Social";
 import Profile from "./pages/Profile";
 import Settings from "./pages/Settings";
 import ForgotPassword from "./pages/ForgotPassword";
@@ -61,6 +62,11 @@ const App = () => (
               <Route path="/channels" element={
                 <ProtectedRoute>
                   <Channels />
+                </ProtectedRoute>
+              } />
+              <Route path="/social" element={
+                <ProtectedRoute>
+                  <Social />
                 </ProtectedRoute>
               } />
               <Route path="/profile" element={
