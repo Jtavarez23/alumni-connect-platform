@@ -590,10 +590,13 @@ export type Database = {
           created_at: string | null
           email: string
           email_notifications: boolean | null
+          facebook_url: string | null
           first_name: string
           graduation_year: number | null
           id: string
+          instagram_url: string | null
           last_name: string
+          linkedin_url: string | null
           privacy_level: string | null
           push_notifications: boolean | null
           school_id: string | null
@@ -614,10 +617,13 @@ export type Database = {
           created_at?: string | null
           email: string
           email_notifications?: boolean | null
+          facebook_url?: string | null
           first_name: string
           graduation_year?: number | null
           id: string
+          instagram_url?: string | null
           last_name: string
+          linkedin_url?: string | null
           privacy_level?: string | null
           push_notifications?: boolean | null
           school_id?: string | null
@@ -638,10 +644,13 @@ export type Database = {
           created_at?: string | null
           email?: string
           email_notifications?: boolean | null
+          facebook_url?: string | null
           first_name?: string
           graduation_year?: number | null
           id?: string
+          instagram_url?: string | null
           last_name?: string
+          linkedin_url?: string | null
           privacy_level?: string | null
           push_notifications?: boolean | null
           school_id?: string | null
@@ -1791,6 +1800,10 @@ export type Database = {
       get_current_user_school_id: {
         Args: Record<PropertyKey, never>
         Returns: string
+      }
+      is_school_admin: {
+        Args: { school_id: string; user_id: string }
+        Returns: boolean
       }
       update_user_stats_points: {
         Args: { points_to_add: number; user_id: string }

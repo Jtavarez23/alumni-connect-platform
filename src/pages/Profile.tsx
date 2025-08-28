@@ -6,14 +6,16 @@ import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { User, Edit, MapPin, GraduationCap, Shield, Calendar, Activity } from "lucide-react";
+import { User, Edit, MapPin, GraduationCap, Shield, Calendar, Activity, Instagram, Facebook, Linkedin } from "lucide-react";
 import ProfileEditDialog from "@/components/profile/ProfileEditDialog";
 import ProfileStats from "@/components/profile/ProfileStats";
+import { useFriendship } from "@/hooks/useFriendship";
 
 export default function Profile() {
   const { profile, user } = useAuth();
   const [editDialogOpen, setEditDialogOpen] = useState(false);
   const [activeTab, setActiveTab] = useState("overview");
+  const { isConnected } = useFriendship(profile?.id);
 
   const getInitials = () => {
     if (!profile) return "U";
@@ -127,9 +129,51 @@ export default function Profile() {
                 </CardHeader>
                 <CardContent>
                   {profile.bio ? (
-                    <p className="text-muted-foreground">{profile.bio}</p>
+                    <p className="text-muted-foreground mb-4">{profile.bio}</p>
                   ) : (
-                    <p className="text-muted-foreground italic">No bio available. Click "Edit Profile" to add one.</p>
+                    <p className="text-muted-foreground italic mb-4">No bio available. Click "Edit Profile" to add one.</p>
+                  )}
+                  
+                  {/* Social Media Links - visible to network connections or own profile */}
+                  {(isConnected || profile.id === user?.id) && (
+                    <div className="space-y-2">
+                      <h4 className="text-sm font-medium text-foreground">Connect</h4>
+                      <div className="flex gap-2">
+                        {profile.instagram_url && (
+                          <Button 
+                            variant="outline" 
+                            size="sm" 
+                            onClick={() => window.open(profile.instagram_url, '_blank')}
+                            className="flex items-center gap-1"
+                          >
+                            <Instagram className="h-3 w-3" />
+                            Instagram
+                          </Button>
+                        )}
+                        {profile.facebook_url && (
+                          <Button 
+                            variant="outline" 
+                            size="sm" 
+                            onClick={() => window.open(profile.facebook_url, '_blank')}
+                            className="flex items-center gap-1"
+                          >
+                            <Facebook className="h-3 w-3" />
+                            Facebook
+                          </Button>
+                        )}
+                        {profile.linkedin_url && (
+                          <Button 
+                            variant="outline" 
+                            size="sm" 
+                            onClick={() => window.open(profile.linkedin_url, '_blank')}
+                            className="flex items-center gap-1"
+                          >
+                            <Linkedin className="h-3 w-3" />
+                            LinkedIn
+                          </Button>
+                        )}
+                      </div>
+                    </div>
                   )}
                 </CardContent>
               </Card>

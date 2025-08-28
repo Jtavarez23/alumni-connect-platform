@@ -24,7 +24,10 @@ const ProfileEditDialog = ({ open, onOpenChange, onComplete }: ProfileEditDialog
     first_name: profile?.first_name || "",
     last_name: profile?.last_name || "",
     bio: profile?.bio || "",
-    avatar_url: profile?.avatar_url || ""
+    avatar_url: profile?.avatar_url || "",
+    instagram_url: profile?.instagram_url || "",
+    facebook_url: profile?.facebook_url || "",
+    linkedin_url: profile?.linkedin_url || ""
   });
 
   const handleSave = async () => {
@@ -122,6 +125,46 @@ const ProfileEditDialog = ({ open, onOpenChange, onComplete }: ProfileEditDialog
               placeholder="Tell us a bit about yourself..."
               rows={3}
             />
+          </div>
+
+          {/* Social Media Links */}
+          <div>
+            <Label className="text-base font-semibold">Social Media</Label>
+            <p className="text-sm text-muted-foreground mb-4">
+              Your social media links will only be visible to people in your network
+            </p>
+            <div className="space-y-3">
+              <div>
+                <Label htmlFor="instagram_url">Instagram</Label>
+                <Input
+                  id="instagram_url"
+                  value={formData.instagram_url}
+                  onChange={(e) => setFormData({...formData, instagram_url: e.target.value})}
+                  placeholder="https://instagram.com/username"
+                  type="url"
+                />
+              </div>
+              <div>
+                <Label htmlFor="facebook_url">Facebook</Label>
+                <Input
+                  id="facebook_url"
+                  value={formData.facebook_url}
+                  onChange={(e) => setFormData({...formData, facebook_url: e.target.value})}
+                  placeholder="https://facebook.com/username"
+                  type="url"
+                />
+              </div>
+              <div>
+                <Label htmlFor="linkedin_url">LinkedIn</Label>
+                <Input
+                  id="linkedin_url"
+                  value={formData.linkedin_url}
+                  onChange={(e) => setFormData({...formData, linkedin_url: e.target.value})}
+                  placeholder="https://linkedin.com/in/username"
+                  type="url"
+                />
+              </div>
+            </div>
           </div>
 
           {/* Multi-School Education History */}
