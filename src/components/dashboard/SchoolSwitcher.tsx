@@ -1,17 +1,17 @@
-import { useState } from "react";
+import React, { useState } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { ChevronDown, GraduationCap, MapPin } from "lucide-react";
-import { useSchoolHistory, SchoolHistory } from "@/hooks/useSchoolHistory";
+import { useSchoolHistory, type SchoolHistory } from "@/hooks/useSchoolHistory";
 
 interface SchoolSwitcherProps {
   selectedSchool: SchoolHistory | null;
   onSchoolSelect: (school: SchoolHistory | null) => void;
 }
 
-const SchoolSwitcher = ({ selectedSchool, onSchoolSelect }: SchoolSwitcherProps) => {
+const SchoolSwitcher: React.FC<SchoolSwitcherProps> = ({ selectedSchool, onSchoolSelect }) => {
   const { schoolHistory } = useSchoolHistory();
   const [open, setOpen] = useState(false);
 
