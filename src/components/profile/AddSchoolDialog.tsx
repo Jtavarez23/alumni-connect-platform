@@ -251,16 +251,13 @@ const AddSchoolDialog = ({ onSchoolAdded }: AddSchoolDialogProps) => {
         .insert({
           name: name.trim(),
           type,
-          slug: name.toLowerCase().replace(/[^a-z0-9]+/g, '-'),
+          slug: name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '') + '-' + Date.now(),
           location: {
             coordinates: finalCoordinates,
-            address: address.trim() || null,
-            city: null,
-            state: null,
-            country: null
+            address: address.trim() || null
           },
           user_submitted: true,
-          submission_status: 'approved', // Auto-approve user submissions for now
+          submission_status: 'approved',
           submitted_by: (await supabase.auth.getUser()).data.user?.id,
           verified: false
         })

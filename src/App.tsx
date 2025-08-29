@@ -17,6 +17,7 @@ import Alumni from "./pages/Alumni";
 import Network from "./pages/Network";
 import Messages from "./pages/Messages";
 import Channels from "./pages/Channels";
+import Schools from "./pages/Schools";
 import Social from "./pages/Social";
 import Profile from "./pages/Profile";
 import Settings from "./pages/Settings";
@@ -71,6 +72,11 @@ const App = () => (
               <Route path="/channels" element={
                 <ProtectedRoute>
                   <Channels />
+                </ProtectedRoute>
+              } />
+              <Route path="/schools" element={
+                <ProtectedRoute>
+                  <Schools />
                 </ProtectedRoute>
               } />
               <Route path="/social" element={

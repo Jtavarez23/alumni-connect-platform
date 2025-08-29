@@ -8,7 +8,8 @@ import {
   User,
   Settings,
   LogOut,
-  Camera
+  Camera,
+  GraduationCap
 } from "lucide-react";
 import { NavLink, useLocation } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
@@ -34,6 +35,7 @@ const mainNavItems = [
   { title: "Yearbooks", url: "/yearbooks", icon: Book },
   { title: "Messages", url: "/messages", icon: MessageCircle },
   { title: "Channels", url: "/channels", icon: Hash },
+  { title: "Schools", url: "/schools", icon: GraduationCap },
   { title: "Social Hub", url: "/social", icon: Camera },
   { title: "Alumni", url: "/alumni", icon: Users },
   { title: "Network", url: "/network", icon: NetworkIcon },
