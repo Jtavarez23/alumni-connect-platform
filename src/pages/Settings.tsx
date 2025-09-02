@@ -1,10 +1,11 @@
 import { useState } from "react";
 import { AppLayout } from "@/components/layout/AppLayout";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Shield, Bell, User } from "lucide-react";
+import { Shield, Bell, User, CreditCard } from "lucide-react";
 import PrivacySettings from "@/components/settings/PrivacySettings";
 import NotificationSettings from "@/components/settings/NotificationSettings";
 import AccountSettings from "@/components/settings/AccountSettings";
+import SubscriptionSettings from "@/components/settings/SubscriptionSettings";
 
 export default function Settings() {
   const [activeTab, setActiveTab] = useState("privacy");
@@ -20,7 +21,7 @@ export default function Settings() {
         </div>
 
         <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
-          <TabsList className="grid w-full grid-cols-3">
+          <TabsList className="grid w-full grid-cols-4">
             <TabsTrigger value="privacy" className="flex items-center gap-2">
               <Shield className="h-4 w-4" />
               Privacy
@@ -32,6 +33,10 @@ export default function Settings() {
             <TabsTrigger value="account" className="flex items-center gap-2">
               <User className="h-4 w-4" />
               Account
+            </TabsTrigger>
+            <TabsTrigger value="subscription" className="flex items-center gap-2">
+              <CreditCard className="h-4 w-4" />
+              Subscription
             </TabsTrigger>
           </TabsList>
 
@@ -45,6 +50,10 @@ export default function Settings() {
 
           <TabsContent value="account">
             <AccountSettings />
+          </TabsContent>
+
+          <TabsContent value="subscription">
+            <SubscriptionSettings />
           </TabsContent>
         </Tabs>
       </div>

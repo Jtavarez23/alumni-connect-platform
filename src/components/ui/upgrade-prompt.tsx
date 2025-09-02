@@ -2,6 +2,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Crown, Zap, Check } from "lucide-react";
+import { useStripe } from "@/hooks/useStripe";
 
 interface UpgradePromptProps {
   onUpgrade?: () => void;
@@ -10,6 +11,15 @@ interface UpgradePromptProps {
 }
 
 export const UpgradePrompt = ({ onUpgrade, feature = "this feature", compact = false }: UpgradePromptProps) => {
+  const { createCheckoutSession, loading } = useStripe();
+  
+  const handleUpgrade = () => {
+    if (onUpgrade) {
+      onUpgrade();
+    } else {
+      createCheckoutSession();
+    }
+  };
   if (compact) {
     return (
       <div className="flex items-center justify-between p-3 bg-gradient-to-r from-primary/10 to-secondary/10 rounded-lg border border-primary/20">
@@ -17,8 +27,8 @@ export const UpgradePrompt = ({ onUpgrade, feature = "this feature", compact = f
           <Crown className="h-4 w-4 text-primary" />
           <span className="text-sm font-medium">Upgrade to Premium to unlock {feature}</span>
         </div>
-        <Button size="sm" onClick={onUpgrade}>
-          Upgrade
+        <Button size="sm" onClick={handleUpgrade} disabled={loading}>
+          {loading ? "Processing..." : "Upgrade"}
         </Button>
       </div>
     );
@@ -62,10 +72,11 @@ export const UpgradePrompt = ({ onUpgrade, feature = "this feature", compact = f
         </div>
         <Button 
           className="w-full bg-gradient-to-r from-primary to-secondary hover:from-primary/90 hover:to-secondary/90" 
-          onClick={onUpgrade}
+          onClick={handleUpgrade}
+          disabled={loading}
         >
           <Crown className="h-4 w-4 mr-2" />
-          Upgrade for $5/month
+          {loading ? "Processing..." : "Upgrade for $5/month"}
         </Button>
       </CardContent>
     </Card>
