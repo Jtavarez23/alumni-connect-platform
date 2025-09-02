@@ -50,6 +50,48 @@ export type Database = {
         }
         Relationships: []
       }
+      admin_permissions: {
+        Row: {
+          admin_id: string | null
+          created_at: string | null
+          granted_at: string | null
+          granted_by: string | null
+          id: string
+          permission_type: string
+        }
+        Insert: {
+          admin_id?: string | null
+          created_at?: string | null
+          granted_at?: string | null
+          granted_by?: string | null
+          id?: string
+          permission_type: string
+        }
+        Update: {
+          admin_id?: string | null
+          created_at?: string | null
+          granted_at?: string | null
+          granted_by?: string | null
+          id?: string
+          permission_type?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "admin_permissions_admin_id_fkey"
+            columns: ["admin_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "admin_permissions_granted_by_fkey"
+            columns: ["granted_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       badge_types: {
         Row: {
           category: string
@@ -257,6 +299,47 @@ export type Database = {
             columns: ["school_id"]
             isOneToOne: false
             referencedRelation: "schools"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      content_moderation: {
+        Row: {
+          action: string
+          content_id: string
+          content_type: string
+          created_at: string | null
+          id: string
+          moderated_at: string | null
+          moderator_id: string | null
+          reason: string | null
+        }
+        Insert: {
+          action: string
+          content_id: string
+          content_type: string
+          created_at?: string | null
+          id?: string
+          moderated_at?: string | null
+          moderator_id?: string | null
+          reason?: string | null
+        }
+        Update: {
+          action?: string
+          content_id?: string
+          content_type?: string
+          created_at?: string | null
+          id?: string
+          moderated_at?: string | null
+          moderator_id?: string | null
+          reason?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "content_moderation_moderator_id_fkey"
+            columns: ["moderator_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
             referencedColumns: ["id"]
           },
         ]
@@ -582,6 +665,7 @@ export type Database = {
       }
       profiles: {
         Row: {
+          admin_role: string | null
           allow_friend_requests: boolean | null
           allow_messages: boolean | null
           allow_tags: boolean | null
@@ -603,12 +687,14 @@ export type Database = {
           show_graduation_year: boolean | null
           show_in_search: boolean | null
           show_school: boolean | null
+          stripe_customer_id: string | null
           subscription_status: string | null
           updated_at: string | null
           username: string | null
           verification_status: string | null
         }
         Insert: {
+          admin_role?: string | null
           allow_friend_requests?: boolean | null
           allow_messages?: boolean | null
           allow_tags?: boolean | null
@@ -630,12 +716,14 @@ export type Database = {
           show_graduation_year?: boolean | null
           show_in_search?: boolean | null
           show_school?: boolean | null
+          stripe_customer_id?: string | null
           subscription_status?: string | null
           updated_at?: string | null
           username?: string | null
           verification_status?: string | null
         }
         Update: {
+          admin_role?: string | null
           allow_friend_requests?: boolean | null
           allow_messages?: boolean | null
           allow_tags?: boolean | null
@@ -657,6 +745,7 @@ export type Database = {
           show_graduation_year?: boolean | null
           show_in_search?: boolean | null
           show_school?: boolean | null
+          stripe_customer_id?: string | null
           subscription_status?: string | null
           updated_at?: string | null
           username?: string | null
@@ -1325,6 +1414,57 @@ export type Database = {
           },
         ]
       }
+      subscription_management: {
+        Row: {
+          created_at: string | null
+          expires_at: string | null
+          granted_at: string | null
+          granted_by: string | null
+          id: string
+          is_manual_grant: boolean | null
+          notes: string | null
+          subscription_type: string
+          user_id: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          expires_at?: string | null
+          granted_at?: string | null
+          granted_by?: string | null
+          id?: string
+          is_manual_grant?: boolean | null
+          notes?: string | null
+          subscription_type?: string
+          user_id?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          expires_at?: string | null
+          granted_at?: string | null
+          granted_by?: string | null
+          id?: string
+          is_manual_grant?: boolean | null
+          notes?: string | null
+          subscription_type?: string
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "subscription_management_granted_by_fkey"
+            columns: ["granted_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "subscription_management_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       tag_suggestions: {
         Row: {
           confidence_score: number | null
@@ -1801,8 +1941,16 @@ export type Database = {
         Args: Record<PropertyKey, never>
         Returns: string
       }
+      is_admin: {
+        Args: { user_id: string }
+        Returns: boolean
+      }
       is_school_admin: {
         Args: { school_id: string; user_id: string }
+        Returns: boolean
+      }
+      is_super_admin: {
+        Args: { user_id: string }
         Returns: boolean
       }
       update_user_stats_points: {
