@@ -42,13 +42,24 @@ serve(async (req) => {
       .single();
 
     if (manualGrant) {
-      await supabaseClient
-        .from("profiles")
-        .update({
-          subscription_status: "premium",
-          updated_at: new Date().toISOString(),
-        })
-        .eq("id", user.id);
+    // Update both profiles and subscribers tables for manual grants
+    await supabaseClient
+      .from("profiles")
+      .update({
+        subscription_status: "premium",
+        updated_at: new Date().toISOString(),
+      })
+      .eq("id", user.id);
+
+    await supabaseClient
+      .from("subscribers")
+      .upsert({
+        user_id: user.id,
+        email: user.email,
+        subscribed: true,
+        subscription_tier: "premium",
+        updated_at: new Date().toISOString(),
+      }, { onConflict: 'email' });
 
       return new Response(JSON.stringify({
         subscribed: true,
@@ -64,13 +75,25 @@ serve(async (req) => {
     const customers = await stripe.customers.list({ email: user.email, limit: 1 });
     
     if (customers.data.length === 0) {
-      await supabaseClient
-        .from("profiles")
-        .update({
-          subscription_status: "free",
-          updated_at: new Date().toISOString(),
-        })
-        .eq("id", user.id);
+    // Update both profiles and subscribers tables for no subscription
+    await supabaseClient
+      .from("profiles")
+      .update({
+        subscription_status: "free",
+        updated_at: new Date().toISOString(),
+      })
+      .eq("id", user.id);
+
+    await supabaseClient
+      .from("subscribers")
+      .upsert({
+        user_id: user.id,
+        email: user.email,
+        subscribed: false,
+        subscription_tier: null,
+        subscription_end: null,
+        updated_at: new Date().toISOString(),
+      }, { onConflict: 'email' });
 
       return new Response(JSON.stringify({ subscribed: false }), {
         headers: { ...corsHeaders, "Content-Type": "application/json" },
@@ -94,6 +117,29 @@ serve(async (req) => {
 
     const hasActiveSub = subscriptions.data.length > 0;
     
+    // Determine subscription details
+    let subscriptionTier = null;
+    let subscriptionEnd = null;
+    
+    if (hasActiveSub) {
+      const subscription = subscriptions.data[0];
+      subscriptionEnd = new Date(subscription.current_period_end * 1000).toISOString();
+      
+      // Determine tier based on price
+      const priceId = subscription.items.data[0].price.id;
+      const price = await stripe.prices.retrieve(priceId);
+      const amount = price.unit_amount || 0;
+      
+      if (amount <= 999) {
+        subscriptionTier = "Basic";
+      } else if (amount <= 1999) {
+        subscriptionTier = "Premium";
+      } else {
+        subscriptionTier = "Enterprise";
+      }
+    }
+
+    // Update both profiles and subscribers tables
     await supabaseClient
       .from("profiles")
       .update({
@@ -101,6 +147,18 @@ serve(async (req) => {
         updated_at: new Date().toISOString(),
       })
       .eq("id", user.id);
+
+    await supabaseClient
+      .from("subscribers")
+      .upsert({
+        user_id: user.id,
+        email: user.email,
+        stripe_customer_id: customerId,
+        subscribed: hasActiveSub,
+        subscription_tier: subscriptionTier,
+        subscription_end: subscriptionEnd,
+        updated_at: new Date().toISOString(),
+      }, { onConflict: 'email' });
 
     return new Response(JSON.stringify({
       subscribed: hasActiveSub,
