@@ -10,10 +10,12 @@ import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/components/ui/use-toast';
 import { notifyNewMessage } from '@/lib/notifications';
 import { format } from 'date-fns';
+import { MessagingRestrictions } from '@/components/messaging/MessagingRestrictions';
+import { useSubscription } from '@/hooks/useSubscription';
 
 interface Message {
   id: string;
-  content: string;
+  text: string;
   sender_id: string;
   created_at: string;
   read_at?: string;
@@ -42,11 +44,13 @@ interface MessageDialogProps {
 export function MessageDialog({ isOpen, onClose, otherUser }: MessageDialogProps) {
   const { user } = useAuth();
   const { toast } = useToast();
+  const { isPremium } = useSubscription();
   const [messages, setMessages] = useState<Message[]>([]);
   const [newMessage, setNewMessage] = useState('');
   const [conversationId, setConversationId] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const [sending, setSending] = useState(false);
+  const [canMessage, setCanMessage] = useState<boolean | null>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   const scrollToBottom = () => {
@@ -181,6 +185,16 @@ export function MessageDialog({ isOpen, onClose, otherUser }: MessageDialogProps
 
   const sendMessage = async () => {
     if (!newMessage.trim() || !conversationId || !user || sending) return;
+    
+    // Check if user can send message (for free users)
+    if (!isPremium && canMessage === false) {
+      toast({
+        title: "Cannot send message",
+        description: "You need to connect with this person first or upgrade to Premium.",
+        variant: "destructive",
+      });
+      return;
+    }
 
     setSending(true);
     try {
@@ -189,7 +203,7 @@ export function MessageDialog({ isOpen, onClose, otherUser }: MessageDialogProps
         .insert({
           conversation_id: conversationId,
           sender_id: user.id,
-          content: newMessage.trim(),
+          text: newMessage.trim(),
         });
 
       if (error) throw error;
@@ -252,6 +266,17 @@ export function MessageDialog({ isOpen, onClose, otherUser }: MessageDialogProps
         </DialogHeader>
 
         <div className="flex-1 flex flex-col min-h-0">
+          {/* Show messaging restrictions for free users */}
+          {!isPremium && (
+            <div className="px-4 py-2 border-b">
+              <MessagingRestrictions 
+                recipientId={otherUser.id}
+                recipientName={`${otherUser.first_name} ${otherUser.last_name}`}
+                onCanMessage={setCanMessage}
+              />
+            </div>
+          )}
+          
           <ScrollArea className="flex-1 px-4">
             {loading ? (
               <div className="flex items-center justify-center h-32">
@@ -280,7 +305,7 @@ export function MessageDialog({ isOpen, onClose, otherUser }: MessageDialogProps
                             : 'bg-muted'
                         }`}
                       >
-                        <p className="text-sm">{message.content}</p>
+                        <p className="text-sm">{message.text}</p>
                         <p className={`text-xs mt-1 ${
                           isOwnMessage ? 'text-primary-foreground/70' : 'text-muted-foreground'
                         }`}>
@@ -301,18 +326,24 @@ export function MessageDialog({ isOpen, onClose, otherUser }: MessageDialogProps
                 value={newMessage}
                 onChange={(e) => setNewMessage(e.target.value)}
                 onKeyPress={handleKeyPress}
-                placeholder="Type a message..."
-                disabled={sending || loading}
+                placeholder={canMessage === false ? "Connect first to message" : "Type a message..."}
+                disabled={sending || loading || (!isPremium && canMessage === false)}
                 className="flex-1"
               />
               <Button
                 onClick={sendMessage}
-                disabled={!newMessage.trim() || sending || loading}
+                disabled={!newMessage.trim() || sending || loading || (!isPremium && canMessage === false)}
                 size="sm"
+                title={canMessage === false ? "You need to connect with this person first" : "Send message"}
               >
                 <Send className="h-4 w-4" />
               </Button>
             </div>
+            {!isPremium && canMessage === false && (
+              <p className="text-xs text-muted-foreground mt-2 text-center">
+                Send a connection request or upgrade to Premium to message anyone
+              </p>
+            )}
           </div>
         </div>
       </DialogContent>

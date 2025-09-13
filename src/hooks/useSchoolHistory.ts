@@ -4,11 +4,11 @@ import { useAuth } from '@/contexts/AuthContext';
 import { useToast } from '@/hooks/use-toast';
 import type { Database } from '@/integrations/supabase/types';
 
-type SchoolHistoryRow = Database['public']['Tables']['school_history']['Row'];
+type UserEducationRow = Database['public']['Tables']['user_education']['Row'];
 type SchoolRow = Database['public']['Tables']['schools']['Row'];
 
-export interface SchoolHistory extends Omit<SchoolHistoryRow, 'user_id' | 'created_at' | 'updated_at'> {
-  school?: Pick<SchoolRow, 'id' | 'name' | 'type' | 'location' | 'verified'>;
+export interface SchoolHistory extends Omit<UserEducationRow, 'user_id' | 'created_at' | 'updated_at'> {
+  schools?: Pick<SchoolRow, 'id' | 'name' | 'type' | 'location' | 'verified'>;
 }
 
 export const useSchoolHistory = () => {
@@ -23,16 +23,56 @@ export const useSchoolHistory = () => {
     setLoading(true);
     try {
       const { data, error } = await supabase
-        .from('school_history')
+        .from('user_education')
         .select(`
           *,
-          school:schools(id, name, type, location, verified)
+          schools(id, name, type, location, verified)
         `)
         .eq('user_id', user.id)
         .order('start_year', { ascending: false });
 
       if (error) throw error;
-      setSchoolHistory((data || []) as SchoolHistory[]);
+      
+      let educationData = (data || []) as SchoolHistory[];
+      
+      // TEMPORARY FIX: If no user_education data, check profile for school_id and auto-migrate
+      if (educationData.length === 0) {
+        const { data: profileData, error: profileError } = await supabase
+          .from('profiles')
+          .select('school_id, schools(id, name, type, location, verified)')
+          .eq('id', user.id)
+          .single();
+          
+        if (!profileError && profileData?.school_id) {
+          
+          // Create the user_education entry
+          const { data: newEducation, error: insertError } = await supabase
+            .from('user_education')
+            .insert({
+              user_id: user.id,
+              school_id: profileData.school_id,
+              school_type: 'high_school',
+              start_year: 2020,
+              end_year: 2024,
+              is_primary: true
+            })
+            .select(`
+              *,
+              schools(id, name, type, location, verified)
+            `)
+            .single();
+            
+          if (!insertError && newEducation) {
+            educationData = [newEducation as SchoolHistory];
+            toast({
+              title: "Profile Updated",
+              description: "Your education history has been set up automatically."
+            });
+          }
+        }
+      }
+      
+      setSchoolHistory(educationData);
     } catch (error: any) {
       toast({
         title: "Error fetching school history",
@@ -44,19 +84,19 @@ export const useSchoolHistory = () => {
     }
   };
 
-  const addSchoolHistory = async (schoolData: Omit<SchoolHistory, 'id' | 'school'>) => {
+  const addSchoolHistory = async (schoolData: Omit<SchoolHistory, 'id' | 'schools'>) => {
     if (!user) return;
 
     try {
       const { data, error } = await supabase
-        .from('school_history')
+        .from('user_education')
         .insert({
           ...schoolData,
           user_id: user.id
         })
         .select(`
           *,
-          school:schools(id, name, type, location, verified)
+          schools(id, name, type, location, verified)
         `)
         .single();
 
@@ -65,7 +105,7 @@ export const useSchoolHistory = () => {
       setSchoolHistory(prev => [data as SchoolHistory, ...prev]);
       toast({
         title: "School added successfully",
-        description: `Added ${data.school?.name} to your education history`
+        description: `Added ${data.schools?.name} to your education history`
       });
       
       return data;
@@ -82,12 +122,12 @@ export const useSchoolHistory = () => {
   const updateSchoolHistory = async (id: string, updates: Partial<SchoolHistory>) => {
     try {
       const { data, error } = await supabase
-        .from('school_history')
+        .from('user_education')
         .update(updates)
         .eq('id', id)
         .select(`
           *,
-          school:schools(id, name, type, location, verified)
+          schools(id, name, type, location, verified)
         `)
         .single();
 
@@ -116,7 +156,7 @@ export const useSchoolHistory = () => {
   const deleteSchoolHistory = async (id: string) => {
     try {
       const { error } = await supabase
-        .from('school_history')
+        .from('user_education')
         .delete()
         .eq('id', id);
 

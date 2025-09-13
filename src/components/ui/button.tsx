@@ -9,14 +9,17 @@ const buttonVariants = cva(
   {
     variants: {
       variant: {
+        // AC-PLAN-006 Spec: Primary with brand-600 bg, white text
+        primary: "bg-brand-600 text-white hover:bg-brand-700",
         default: "bg-primary text-primary-foreground hover:bg-primary/90",
-        destructive:
-          "bg-destructive text-destructive-foreground hover:bg-destructive/90",
+        // AC-PLAN-006 Spec: Secondary with neutral-100 bg, brand-600 text
+        secondary: "bg-neutral-100 text-brand-600 hover:bg-neutral-200",
+        // AC-PLAN-006 Spec: Ghost with transparent bg, hover brand-50
+        ghost: "bg-transparent hover:bg-brand-50 hover:text-brand-700",
+        // AC-PLAN-006 Spec: Destructive with red-600 bg
+        destructive: "bg-red-600 text-white hover:bg-red-700",
         outline:
           "border border-input bg-background hover:bg-accent hover:text-accent-foreground",
-        secondary:
-          "bg-secondary text-secondary-foreground hover:bg-secondary/80",
-        ghost: "hover:bg-accent hover:text-accent-foreground",
         link: "text-primary underline-offset-4 hover:underline",
         success: "bg-success text-success-foreground hover:bg-success/90",
       },

@@ -19,6 +19,7 @@ import {
   Trophy
 } from "lucide-react";
 import { useSchoolHistory } from "@/hooks/useSchoolHistory";
+import { formatSchoolType } from "@/lib/utils/schoolUtils";
 import { EnhancedSchoolDiscovery } from "@/components/school/EnhancedSchoolDiscovery";
 import AddSchoolDialog from "@/components/profile/AddSchoolDialog";
 import { NavLink } from "react-router-dom";
@@ -33,11 +34,6 @@ const Schools = () => {
     return schoolHistory.find(sh => sh.is_primary) || schoolHistory[0];
   };
 
-  const formatSchoolType = (type: string) => {
-    return type.split('_').map(word => 
-      word.charAt(0).toUpperCase() + word.slice(1)
-    ).join(' ');
-  };
 
   const getYearRange = (startYear: number, endYear?: number) => {
     return endYear ? `${startYear} - ${endYear}` : `${startYear} - Present`;
@@ -57,7 +53,7 @@ const Schools = () => {
           <div className="flex gap-2">
             <EnhancedSchoolDiscovery 
               onSchoolSelect={(school) => {
-                console.log("School selected:", school);
+                // School selected
               }}
             />
             <AddSchoolDialog />

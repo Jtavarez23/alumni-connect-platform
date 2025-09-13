@@ -1,0 +1,99 @@
+name: Staging Build and Test
+
+on:
+  push:
+    branches: [ develop, staging ]
+  pull_request:
+    branches: [ develop, staging ]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+    
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '20'
+        cache: 'npm'
+    
+    - name: Install dependencies
+      run: npm ci --legacy-peer-deps
+    
+    - name: Run tests
+      run: npm run test:ci
+    
+    - name: Run linting
+      run: npm run lint
+    
+    - name: Run E2E tests
+      run: npm run test:e2e:build && npm run test:e2e
+      if: success()
+  
+  build-staging:
+    needs: test
+    runs-on: ubuntu-latest
+    if: github.event_name == 'push'
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+    
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '20'
+        cache: 'npm'
+    
+    - name: Install dependencies
+      run: npm ci --legacy-peer-deps
+    
+    - name: Setup EAS
+      run: npm install -g eas-cli
+    
+    - name: Login to EAS
+      run: eas login --token ${{ secrets.EAS_TOKEN }}
+    
+    - name: Build Staging Android
+      run: eas build --platform android --profile preview
+      env:
+        EXPO_PUBLIC_SUPABASE_URL: ${{ secrets.EXPO_PUBLIC_SUPABASE_URL_STAGING }}
+        EXPO_PUBLIC_SUPABASE_ANON_KEY: ${{ secrets.EXPO_PUBLIC_SUPABASE_ANON_KEY_STAGING }}
+    
+    - name: Build Staging iOS
+      run: eas build --platform ios --profile preview
+      env:
+        EXPO_PUBLIC_SUPABASE_URL: ${{ secrets.EXPO_PUBLIC_SUPABASE_URL_STAGING }}
+        EXPO_PUBLIC_SUPABASE_ANON_KEY: ${{ secrets.EXPO_PUBLIC_SUPABASE_ANON_KEY_STAGING }}
+    
+    - name: Build Staging Web
+      run: npm run build:web
+      env:
+        EXPO_PUBLIC_SUPABASE_URL: ${{ secrets.EXPO_PUBLIC_SUPABASE_URL_STAGING }}
+        EXPO_PUBLIC_SUPABASE_ANON_KEY: ${{ secrets.EXPO_PUBLIC_SUPABASE_ANON_KEY_STAGING }}
+    
+    - name: Deploy Staging Web
+      uses: amondnet/vercel-action@v25
+      with:
+        vercel-token: ${{ secrets.VERCEL_TOKEN_STAGING }}
+        vercel-org-id: ${{ secrets.VERCEL_ORG_ID }}
+        vercel-project-id: ${{ secrets.VERCEL_PROJECT_ID_STAGING }}
+        working-directory: ./dist-web
+        vercel-args: '--env APP_ENV=staging'
+  
+  notify-staging:
+    needs: [test, build-staging]
+    runs-on: ubuntu-latest
+    if: always()
+    
+    steps:
+    - name: Send Slack notification
+      uses: 8398a7/action-slack@v3
+      with:
+        status: ${{ job.status }}
+        channel: '#staging-deployments'
+        webhook_url: ${{ secrets.SLACK_WEBHOOK_STAGING }}
+      if: always()

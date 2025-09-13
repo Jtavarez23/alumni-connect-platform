@@ -39,24 +39,24 @@ const SchoolSwitcher: React.FC<SchoolSwitcherProps> = ({ selectedSchool, onSchoo
           <div className="flex items-center space-x-3">
             <GraduationCap className="h-8 w-8 text-primary" />
             <div>
-              <h3 className="font-semibold">{school.school?.name}</h3>
+              <h3 className="font-semibold">{school.schools?.name}</h3>
               <div className="flex items-center space-x-2 text-sm text-muted-foreground">
                 <span>{school.start_year} - {school.end_year || "Present"}</span>
                 {school.is_primary && <Badge variant="default" className="text-xs">Primary</Badge>}
               </div>
-              {school.school?.location && (
+              {school.schools?.location && (
                 <div className="flex items-center mt-1 text-sm text-muted-foreground">
                   <MapPin className="h-3 w-3 mr-1" />
-                  {getLocationDisplay(school.school.location)}
+                  {getLocationDisplay(school.schools.location)}
                 </div>
               )}
-              {school.school?.id && (
+              {school.schools?.id && (
                 <div className="mt-2">
                   <SchoolAlumniStats
-                    schoolId={school.school.id}
-                    currentCount={getStatsForSchool(school.school.id)?.currentAlumniCount || 0}
-                    recentCount={getStatsForSchool(school.school.id)?.recentConnections24h || 0}
-                    growthPercentage={getStatsForSchool(school.school.id)?.growthPercentage}
+                    schoolId={school.schools.id}
+                    currentCount={getStatsForSchool(school.schools.id)?.currentAlumniCount || 0}
+                    recentCount={getStatsForSchool(school.schools.id)?.recentConnections24h || 0}
+                    growthPercentage={getStatsForSchool(school.schools.id)?.growthPercentage}
                     size="sm"
                   />
                 </div>
@@ -123,16 +123,16 @@ const SchoolSwitcher: React.FC<SchoolSwitcherProps> = ({ selectedSchool, onSchoo
                     <div className="flex items-center space-x-2 w-full">
                       <GraduationCap className="h-4 w-4 text-primary flex-shrink-0" />
                       <div className="text-left flex-1 min-w-0 space-y-1">
-                        <div className="font-medium truncate">{school.school?.name}</div>
+                        <div className="font-medium truncate">{school.schools?.name}</div>
                         <div className="flex items-center space-x-2 text-xs text-muted-foreground">
                           <span>{school.start_year} - {school.end_year || "Present"}</span>
                           {school.is_primary && <Badge variant="default" className="text-xs">Primary</Badge>}
                         </div>
-                        {school.school?.id && (
+                        {school.schools?.id && (
                           <SchoolAlumniStats
-                            schoolId={school.school.id}
-                            currentCount={getStatsForSchool(school.school.id)?.currentAlumniCount || 0}
-                            recentCount={getStatsForSchool(school.school.id)?.recentConnections24h || 0}
+                            schoolId={school.schools.id}
+                            currentCount={getStatsForSchool(school.schools.id)?.currentAlumniCount || 0}
+                            recentCount={getStatsForSchool(school.schools.id)?.recentConnections24h || 0}
                             size="sm"
                             showGrowth={false}
                           />

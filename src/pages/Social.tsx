@@ -11,7 +11,8 @@ import { PartyRoomDialog } from "@/components/yearbook/PartyRoomDialog";
 import { PartyRoomBrowser } from "@/components/yearbook/PartyRoomBrowser";
 import { PartyYearbookViewer } from "@/components/yearbook/PartyYearbookViewer";
 import { AppLayout } from "@/components/layout/AppLayout";
-import { Camera, Eye, Image, BookOpen, Users } from "lucide-react";
+import { Feed } from "@/components/feed/Feed";
+import { Camera, Eye, Image, BookOpen, Users, Home } from "lucide-react";
 
 interface YearbookEdition {
   id: string;
@@ -38,7 +39,7 @@ const Social = () => {
   const fetchYearbooks = async () => {
     try {
       const { data, error } = await supabase
-        .from("yearbook_editions")
+        .from("yearbooks")
         .select(`
           id,
           title,
@@ -100,8 +101,12 @@ const Social = () => {
           </div>
         </div>
 
-        <Tabs defaultValue="then-vs-now" className="w-full">
-          <TabsList className="grid w-full grid-cols-4">
+        <Tabs defaultValue="feed" className="w-full">
+          <TabsList className="grid w-full grid-cols-5">
+            <TabsTrigger value="feed" className="flex items-center gap-2">
+              <Home className="h-4 w-4" />
+              Feed
+            </TabsTrigger>
             <TabsTrigger value="then-vs-now" className="flex items-center gap-2">
               <Camera className="h-4 w-4" />
               Then vs Now
@@ -119,6 +124,10 @@ const Social = () => {
               Party Rooms
             </TabsTrigger>
           </TabsList>
+
+          <TabsContent value="feed" className="mt-6">
+            <Feed />
+          </TabsContent>
 
           <TabsContent value="then-vs-now" className="mt-6">
             <ThenVsNowPosts />

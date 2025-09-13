@@ -35,7 +35,7 @@ const ProfileStats = ({ userId }: ProfileStatsProps) => {
 
         // Get yearbook appearances count
         const { count: yearbooksCount } = await supabase
-          .from('yearbook_entries')
+          .from('yearbook_pages')
           .select('*', { count: 'exact', head: true })
           .eq('profile_id', userId);
 

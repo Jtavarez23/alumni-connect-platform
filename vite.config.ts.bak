@@ -1,0 +1,68 @@
+import { defineConfig } from "vite";
+import react from "@vitejs/plugin-react-swc";
+import path from "path";
+import { componentTagger } from "lovable-tagger";
+import { sentryVitePlugin } from "@sentry/vite-plugin";
+
+// https://vitejs.dev/config/
+export default defineConfig(({ mode }) => ({
+  server: {
+    host: "::",
+    port: 8080,
+  },
+  plugins: [
+    react(),
+    mode === 'development' && componentTagger(),
+    // Add Sentry plugin for production builds
+    mode === 'production' && process.env.SENTRY_ORG && sentryVitePlugin({
+      org: process.env.SENTRY_ORG,
+      project: process.env.SENTRY_PROJECT,
+      authToken: process.env.SENTRY_AUTH_TOKEN,
+      sourceMaps: {
+        assets: ["./dist/**"],
+        ignore: ["node_modules/**"],
+      },
+    }),
+  ].filter(Boolean),
+  resolve: {
+    alias: {
+      "@": path.resolve(__dirname, "./src"),
+    },
+  },
+  build: {
+    rollupOptions: {
+      output: {
+        manualChunks: {
+          // Vendor chunks
+          'react-vendor': ['react', 'react-dom', 'react-router-dom'],
+          'ui-vendor': ['@radix-ui/react-dialog', '@radix-ui/react-dropdown-menu', '@radix-ui/react-select', '@radix-ui/react-avatar'],
+          'supabase-vendor': ['@supabase/supabase-js'],
+          'query-vendor': ['@tanstack/react-query'],
+          
+          // Page chunks (split more granularly)
+          'auth-pages': ['./src/pages/Login.tsx', './src/pages/Signup.tsx', './src/pages/ForgotPassword.tsx'],
+          'dashboard-page': ['./src/pages/Dashboard.tsx'],
+          'profile-page': ['./src/pages/Profile.tsx'],
+          'social-pages': ['./src/pages/Alumni.tsx', './src/pages/Network.tsx', './src/pages/Messages.tsx', './src/pages/Social.tsx'],
+          'school-pages': ['./src/pages/Schools.tsx', './src/pages/SchoolPage.tsx'],
+          'content-pages': ['./src/pages/Yearbooks.tsx', './src/pages/Channels.tsx'],
+          'admin-pages': ['./src/pages/Admin.tsx', './src/pages/Settings.tsx'],
+        },
+      },
+    },
+    // Increase chunk size warning limit
+    chunkSizeWarningLimit: 1000,
+    
+    // Additional production optimizations
+    minify: 'terser',
+    terserOptions: {
+      compress: {
+        drop_console: mode === 'production',
+        drop_debugger: true,
+      },
+    },
+    
+    // Source maps for production debugging
+    sourcemap: mode === 'production' ? 'hidden' : true,
+  },
+}));

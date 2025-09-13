@@ -20,7 +20,7 @@ interface YearbookEntry {
   quote: string | null;
   profile_id: string | null;
   edition_id: string;
-  yearbook_editions: {
+  yearbooks: {
     title: string;
     year: number;
     schools: {
@@ -71,10 +71,10 @@ export const TikTokYearbookBrowser = ({ open, onClose, initialEntryId }: TikTokY
     try {
       // Fetch yearbook entries with school data
       const { data, error } = await supabase
-        .from('yearbook_entries')
+        .from('yearbook_pages')
         .select(`
           *,
-          yearbook_editions!inner(
+          yearbooks!inner(
             title,
             year,
             schools!inner(
@@ -211,10 +211,10 @@ export const TikTokYearbookBrowser = ({ open, onClose, initialEntryId }: TikTokY
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
             <h2 className="text-lg font-semibold text-foreground">
-              {currentEntry.yearbook_editions.schools.name}
+              {currentEntry.yearbooks.schools.name}
             </h2>
             <Badge variant="secondary">
-              {currentEntry.yearbook_editions.year}
+              {currentEntry.yearbooks.year}
             </Badge>
           </div>
           <Button variant="ghost" size="sm" onClick={onClose}>

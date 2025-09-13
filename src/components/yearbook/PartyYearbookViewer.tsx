@@ -52,7 +52,7 @@ export function PartyYearbookViewer({ roomId, onLeave }: PartyYearbookViewerProp
 
     try {
       const { data, error } = await supabase
-        .from("yearbook_editions")
+        .from("yearbooks")
         .select(`
           *,
           school:schools(name)

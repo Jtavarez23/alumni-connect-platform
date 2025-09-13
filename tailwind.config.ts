@@ -27,6 +27,21 @@ export default {
 				ring: 'hsl(var(--ring))',
 				background: 'hsl(var(--background))',
 				foreground: 'hsl(var(--foreground))',
+				// Brand Colors from AC-PLAN-006
+				brand: {
+					50: '#f5f9ff',
+					100: '#e0edff',
+					500: '#3b82f6',
+					600: '#2563eb',
+					700: '#1d4ed8',
+				},
+				neutral: {
+					50: '#fafafa',
+					100: '#f5f5f5',
+					300: '#d4d4d8',
+					700: '#3f3f46',
+					900: '#18181b',
+				},
 				primary: {
 					DEFAULT: 'hsl(var(--primary))',
 					foreground: 'hsl(var(--primary-foreground))',
@@ -76,10 +91,27 @@ export default {
 					ring: 'hsl(var(--sidebar-ring))'
 				}
 			},
+			// Spacing from AC-PLAN-006
+			spacing: {
+				0: '0',
+				1: '0.25rem',
+				2: '0.5rem', 
+				4: '1rem',
+				6: '1.5rem',
+				8: '2rem',
+				12: '3rem'
+			},
 			borderRadius: {
-				lg: 'var(--radius)',
-				md: 'calc(var(--radius) - 2px)',
-				sm: 'calc(var(--radius) - 4px)'
+				// Radius from AC-PLAN-006
+				sm: '0.375rem',
+				md: '0.5rem',
+				lg: '0.75rem',
+				xl: '1rem',
+				'2xl': '1.5rem',
+				// Keep existing CSS variable based radius
+				'var-lg': 'var(--radius)',
+				'var-md': 'calc(var(--radius) - 2px)',
+				'var-sm': 'calc(var(--radius) - 4px)'
 			},
 			keyframes: {
 				'accordion-down': {

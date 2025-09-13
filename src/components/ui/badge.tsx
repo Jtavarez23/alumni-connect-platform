@@ -15,6 +15,15 @@ const badgeVariants = cva(
         destructive:
           "border-transparent bg-destructive text-destructive-foreground hover:bg-destructive/80",
         outline: "text-foreground",
+        // AC-PLAN-006 Spec: Alumni-specific badges
+        verified:
+          "border-transparent bg-brand-500 text-white hover:bg-brand/80",
+        premium:
+          "border-transparent bg-amber-500 text-white hover:bg-amber/80",
+        eventHost:
+          "border-transparent bg-purple-500 text-white hover:bg-purple/80",
+        moderator:
+          "border-transparent bg-green-600 text-white hover:bg-green/80",
       },
     },
     defaultVariants: {

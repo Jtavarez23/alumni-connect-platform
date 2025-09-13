@@ -9,6 +9,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { toast } from "sonner";
 import { Upload, X } from "lucide-react";
+import { formatSchoolType } from "@/lib/utils/schoolUtils";
 
 interface YearbookUploadDialogProps {
   open: boolean;
@@ -72,14 +73,34 @@ export function YearbookUploadDialog({ open, onClose, onSuccess }: YearbookUploa
 
       // Upload cover image if provided
       if (formData.cover_image) {
+        
+        // Validate file type
+        const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp'];
+        if (!allowedTypes.includes(formData.cover_image.type)) {
+          throw new Error('Please upload a valid image file (JPEG, PNG, or WebP)');
+        }
+        
+        // Validate file size (5MB limit)
+        if (formData.cover_image.size > 5 * 1024 * 1024) {
+          throw new Error('Image file must be less than 5MB');
+        }
+        
         const fileExt = formData.cover_image.name.split('.').pop();
-        const fileName = `${crypto.randomUUID()}.${fileExt}`;
+        const fileName = `${Date.now()}-${crypto.randomUUID()}.${fileExt}`;
+        
         
         const { data: uploadData, error: uploadError } = await supabase.storage
           .from('yearbook-covers')
-          .upload(fileName, formData.cover_image);
+          .upload(fileName, formData.cover_image, {
+            cacheControl: '3600',
+            upsert: false
+          });
 
-        if (uploadError) throw uploadError;
+        if (uploadError) {
+          console.error('Storage upload error:', uploadError);
+          throw new Error(`Upload failed: ${uploadError.message}`);
+        }
+        
         
         const { data: { publicUrl } } = supabase.storage
           .from('yearbook-covers')
@@ -88,19 +109,26 @@ export function YearbookUploadDialog({ open, onClose, onSuccess }: YearbookUploa
         cover_image_url = publicUrl;
       }
 
-      // Create yearbook edition
+      // Create yearbook
       const { error } = await supabase
-        .from("yearbook_editions")
+        .from("yearbooks")
         .insert({
           title: formData.title,
           year: formData.year,
           school_id: formData.school_id,
           cover_image_url,
-          upload_status: "pending",
+          upload_status: "completed",
           page_count: 0,
+          uploaded_by: user.id
         });
 
-      if (error) throw error;
+      if (error) {
+        console.error('Yearbook insert error:', error);
+        if (error.code === '23505') { // Unique violation
+          throw new Error(`A yearbook for this school and year (${formData.year}) already exists. Please choose a different year or contact support if you need to replace it.`);
+        }
+        throw error;
+      }
 
       toast.success("Yearbook uploaded successfully!");
       onSuccess();
@@ -111,9 +139,10 @@ export function YearbookUploadDialog({ open, onClose, onSuccess }: YearbookUploa
         description: "",
         cover_image: null,
       });
-    } catch (error) {
+    } catch (error: any) {
       console.error("Error uploading yearbook:", error);
-      toast.error("Failed to upload yearbook");
+      const errorMessage = error.message || "Failed to upload yearbook";
+      toast.error(errorMessage);
     } finally {
       setLoading(false);
     }
@@ -175,7 +204,7 @@ export function YearbookUploadDialog({ open, onClose, onSuccess }: YearbookUploa
                 )}
                 {schools.map((school) => (
                   <SelectItem key={school.id} value={school.id}>
-                    {school.name} ({school.type})
+                    {school.name} ({formatSchoolType(school.type)})
                   </SelectItem>
                 ))}
               </SelectContent>

@@ -26,7 +26,7 @@ const Footer = () => {
               <div className="w-8 h-8 bg-gradient-to-r from-primary to-secondary rounded-lg flex items-center justify-center">
                 <span className="text-white font-bold text-sm">YC</span>
               </div>
-              <span className="text-xl font-bold gradient-text">YearbookConnect</span>
+              <span className="text-xl font-bold gradient-text">Alumni Connect</span>
             </div>
             <p className="text-muted-foreground mb-6 max-w-sm">
               Transforming yearbooks into living networks. Connect with classmates, share your journey, and build meaningful professional relationships.
@@ -74,7 +74,7 @@ const Footer = () => {
         <div className="pt-8 border-t border-border">
           <div className="flex flex-col md:flex-row justify-between items-center gap-4">
             <p className="text-muted-foreground text-sm">
-              © 2024 YearbookConnect. All rights reserved.
+              © 2024 Alumni Connect. All rights reserved.
             </p>
             <div className="flex space-x-6 text-sm">
               <a href="#" className="text-muted-foreground hover:text-primary transition-colors">

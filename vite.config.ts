@@ -1,22 +1,194 @@
-import { defineConfig } from "vite";
+import { defineConfig, loadEnv } from "vite";
 import react from "@vitejs/plugin-react-swc";
 import path from "path";
 import { componentTagger } from "lovable-tagger";
+import { sentryVitePlugin } from "@sentry/vite-plugin";
 
 // https://vitejs.dev/config/
-export default defineConfig(({ mode }) => ({
-  server: {
-    host: "::",
-    port: 8080,
-  },
-  plugins: [
-    react(),
-    mode === 'development' &&
-    componentTagger(),
-  ].filter(Boolean),
-  resolve: {
-    alias: {
-      "@": path.resolve(__dirname, "./src"),
+export default defineConfig(({ mode }) => {
+  // Load env file based on `mode` in the current working directory.
+  const env = loadEnv(mode, process.cwd(), '');
+  
+  return {
+    server: {
+      host: "0.0.0.0",
+      port: 3000,
+      strictPort: true,
+      open: true,
+      hmr: {
+        port: 3001,
+        host: "localhost"
+      },
+      watch: {
+        usePolling: true,
+        interval: 100
+      },
+      fs: {
+        strict: false
+      },
+      proxy: {
+        '/api': {
+          target: 'http://localhost:54321',
+          changeOrigin: true,
+          secure: false,
+          configure: (proxy, _options) => {
+            proxy.on('error', (err, _req, _res) => {
+              console.log('proxy error', err);
+            });
+            proxy.on('proxyReq', (proxyReq, req, _res) => {
+              console.log('Sending Request to the Target:', req.method, req.url);
+            });
+            proxy.on('proxyRes', (proxyRes, req, _res) => {
+              console.log('Received Response from the Target:', proxyRes.statusCode, req.url);
+            });
+          },
+        },
+        '/auth': {
+          target: 'http://localhost:54321',
+          changeOrigin: true,
+          secure: false
+        },
+        '/storage': {
+          target: 'http://localhost:54321',
+          changeOrigin: true,
+          secure: false
+        },
+        '/rest': {
+          target: 'http://localhost:54321',
+          changeOrigin: true,
+          secure: false
+        }
+      }
     },
-  },
-}));
+    plugins: [
+      react({
+        // Enable Fast Refresh
+        fastRefresh: true,
+        jsxImportSource: '@emotion/react',
+      }),
+      mode === 'development' && componentTagger(),
+      // Add Sentry plugin for production builds
+      mode === 'production' && env.SENTRY_ORG && sentryVitePlugin({
+        org: env.SENTRY_ORG,
+        project: env.SENTRY_PROJECT,
+        authToken: env.SENTRY_AUTH_TOKEN,
+        sourceMaps: {
+          assets: ["./dist/**"],
+          ignore: ["node_modules/**"],
+        },
+      }),
+    ].filter(Boolean),
+    resolve: {
+      alias: {
+        "@": path.resolve(__dirname, "./src"),
+        "@components": path.resolve(__dirname, "./src/components"),
+        "@hooks": path.resolve(__dirname, "./src/hooks"),
+        "@utils": path.resolve(__dirname, "./src/utils"),
+        "@types": path.resolve(__dirname, "./src/types"),
+        "@pages": path.resolve(__dirname, "./src/pages"),
+        "@integrations": path.resolve(__dirname, "./src/integrations"),
+        "@lib": path.resolve(__dirname, "./src/lib")
+      },
+    },
+    define: {
+      // Make env variables available to the app
+      __DEV__: mode === 'development',
+      __PROD__: mode === 'production',
+      'process.env.NODE_ENV': JSON.stringify(mode),
+    },
+    build: {
+      rollupOptions: {
+        output: {
+          manualChunks: (id) => {
+            if (id.includes('node_modules')) {
+              if (id.includes('react') || id.includes('react-dom')) {
+                return 'react-vendor';
+              }
+              if (id.includes('@radix-ui')) {
+                return 'ui-vendor';
+              }
+              if (id.includes('@supabase')) {
+                return 'supabase-vendor';
+              }
+              if (id.includes('@tanstack')) {
+                return 'query-vendor';
+              }
+              if (id.includes('lucide-react')) {
+                return 'icons-vendor';
+              }
+              return 'vendor';
+            }
+            
+            // Split pages more granularly
+            if (id.includes('/src/pages/')) {
+              if (id.includes('Profile')) {
+                return 'profile-page';
+              }
+              if (id.includes('Dashboard')) {
+                return 'dashboard-page';
+              }
+              if (id.includes('Login') || id.includes('Signup') || id.includes('ForgotPassword')) {
+                return 'auth-pages';
+              }
+              if (id.includes('Network') || id.includes('Messages') || id.includes('Social')) {
+                return 'social-pages';
+              }
+              if (id.includes('Yearbooks') || id.includes('Channels')) {
+                return 'content-pages';
+              }
+              if (id.includes('Schools')) {
+                return 'school-pages';
+              }
+              if (id.includes('Admin') || id.includes('Settings')) {
+                return 'admin-pages';
+              }
+            }
+          },
+        },
+      },
+      // Increase chunk size warning limit
+      chunkSizeWarningLimit: 800,
+      
+      // Additional production optimizations
+      minify: 'terser',
+      terserOptions: {
+        compress: {
+          drop_console: mode === 'production',
+          drop_debugger: true,
+        },
+      },
+      
+      // Source maps for production debugging
+      sourcemap: mode === 'production' ? 'hidden' : true,
+      
+      // Target modern browsers for smaller bundles
+      target: 'es2020',
+    },
+    optimizeDeps: {
+      include: [
+        'react',
+        'react-dom',
+        'react-router-dom',
+        '@supabase/supabase-js',
+        '@tanstack/react-query',
+        'lucide-react',
+        'date-fns',
+        'clsx',
+        'tailwind-merge'
+      ],
+      exclude: ['@vite/client', '@vite/env']
+    },
+    // Environment-specific settings
+    esbuild: {
+      logOverride: { 'this-is-undefined-in-esm': 'silent' }
+    },
+    css: {
+      devSourcemap: mode === 'development',
+      preprocessorOptions: {
+        scss: {
+          additionalData: `@import "@/styles/variables.scss";`
+        }
+      }
+    }
+  };
+});

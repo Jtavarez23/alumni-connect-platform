@@ -1,0 +1,1566 @@
+{
+  "timestamp": "2025-09-11T22:23:41.408Z",
+  "summary": {
+    "totalTables": 0,
+    "totalIssues": 221,
+    "highSeverityIssues": 221,
+    "totalPolicies": 0,
+    "totalIndexes": 0
+  },
+  "details": {
+    "tables": {},
+    "relationships": [],
+    "policies": [],
+    "indexes": [],
+    "issues": [
+      {
+        "type": "MIGRATION_DEPENDENCY",
+        "file": "20250827000000_initial_setup.sql",
+        "issue": "References table 'auth' that may not exist yet",
+        "severity": "HIGH",
+        "description": "References table 'auth' that may not exist yet"
+      },
+      {
+        "type": "MIGRATION_DEPENDENCY",
+        "file": "20250827000000_initial_setup.sql",
+        "issue": "References table 'schools' that may not exist yet",
+        "severity": "HIGH",
+        "description": "References table 'schools' that may not exist yet"
+      },
+      {
+        "type": "MIGRATION_DEPENDENCY",
+        "file": "20250827174313_17949af8-8ddd-49e4-a46e-b52960be32f4.sql",
+        "issue": "References table 'auth' that may not exist yet",
+        "severity": "HIGH",
+        "description": "References table 'auth' that may not exist yet"
+      },
+      {
+        "type": "MIGRATION_DEPENDENCY",
+        "file": "20250827181052_6e90edfe-b3b5-47a9-83ff-4abb6d29d4fe.sql",
+        "issue": "References table 'auth' that may not exist yet",
+        "severity": "HIGH",
+        "description": "References table 'auth' that may not exist yet"
+      },
+      {
+        "type": "MIGRATION_DEPENDENCY",
+        "file": "20250827184334_276b751c-8c1e-49df-b8b0-d85a547099e8.sql",
+        "issue": "References table 'yearbook_entries' that may not exist yet",
+        "severity": "HIGH",
+        "description": "References table 'yearbook_entries' that may not exist yet"
+      },
+      {
+        "type": "MIGRATION_DEPENDENCY",
+        "file": "20250827184334_276b751c-8c1e-49df-b8b0-d85a547099e8.sql",
+        "issue": "References table 'profiles' that may not exist yet",
+        "severity": "HIGH",
+        "description": "References table 'profiles' that may not exist yet"
+      },
+      {
+        "type": "MIGRATION_DEPENDENCY",
+        "file": "20250827184334_276b751c-8c1e-49df-b8b0-d85a547099e8.sql",
+        "issue": "References table 'profiles' that may not exist yet",
+        "severity": "HIGH",
+        "description": "References table 'profiles' that may not exist yet"
+      },
+      {
+        "type": "MIGRATION_DEPENDENCY",
+        "file": "20250827184334_276b751c-8c1e-49df-b8b0-d85a547099e8.sql",
+        "issue": "References table 'yearbook_entries' that may not exist yet",
+        "severity": "HIGH",
+        "description": "References table 'yearbook_entries' that may not exist yet"
+      },
+      {
+        "type": "MIGRATION_DEPENDENCY",
+        "file": "20250827184334_276b751c-8c1e-49df-b8b0-d85a547099e8.sql",
+        "issue": "References table 'profiles' that may not exist yet",
+        "severity": "HIGH",
+        "description": "References table 'profiles' that may not exist yet"
+      },
+      {
+        "type": "MIGRATION_DEPENDENCY",
+        "file": "20250827184334_276b751c-8c1e-49df-b8b0-d85a547099e8.sql",
+        "issue": "References table 'profiles' that may not exist yet",
+        "severity": "HIGH",
+        "description": "References table 'profiles' that may not exist yet"
+      },
+      {
+        "type": "MIGRATION_DEPENDENCY",
+        "file": "20250827184334_276b751c-8c1e-49df-b8b0-d85a547099e8.sql",
+        "issue": "References table 'student_tags' that may not exist yet",
+        "severity": "HIGH",
+        "description": "References table 'student_tags' that may not exist yet"
+      },
+      {
+        "type": "MIGRATION_DEPENDENCY",
+        "file": "20250827184334_276b751c-8c1e-49df-b8b0-d85a547099e8.sql",
+        "issue": "References table 'profiles' that may not exist yet",
+        "severity": "HIGH",
+        "description": "References table 'profiles' that may not exist yet"
+      },
+      {
+        "type": "MIGRATION_DEPENDENCY",
+        "file": "20250827192610_ef2229f0-af40-4f07-9245-576b48a36140.sql",
+        "issue": "References table 'auth' that may not exist yet",
+        "severity": "HIGH",
+        "description": "References table 'auth' that may not exist yet"
+      },
+      {
+        "type": "MIGRATION_DEPENDENCY",
+        "file": "20250827192610_ef2229f0-af40-4f07-9245-576b48a36140.sql",
+        "issue": "References table 'auth' that may not exist yet",
+        "severity": "HIGH",
+        "description": "References table 'auth' that may not exist yet"
+      },
+      {
+        "type": "MIGRATION_DEPENDENCY",
+        "file": "20250828013454_51c97e98-5f4f-48a7-8300-2828ac91bad8.sql",
+        "issue": "References table 'auth' that may not exist yet",
+        "severity": "HIGH",
+        "description": "References table 'auth' that may not exist yet"
+      },
+      {
+        "type": "MIGRATION_DEPENDENCY",
+        "file": "20250828013454_51c97e98-5f4f-48a7-8300-2828ac91bad8.sql",
+        "issue": "References table 'badge_types' that may not exist yet",
+        "severity": "HIGH",
+        "description": "References table 'badge_types' that may not exist yet"
+      },
+      {
+        "type": "MIGRATION_DEPENDENCY",
+        "file": "20250828013454_51c97e98-5f4f-48a7-8300-2828ac91bad8.sql",
+        "issue": "References table 'auth' that may not exist yet",
+        "severity": "HIGH",
+        "description": "References table 'auth' that may not exist yet"
+      },
+      {
+        "type": "MIGRATION_DEPENDENCY",
+        "file": "20250828013454_51c97e98-5f4f-48a7-8300-2828ac91bad8.sql",
+        "issue": "References table 'auth' that may not exist yet",
+        "severity": "HIGH",
+        "description": "References table 'auth' that may not exist yet"
+      },
+      {
+        "type": "MIGRATION_DEPENDENCY",
+        "file": "20250828022511_0e7dbc2c-2daa-4190-a373-d7a1d113df0f.sql",
+        "issue": "References table 'auth' that may not exist yet",
+        "severity": "HIGH",
+        "description": "References table 'auth' that may not exist yet"
+      },
+      {
+        "type": "MIGRATION_DEPENDENCY",
+        "file": "20250828022511_0e7dbc2c-2daa-4190-a373-d7a1d113df0f.sql",
+        "issue": "References table 'yearbook_entries' that may not exist yet",
+        "severity": "HIGH",
+        "description": "References table 'yearbook_entries' that may not exist yet"
+      },
+      {
+        "type": "MIGRATION_DEPENDENCY",
+        "file": "20250828022511_0e7dbc2c-2daa-4190-a373-d7a1d113df0f.sql",
+        "issue": "References table 'auth' that may not exist yet",
+        "severity": "HIGH",
+        "description": "References table 'auth' that may not exist yet"
+      },
+      {
+        "type": "MIGRATION_DEPENDENCY",
+        "file": "20250828022511_0e7dbc2c-2daa-4190-a373-d7a1d113df0f.sql",
+        "issue": "References table 'auth' that may not exist yet",
+        "severity": "HIGH",
+        "description": "References table 'auth' that may not exist yet"
+      },
+      {
+        "type": "MIGRATION_DEPENDENCY",
+        "file": "20250828022511_0e7dbc2c-2daa-4190-a373-d7a1d113df0f.sql",
+        "issue": "References table 'auth' that may not exist yet",
+        "severity": "HIGH",
+        "description": "References table 'auth' that may not exist yet"
+      },
+      {
+        "type": "MIGRATION_DEPENDENCY",
+        "file": "20250828022511_0e7dbc2c-2daa-4190-a373-d7a1d113df0f.sql",
+        "issue": "References table 'yearbook_editions' that may not exist yet",
+        "severity": "HIGH",
+        "description": "References table 'yearbook_editions' that may not exist yet"
+      },
+      {
+        "type": "MIGRATION_DEPENDENCY",
+        "file": "20250828022511_0e7dbc2c-2daa-4190-a373-d7a1d113df0f.sql",
+        "issue": "References table 'yearbook_party_rooms' that may not exist yet",
+        "severity": "HIGH",
+        "description": "References table 'yearbook_party_rooms' that may not exist yet"
+      },
+      {
+        "type": "MIGRATION_DEPENDENCY",
+        "file": "20250828022511_0e7dbc2c-2daa-4190-a373-d7a1d113df0f.sql",
+        "issue": "References table 'auth' that may not exist yet",
+        "severity": "HIGH",
+        "description": "References table 'auth' that may not exist yet"
+      },
+      {
+        "type": "MIGRATION_DEPENDENCY",
+        "file": "20250828022700_8788887e-eb32-4e13-bbba-d1efc855833d.sql",
+        "issue": "References table 'auth' that may not exist yet",
+        "severity": "HIGH",
+        "description": "References table 'auth' that may not exist yet"
+      },
+      {
+        "type": "MIGRATION_DEPENDENCY",
+        "file": "20250828022700_8788887e-eb32-4e13-bbba-d1efc855833d.sql",
+        "issue": "References table 'yearbook_entries' that may not exist yet",
+        "severity": "HIGH",
+        "description": "References table 'yearbook_entries' that may not exist yet"
+      },
+      {
+        "type": "MIGRATION_DEPENDENCY",
+        "file": "20250828024447_1367943a-db95-45bb-bb12-fd734bfb0432.sql",
+        "issue": "References table 'profiles' that may not exist yet",
+        "severity": "HIGH",
+        "description": "References table 'profiles' that may not exist yet"
+      },
+      {
+        "type": "MIGRATION_DEPENDENCY",
+        "file": "20250828024447_1367943a-db95-45bb-bb12-fd734bfb0432.sql",
+        "issue": "References table 'yearbook_editions' that may not exist yet",
+        "severity": "HIGH",
+        "description": "References table 'yearbook_editions' that may not exist yet"
+      },
+      {
+        "type": "MIGRATION_DEPENDENCY",
+        "file": "20250828024447_1367943a-db95-45bb-bb12-fd734bfb0432.sql",
+        "issue": "References table 'yearbook_party_rooms' that may not exist yet",
+        "severity": "HIGH",
+        "description": "References table 'yearbook_party_rooms' that may not exist yet"
+      },
+      {
+        "type": "MIGRATION_DEPENDENCY",
+        "file": "20250828024447_1367943a-db95-45bb-bb12-fd734bfb0432.sql",
+        "issue": "References table 'profiles' that may not exist yet",
+        "severity": "HIGH",
+        "description": "References table 'profiles' that may not exist yet"
+      },
+      {
+        "type": "MIGRATION_DEPENDENCY",
+        "file": "20250828024728_9f4facf8-a62a-471e-ad5e-1766147b780d.sql",
+        "issue": "References table 'profiles' that may not exist yet",
+        "severity": "HIGH",
+        "description": "References table 'profiles' that may not exist yet"
+      },
+      {
+        "type": "MIGRATION_DEPENDENCY",
+        "file": "20250828024728_9f4facf8-a62a-471e-ad5e-1766147b780d.sql",
+        "issue": "References table 'yearbook_editions' that may not exist yet",
+        "severity": "HIGH",
+        "description": "References table 'yearbook_editions' that may not exist yet"
+      },
+      {
+        "type": "MIGRATION_DEPENDENCY",
+        "file": "20250828024728_9f4facf8-a62a-471e-ad5e-1766147b780d.sql",
+        "issue": "References table 'yearbook_party_rooms' that may not exist yet",
+        "severity": "HIGH",
+        "description": "References table 'yearbook_party_rooms' that may not exist yet"
+      },
+      {
+        "type": "MIGRATION_DEPENDENCY",
+        "file": "20250828024728_9f4facf8-a62a-471e-ad5e-1766147b780d.sql",
+        "issue": "References table 'profiles' that may not exist yet",
+        "severity": "HIGH",
+        "description": "References table 'profiles' that may not exist yet"
+      },
+      {
+        "type": "MIGRATION_DEPENDENCY",
+        "file": "20250828025439_4cec5efa-deec-4748-bc53-de6877a9672e.sql",
+        "issue": "References table 'auth' that may not exist yet",
+        "severity": "HIGH",
+        "description": "References table 'auth' that may not exist yet"
+      },
+      {
+        "type": "MIGRATION_DEPENDENCY",
+        "file": "20250828025439_4cec5efa-deec-4748-bc53-de6877a9672e.sql",
+        "issue": "References table 'auth' that may not exist yet",
+        "severity": "HIGH",
+        "description": "References table 'auth' that may not exist yet"
+      },
+      {
+        "type": "MIGRATION_DEPENDENCY",
+        "file": "20250828025521_76986b0d-48a4-4261-b797-66d536392710.sql",
+        "issue": "References table 'auth' that may not exist yet",
+        "severity": "HIGH",
+        "description": "References table 'auth' that may not exist yet"
+      },
+      {
+        "type": "MIGRATION_DEPENDENCY",
+        "file": "20250828025521_76986b0d-48a4-4261-b797-66d536392710.sql",
+        "issue": "References table 'auth' that may not exist yet",
+        "severity": "HIGH",
+        "description": "References table 'auth' that may not exist yet"
+      },
+      {
+        "type": "MIGRATION_DEPENDENCY",
+        "file": "20250828025614_1d6d983f-a1f8-4af9-95f2-ac13f17a2d79.sql",
+        "issue": "References table 'auth' that may not exist yet",
+        "severity": "HIGH",
+        "description": "References table 'auth' that may not exist yet"
+      },
+      {
+        "type": "MIGRATION_DEPENDENCY",
+        "file": "20250828025614_1d6d983f-a1f8-4af9-95f2-ac13f17a2d79.sql",
+        "issue": "References table 'auth' that may not exist yet",
+        "severity": "HIGH",
+        "description": "References table 'auth' that may not exist yet"
+      },
+      {
+        "type": "MIGRATION_DEPENDENCY",
+        "file": "20250828045400_049bd637-3b3a-4565-976c-348f0519e92e.sql",
+        "issue": "References table 'auth' that may not exist yet",
+        "severity": "HIGH",
+        "description": "References table 'auth' that may not exist yet"
+      },
+      {
+        "type": "MIGRATION_DEPENDENCY",
+        "file": "20250828045400_049bd637-3b3a-4565-976c-348f0519e92e.sql",
+        "issue": "References table 'auth' that may not exist yet",
+        "severity": "HIGH",
+        "description": "References table 'auth' that may not exist yet"
+      },
+      {
+        "type": "MIGRATION_DEPENDENCY",
+        "file": "20250903153924_cb39f76f-1f4f-4b9a-bd5d-7c72388423a8.sql",
+        "issue": "References table 'auth' that may not exist yet",
+        "severity": "HIGH",
+        "description": "References table 'auth' that may not exist yet"
+      },
+      {
+        "type": "MIGRATION_DEPENDENCY",
+        "file": "20250903160000_multi_school_v2_architecture.sql",
+        "issue": "References table 'profiles' that may not exist yet",
+        "severity": "HIGH",
+        "description": "References table 'profiles' that may not exist yet"
+      },
+      {
+        "type": "MIGRATION_DEPENDENCY",
+        "file": "20250903160000_multi_school_v2_architecture.sql",
+        "issue": "References table 'schools' that may not exist yet",
+        "severity": "HIGH",
+        "description": "References table 'schools' that may not exist yet"
+      },
+      {
+        "type": "MIGRATION_DEPENDENCY",
+        "file": "20250903160000_multi_school_v2_architecture.sql",
+        "issue": "References table 'profiles' that may not exist yet",
+        "severity": "HIGH",
+        "description": "References table 'profiles' that may not exist yet"
+      },
+      {
+        "type": "MIGRATION_DEPENDENCY",
+        "file": "20250903160000_multi_school_v2_architecture.sql",
+        "issue": "References table 'profiles' that may not exist yet",
+        "severity": "HIGH",
+        "description": "References table 'profiles' that may not exist yet"
+      },
+      {
+        "type": "MIGRATION_DEPENDENCY",
+        "file": "20250903160000_multi_school_v2_architecture.sql",
+        "issue": "References table 'profiles' that may not exist yet",
+        "severity": "HIGH",
+        "description": "References table 'profiles' that may not exist yet"
+      },
+      {
+        "type": "MIGRATION_DEPENDENCY",
+        "file": "20250903160000_multi_school_v2_architecture.sql",
+        "issue": "References table 'profiles' that may not exist yet",
+        "severity": "HIGH",
+        "description": "References table 'profiles' that may not exist yet"
+      },
+      {
+        "type": "MIGRATION_DEPENDENCY",
+        "file": "20250903160000_multi_school_v2_architecture.sql",
+        "issue": "References table 'profiles' that may not exist yet",
+        "severity": "HIGH",
+        "description": "References table 'profiles' that may not exist yet"
+      },
+      {
+        "type": "MIGRATION_DEPENDENCY",
+        "file": "20250903160000_multi_school_v2_architecture.sql",
+        "issue": "References table 'profiles' that may not exist yet",
+        "severity": "HIGH",
+        "description": "References table 'profiles' that may not exist yet"
+      },
+      {
+        "type": "MIGRATION_DEPENDENCY",
+        "file": "20250903160000_multi_school_v2_architecture.sql",
+        "issue": "References table 'profiles' that may not exist yet",
+        "severity": "HIGH",
+        "description": "References table 'profiles' that may not exist yet"
+      },
+      {
+        "type": "MIGRATION_DEPENDENCY",
+        "file": "20250903160000_multi_school_v2_architecture.sql",
+        "issue": "References table 'schools' that may not exist yet",
+        "severity": "HIGH",
+        "description": "References table 'schools' that may not exist yet"
+      },
+      {
+        "type": "MIGRATION_DEPENDENCY",
+        "file": "20250903160000_multi_school_v2_architecture.sql",
+        "issue": "References table 'profiles' that may not exist yet",
+        "severity": "HIGH",
+        "description": "References table 'profiles' that may not exist yet"
+      },
+      {
+        "type": "MIGRATION_DEPENDENCY",
+        "file": "20250903160000_multi_school_v2_architecture.sql",
+        "issue": "References table 'profiles' that may not exist yet",
+        "severity": "HIGH",
+        "description": "References table 'profiles' that may not exist yet"
+      },
+      {
+        "type": "MIGRATION_DEPENDENCY",
+        "file": "20250903160000_multi_school_v2_architecture.sql",
+        "issue": "References table 'various' that may not exist yet",
+        "severity": "HIGH",
+        "description": "References table 'various' that may not exist yet"
+      },
+      {
+        "type": "MIGRATION_DEPENDENCY",
+        "file": "20250903160000_multi_school_v2_architecture.sql",
+        "issue": "References table 'schools' that may not exist yet",
+        "severity": "HIGH",
+        "description": "References table 'schools' that may not exist yet"
+      },
+      {
+        "type": "MIGRATION_DEPENDENCY",
+        "file": "20250903160000_multi_school_v2_architecture.sql",
+        "issue": "References table 'schools' that may not exist yet",
+        "severity": "HIGH",
+        "description": "References table 'schools' that may not exist yet"
+      },
+      {
+        "type": "MIGRATION_DEPENDENCY",
+        "file": "20250903160000_multi_school_v2_architecture.sql",
+        "issue": "References table 'profiles' that may not exist yet",
+        "severity": "HIGH",
+        "description": "References table 'profiles' that may not exist yet"
+      },
+      {
+        "type": "MIGRATION_DEPENDENCY",
+        "file": "20250903160000_multi_school_v2_architecture.sql",
+        "issue": "References table 'group_chats' that may not exist yet",
+        "severity": "HIGH",
+        "description": "References table 'group_chats' that may not exist yet"
+      },
+      {
+        "type": "MIGRATION_DEPENDENCY",
+        "file": "20250903160000_multi_school_v2_architecture.sql",
+        "issue": "References table 'profiles' that may not exist yet",
+        "severity": "HIGH",
+        "description": "References table 'profiles' that may not exist yet"
+      },
+      {
+        "type": "MIGRATION_DEPENDENCY",
+        "file": "20250903160000_multi_school_v2_architecture.sql",
+        "issue": "References table 'profiles' that may not exist yet",
+        "severity": "HIGH",
+        "description": "References table 'profiles' that may not exist yet"
+      },
+      {
+        "type": "MIGRATION_DEPENDENCY",
+        "file": "20250903160000_multi_school_v2_architecture.sql",
+        "issue": "References table 'schools' that may not exist yet",
+        "severity": "HIGH",
+        "description": "References table 'schools' that may not exist yet"
+      },
+      {
+        "type": "MIGRATION_DEPENDENCY",
+        "file": "20250903160000_multi_school_v2_architecture.sql",
+        "issue": "References table 'profiles' that may not exist yet",
+        "severity": "HIGH",
+        "description": "References table 'profiles' that may not exist yet"
+      },
+      {
+        "type": "MIGRATION_DEPENDENCY",
+        "file": "20250904180000_yearbook_processing_pipeline.sql",
+        "issue": "References table 'auth' that may not exist yet",
+        "severity": "HIGH",
+        "description": "References table 'auth' that may not exist yet"
+      },
+      {
+        "type": "MIGRATION_DEPENDENCY",
+        "file": "20250904180000_yearbook_processing_pipeline.sql",
+        "issue": "References table 'auth' that may not exist yet",
+        "severity": "HIGH",
+        "description": "References table 'auth' that may not exist yet"
+      },
+      {
+        "type": "MIGRATION_DEPENDENCY",
+        "file": "20250904180000_yearbook_processing_pipeline.sql",
+        "issue": "References table 'auth' that may not exist yet",
+        "severity": "HIGH",
+        "description": "References table 'auth' that may not exist yet"
+      },
+      {
+        "type": "MIGRATION_DEPENDENCY",
+        "file": "20250904180000_yearbook_processing_pipeline.sql",
+        "issue": "References table 'auth' that may not exist yet",
+        "severity": "HIGH",
+        "description": "References table 'auth' that may not exist yet"
+      },
+      {
+        "type": "MIGRATION_DEPENDENCY",
+        "file": "20250904180000_yearbook_processing_pipeline.sql",
+        "issue": "References table 'auth' that may not exist yet",
+        "severity": "HIGH",
+        "description": "References table 'auth' that may not exist yet"
+      },
+      {
+        "type": "MIGRATION_DEPENDENCY",
+        "file": "20250904180000_yearbook_processing_pipeline.sql",
+        "issue": "References table 'auth' that may not exist yet",
+        "severity": "HIGH",
+        "description": "References table 'auth' that may not exist yet"
+      },
+      {
+        "type": "MIGRATION_DEPENDENCY",
+        "file": "20250904180000_yearbook_processing_pipeline.sql",
+        "issue": "References table 'auth' that may not exist yet",
+        "severity": "HIGH",
+        "description": "References table 'auth' that may not exist yet"
+      },
+      {
+        "type": "MIGRATION_DEPENDENCY",
+        "file": "20250904180000_yearbook_processing_pipeline.sql",
+        "issue": "References table 'auth' that may not exist yet",
+        "severity": "HIGH",
+        "description": "References table 'auth' that may not exist yet"
+      },
+      {
+        "type": "MIGRATION_DEPENDENCY",
+        "file": "20250904180000_yearbook_processing_pipeline.sql",
+        "issue": "References table 'auth' that may not exist yet",
+        "severity": "HIGH",
+        "description": "References table 'auth' that may not exist yet"
+      },
+      {
+        "type": "MIGRATION_DEPENDENCY",
+        "file": "20250904180000_yearbook_processing_pipeline.sql",
+        "issue": "References table 'auth' that may not exist yet",
+        "severity": "HIGH",
+        "description": "References table 'auth' that may not exist yet"
+      },
+      {
+        "type": "MIGRATION_DEPENDENCY",
+        "file": "20250904180000_yearbook_processing_pipeline.sql",
+        "issue": "References table 'auth' that may not exist yet",
+        "severity": "HIGH",
+        "description": "References table 'auth' that may not exist yet"
+      },
+      {
+        "type": "MIGRATION_DEPENDENCY",
+        "file": "20250904180000_yearbook_processing_pipeline.sql",
+        "issue": "References table 'auth' that may not exist yet",
+        "severity": "HIGH",
+        "description": "References table 'auth' that may not exist yet"
+      },
+      {
+        "type": "MIGRATION_DEPENDENCY",
+        "file": "20250904180000_yearbook_processing_pipeline.sql",
+        "issue": "References table 'auth' that may not exist yet",
+        "severity": "HIGH",
+        "description": "References table 'auth' that may not exist yet"
+      },
+      {
+        "type": "MIGRATION_DEPENDENCY",
+        "file": "20250904180000_yearbook_processing_pipeline.sql",
+        "issue": "References table 'auth' that may not exist yet",
+        "severity": "HIGH",
+        "description": "References table 'auth' that may not exist yet"
+      },
+      {
+        "type": "MIGRATION_DEPENDENCY",
+        "file": "20250904180000_yearbook_processing_pipeline.sql",
+        "issue": "References table 'auth' that may not exist yet",
+        "severity": "HIGH",
+        "description": "References table 'auth' that may not exist yet"
+      },
+      {
+        "type": "MIGRATION_DEPENDENCY",
+        "file": "20250904180000_yearbook_processing_pipeline.sql",
+        "issue": "References table 'auth' that may not exist yet",
+        "severity": "HIGH",
+        "description": "References table 'auth' that may not exist yet"
+      },
+      {
+        "type": "MIGRATION_DEPENDENCY",
+        "file": "20250904180000_yearbook_processing_pipeline.sql",
+        "issue": "References table 'auth' that may not exist yet",
+        "severity": "HIGH",
+        "description": "References table 'auth' that may not exist yet"
+      },
+      {
+        "type": "MIGRATION_DEPENDENCY",
+        "file": "20250904180000_yearbook_processing_pipeline.sql",
+        "issue": "References table 'auth' that may not exist yet",
+        "severity": "HIGH",
+        "description": "References table 'auth' that may not exist yet"
+      },
+      {
+        "type": "MIGRATION_DEPENDENCY",
+        "file": "20250904180000_yearbook_processing_pipeline.sql",
+        "issue": "References table 'auth' that may not exist yet",
+        "severity": "HIGH",
+        "description": "References table 'auth' that may not exist yet"
+      },
+      {
+        "type": "MIGRATION_DEPENDENCY",
+        "file": "20250904180000_yearbook_processing_pipeline.sql",
+        "issue": "References table 'auth' that may not exist yet",
+        "severity": "HIGH",
+        "description": "References table 'auth' that may not exist yet"
+      },
+      {
+        "type": "MIGRATION_DEPENDENCY",
+        "file": "20250904180000_yearbook_processing_pipeline.sql",
+        "issue": "References table 'auth' that may not exist yet",
+        "severity": "HIGH",
+        "description": "References table 'auth' that may not exist yet"
+      },
+      {
+        "type": "MIGRATION_DEPENDENCY",
+        "file": "20250904180000_yearbook_processing_pipeline.sql",
+        "issue": "References table 'auth' that may not exist yet",
+        "severity": "HIGH",
+        "description": "References table 'auth' that may not exist yet"
+      },
+      {
+        "type": "MIGRATION_DEPENDENCY",
+        "file": "20250904180000_yearbook_processing_pipeline.sql",
+        "issue": "References table 'auth' that may not exist yet",
+        "severity": "HIGH",
+        "description": "References table 'auth' that may not exist yet"
+      },
+      {
+        "type": "MIGRATION_DEPENDENCY",
+        "file": "20250904180000_yearbook_processing_pipeline.sql",
+        "issue": "References table 'auth' that may not exist yet",
+        "severity": "HIGH",
+        "description": "References table 'auth' that may not exist yet"
+      },
+      {
+        "type": "MIGRATION_DEPENDENCY",
+        "file": "20250906180000_fix_yearbooks_uploaded_by.sql",
+        "issue": "References table 'auth' that may not exist yet",
+        "severity": "HIGH",
+        "description": "References table 'auth' that may not exist yet"
+      },
+      {
+        "type": "MIGRATION_DEPENDENCY",
+        "file": "20250906200000_priority_2_core_tables.sql",
+        "issue": "References table 'auth' that may not exist yet",
+        "severity": "HIGH",
+        "description": "References table 'auth' that may not exist yet"
+      },
+      {
+        "type": "MIGRATION_DEPENDENCY",
+        "file": "20250906200000_priority_2_core_tables.sql",
+        "issue": "References table 'auth' that may not exist yet",
+        "severity": "HIGH",
+        "description": "References table 'auth' that may not exist yet"
+      },
+      {
+        "type": "MIGRATION_DEPENDENCY",
+        "file": "20250906200000_priority_2_core_tables.sql",
+        "issue": "References table 'auth' that may not exist yet",
+        "severity": "HIGH",
+        "description": "References table 'auth' that may not exist yet"
+      },
+      {
+        "type": "MIGRATION_DEPENDENCY",
+        "file": "20250906200000_priority_2_core_tables.sql",
+        "issue": "References table 'auth' that may not exist yet",
+        "severity": "HIGH",
+        "description": "References table 'auth' that may not exist yet"
+      },
+      {
+        "type": "MIGRATION_DEPENDENCY",
+        "file": "20250906200000_priority_2_core_tables.sql",
+        "issue": "References table 'auth' that may not exist yet",
+        "severity": "HIGH",
+        "description": "References table 'auth' that may not exist yet"
+      },
+      {
+        "type": "MIGRATION_DEPENDENCY",
+        "file": "20250906200000_priority_2_core_tables.sql",
+        "issue": "References table 'auth' that may not exist yet",
+        "severity": "HIGH",
+        "description": "References table 'auth' that may not exist yet"
+      },
+      {
+        "type": "MIGRATION_DEPENDENCY",
+        "file": "20250906200000_priority_2_core_tables.sql",
+        "issue": "References table 'auth' that may not exist yet",
+        "severity": "HIGH",
+        "description": "References table 'auth' that may not exist yet"
+      },
+      {
+        "type": "MIGRATION_DEPENDENCY",
+        "file": "20250906200000_priority_2_core_tables.sql",
+        "issue": "References table 'auth' that may not exist yet",
+        "severity": "HIGH",
+        "description": "References table 'auth' that may not exist yet"
+      },
+      {
+        "type": "MIGRATION_DEPENDENCY",
+        "file": "20250906200000_priority_2_core_tables.sql",
+        "issue": "References table 'auth' that may not exist yet",
+        "severity": "HIGH",
+        "description": "References table 'auth' that may not exist yet"
+      },
+      {
+        "type": "MIGRATION_DEPENDENCY",
+        "file": "20250906200000_priority_2_core_tables.sql",
+        "issue": "References table 'auth' that may not exist yet",
+        "severity": "HIGH",
+        "description": "References table 'auth' that may not exist yet"
+      },
+      {
+        "type": "MIGRATION_DEPENDENCY",
+        "file": "20250906200000_priority_2_core_tables.sql",
+        "issue": "References table 'text' that may not exist yet",
+        "severity": "HIGH",
+        "description": "References table 'text' that may not exist yet"
+      },
+      {
+        "type": "MIGRATION_DEPENDENCY",
+        "file": "20250906200000_priority_2_core_tables.sql",
+        "issue": "References table 'auth' that may not exist yet",
+        "severity": "HIGH",
+        "description": "References table 'auth' that may not exist yet"
+      },
+      {
+        "type": "MIGRATION_DEPENDENCY",
+        "file": "20250906200000_priority_2_core_tables.sql",
+        "issue": "References table 'auth' that may not exist yet",
+        "severity": "HIGH",
+        "description": "References table 'auth' that may not exist yet"
+      },
+      {
+        "type": "MIGRATION_DEPENDENCY",
+        "file": "20250906200000_priority_2_core_tables.sql",
+        "issue": "References table 'auth' that may not exist yet",
+        "severity": "HIGH",
+        "description": "References table 'auth' that may not exist yet"
+      },
+      {
+        "type": "MIGRATION_DEPENDENCY",
+        "file": "20250906200000_priority_2_core_tables.sql",
+        "issue": "References table 'auth' that may not exist yet",
+        "severity": "HIGH",
+        "description": "References table 'auth' that may not exist yet"
+      },
+      {
+        "type": "MIGRATION_DEPENDENCY",
+        "file": "20250906200000_priority_2_core_tables.sql",
+        "issue": "References table 'jsonb' that may not exist yet",
+        "severity": "HIGH",
+        "description": "References table 'jsonb' that may not exist yet"
+      },
+      {
+        "type": "MIGRATION_DEPENDENCY",
+        "file": "20250906200000_priority_2_core_tables.sql",
+        "issue": "References table 'auth' that may not exist yet",
+        "severity": "HIGH",
+        "description": "References table 'auth' that may not exist yet"
+      },
+      {
+        "type": "MIGRATION_DEPENDENCY",
+        "file": "20250906200000_priority_2_core_tables.sql",
+        "issue": "References table 'auth' that may not exist yet",
+        "severity": "HIGH",
+        "description": "References table 'auth' that may not exist yet"
+      },
+      {
+        "type": "MIGRATION_DEPENDENCY",
+        "file": "20250906200000_priority_2_core_tables.sql",
+        "issue": "References table 'auth' that may not exist yet",
+        "severity": "HIGH",
+        "description": "References table 'auth' that may not exist yet"
+      },
+      {
+        "type": "MIGRATION_DEPENDENCY",
+        "file": "20250906200000_priority_2_core_tables.sql",
+        "issue": "References table 'auth' that may not exist yet",
+        "severity": "HIGH",
+        "description": "References table 'auth' that may not exist yet"
+      },
+      {
+        "type": "MIGRATION_DEPENDENCY",
+        "file": "20250906200000_priority_2_core_tables.sql",
+        "issue": "References table 'auth' that may not exist yet",
+        "severity": "HIGH",
+        "description": "References table 'auth' that may not exist yet"
+      },
+      {
+        "type": "MIGRATION_DEPENDENCY",
+        "file": "20250906200000_priority_2_core_tables.sql",
+        "issue": "References table 'auth' that may not exist yet",
+        "severity": "HIGH",
+        "description": "References table 'auth' that may not exist yet"
+      },
+      {
+        "type": "MIGRATION_DEPENDENCY",
+        "file": "20250906200000_priority_2_core_tables.sql",
+        "issue": "References table 'auth' that may not exist yet",
+        "severity": "HIGH",
+        "description": "References table 'auth' that may not exist yet"
+      },
+      {
+        "type": "MIGRATION_DEPENDENCY",
+        "file": "20250906200000_priority_2_core_tables.sql",
+        "issue": "References table 'auth' that may not exist yet",
+        "severity": "HIGH",
+        "description": "References table 'auth' that may not exist yet"
+      },
+      {
+        "type": "MIGRATION_DEPENDENCY",
+        "file": "20250906200000_priority_2_core_tables.sql",
+        "issue": "References table 'auth' that may not exist yet",
+        "severity": "HIGH",
+        "description": "References table 'auth' that may not exist yet"
+      },
+      {
+        "type": "MIGRATION_DEPENDENCY",
+        "file": "20250907010000_schema_alignment_fix.sql",
+        "issue": "References table 'after' that may not exist yet",
+        "severity": "HIGH",
+        "description": "References table 'after' that may not exist yet"
+      },
+      {
+        "type": "MIGRATION_DEPENDENCY",
+        "file": "20250907010000_schema_alignment_fix.sql",
+        "issue": "References table 'auth' that may not exist yet",
+        "severity": "HIGH",
+        "description": "References table 'auth' that may not exist yet"
+      },
+      {
+        "type": "MIGRATION_DEPENDENCY",
+        "file": "20250907010000_schema_alignment_fix.sql",
+        "issue": "References table 'auth' that may not exist yet",
+        "severity": "HIGH",
+        "description": "References table 'auth' that may not exist yet"
+      },
+      {
+        "type": "MIGRATION_DEPENDENCY",
+        "file": "20250907010000_schema_alignment_fix.sql",
+        "issue": "References table 'auth' that may not exist yet",
+        "severity": "HIGH",
+        "description": "References table 'auth' that may not exist yet"
+      },
+      {
+        "type": "MIGRATION_DEPENDENCY",
+        "file": "20250907010000_schema_alignment_fix.sql",
+        "issue": "References table 'auth' that may not exist yet",
+        "severity": "HIGH",
+        "description": "References table 'auth' that may not exist yet"
+      },
+      {
+        "type": "MIGRATION_DEPENDENCY",
+        "file": "20250907010000_schema_alignment_fix.sql",
+        "issue": "References table 'auth' that may not exist yet",
+        "severity": "HIGH",
+        "description": "References table 'auth' that may not exist yet"
+      },
+      {
+        "type": "MIGRATION_DEPENDENCY",
+        "file": "20250907010000_schema_alignment_fix.sql",
+        "issue": "References table 'auth' that may not exist yet",
+        "severity": "HIGH",
+        "description": "References table 'auth' that may not exist yet"
+      },
+      {
+        "type": "MIGRATION_DEPENDENCY",
+        "file": "20250908010000_core_features_migration.sql",
+        "issue": "References table 'auth' that may not exist yet",
+        "severity": "HIGH",
+        "description": "References table 'auth' that may not exist yet"
+      },
+      {
+        "type": "MIGRATION_DEPENDENCY",
+        "file": "20250908010000_core_features_migration.sql",
+        "issue": "References table 'auth' that may not exist yet",
+        "severity": "HIGH",
+        "description": "References table 'auth' that may not exist yet"
+      },
+      {
+        "type": "MIGRATION_DEPENDENCY",
+        "file": "20250908010000_core_features_migration.sql",
+        "issue": "References table 'auth' that may not exist yet",
+        "severity": "HIGH",
+        "description": "References table 'auth' that may not exist yet"
+      },
+      {
+        "type": "MIGRATION_DEPENDENCY",
+        "file": "20250908010000_core_features_migration.sql",
+        "issue": "References table 'auth' that may not exist yet",
+        "severity": "HIGH",
+        "description": "References table 'auth' that may not exist yet"
+      },
+      {
+        "type": "MIGRATION_DEPENDENCY",
+        "file": "20250908010000_core_features_migration.sql",
+        "issue": "References table 'auth' that may not exist yet",
+        "severity": "HIGH",
+        "description": "References table 'auth' that may not exist yet"
+      },
+      {
+        "type": "MIGRATION_DEPENDENCY",
+        "file": "20250908010000_core_features_migration.sql",
+        "issue": "References table 'auth' that may not exist yet",
+        "severity": "HIGH",
+        "description": "References table 'auth' that may not exist yet"
+      },
+      {
+        "type": "MIGRATION_DEPENDENCY",
+        "file": "20250908010000_core_features_migration.sql",
+        "issue": "References table 'auth' that may not exist yet",
+        "severity": "HIGH",
+        "description": "References table 'auth' that may not exist yet"
+      },
+      {
+        "type": "MIGRATION_DEPENDENCY",
+        "file": "20250908010000_core_features_migration.sql",
+        "issue": "References table 'auth' that may not exist yet",
+        "severity": "HIGH",
+        "description": "References table 'auth' that may not exist yet"
+      },
+      {
+        "type": "MIGRATION_DEPENDENCY",
+        "file": "20250908010000_core_features_migration.sql",
+        "issue": "References table 'auth' that may not exist yet",
+        "severity": "HIGH",
+        "description": "References table 'auth' that may not exist yet"
+      },
+      {
+        "type": "MIGRATION_DEPENDENCY",
+        "file": "20250908010000_core_features_migration.sql",
+        "issue": "References table 'auth' that may not exist yet",
+        "severity": "HIGH",
+        "description": "References table 'auth' that may not exist yet"
+      },
+      {
+        "type": "MIGRATION_DEPENDENCY",
+        "file": "20250908010000_core_features_migration.sql",
+        "issue": "References table 'auth' that may not exist yet",
+        "severity": "HIGH",
+        "description": "References table 'auth' that may not exist yet"
+      },
+      {
+        "type": "MIGRATION_DEPENDENCY",
+        "file": "20250908010000_core_features_migration.sql",
+        "issue": "References table 'auth' that may not exist yet",
+        "severity": "HIGH",
+        "description": "References table 'auth' that may not exist yet"
+      },
+      {
+        "type": "MIGRATION_DEPENDENCY",
+        "file": "20250908010000_core_features_migration.sql",
+        "issue": "References table 'auth' that may not exist yet",
+        "severity": "HIGH",
+        "description": "References table 'auth' that may not exist yet"
+      },
+      {
+        "type": "MIGRATION_DEPENDENCY",
+        "file": "20250908010000_core_features_migration.sql",
+        "issue": "References table 'auth' that may not exist yet",
+        "severity": "HIGH",
+        "description": "References table 'auth' that may not exist yet"
+      },
+      {
+        "type": "MIGRATION_DEPENDENCY",
+        "file": "20250908010000_core_features_migration.sql",
+        "issue": "References table 'auth' that may not exist yet",
+        "severity": "HIGH",
+        "description": "References table 'auth' that may not exist yet"
+      },
+      {
+        "type": "MIGRATION_DEPENDENCY",
+        "file": "20250909010000_fix_rls_recursion.sql",
+        "issue": "References table 'with' that may not exist yet",
+        "severity": "HIGH",
+        "description": "References table 'with' that may not exist yet"
+      },
+      {
+        "type": "MIGRATION_DEPENDENCY",
+        "file": "20250910010000_group_conversations_support.sql",
+        "issue": "References table 'auth' that may not exist yet",
+        "severity": "HIGH",
+        "description": "References table 'auth' that may not exist yet"
+      },
+      {
+        "type": "MIGRATION_DEPENDENCY",
+        "file": "20250910020000_rate_limiting_rpc.sql",
+        "issue": "References table 'auth' that may not exist yet",
+        "severity": "HIGH",
+        "description": "References table 'auth' that may not exist yet"
+      },
+      {
+        "type": "MIGRATION_DEPENDENCY",
+        "file": "20250910100001_enhanced_face_embeddings_schema.sql",
+        "issue": "References table 'auth' that may not exist yet",
+        "severity": "HIGH",
+        "description": "References table 'auth' that may not exist yet"
+      },
+      {
+        "type": "MIGRATION_DEPENDENCY",
+        "file": "20250910100001_enhanced_face_embeddings_schema.sql",
+        "issue": "References table 'auth' that may not exist yet",
+        "severity": "HIGH",
+        "description": "References table 'auth' that may not exist yet"
+      },
+      {
+        "type": "MIGRATION_DEPENDENCY",
+        "file": "20250910200000_fix_mentorship_essentials.sql",
+        "issue": "References table 'auth' that may not exist yet",
+        "severity": "HIGH",
+        "description": "References table 'auth' that may not exist yet"
+      },
+      {
+        "type": "MIGRATION_DEPENDENCY",
+        "file": "20250910200000_fix_mentorship_essentials.sql",
+        "issue": "References table 'auth' that may not exist yet",
+        "severity": "HIGH",
+        "description": "References table 'auth' that may not exist yet"
+      },
+      {
+        "type": "MIGRATION_DEPENDENCY",
+        "file": "20250910200000_fix_mentorship_essentials.sql",
+        "issue": "References table 'auth' that may not exist yet",
+        "severity": "HIGH",
+        "description": "References table 'auth' that may not exist yet"
+      },
+      {
+        "type": "MIGRATION_DEPENDENCY",
+        "file": "20250910210000_critical_features_only.sql",
+        "issue": "References table 'auth' that may not exist yet",
+        "severity": "HIGH",
+        "description": "References table 'auth' that may not exist yet"
+      },
+      {
+        "type": "MIGRATION_DEPENDENCY",
+        "file": "20250910210000_critical_features_only.sql",
+        "issue": "References table 'auth' that may not exist yet",
+        "severity": "HIGH",
+        "description": "References table 'auth' that may not exist yet"
+      },
+      {
+        "type": "MIGRATION_DEPENDENCY",
+        "file": "20250910210000_critical_features_only.sql",
+        "issue": "References table 'auth' that may not exist yet",
+        "severity": "HIGH",
+        "description": "References table 'auth' that may not exist yet"
+      },
+      {
+        "type": "MIGRATION_DEPENDENCY",
+        "file": "20250910210000_critical_features_only.sql",
+        "issue": "References table 'auth' that may not exist yet",
+        "severity": "HIGH",
+        "description": "References table 'auth' that may not exist yet"
+      },
+      {
+        "type": "MIGRATION_DEPENDENCY",
+        "file": "20250910210000_critical_features_only.sql",
+        "issue": "References table 'auth' that may not exist yet",
+        "severity": "HIGH",
+        "description": "References table 'auth' that may not exist yet"
+      },
+      {
+        "type": "MIGRATION_DEPENDENCY",
+        "file": "20250910210000_critical_features_only.sql",
+        "issue": "References table 'auth' that may not exist yet",
+        "severity": "HIGH",
+        "description": "References table 'auth' that may not exist yet"
+      },
+      {
+        "type": "MIGRATION_DEPENDENCY",
+        "file": "20250911010000_post_analytics_system.sql",
+        "issue": "References table 'auth' that may not exist yet",
+        "severity": "HIGH",
+        "description": "References table 'auth' that may not exist yet"
+      },
+      {
+        "type": "MIGRATION_DEPENDENCY",
+        "file": "20250911010000_post_analytics_system.sql",
+        "issue": "References table 'auth' that may not exist yet",
+        "severity": "HIGH",
+        "description": "References table 'auth' that may not exist yet"
+      },
+      {
+        "type": "MIGRATION_DEPENDENCY",
+        "file": "20250911120000_missing_core_tables_phase1.sql",
+        "issue": "References table 'auth' that may not exist yet",
+        "severity": "HIGH",
+        "description": "References table 'auth' that may not exist yet"
+      },
+      {
+        "type": "MIGRATION_DEPENDENCY",
+        "file": "20250911120000_missing_core_tables_phase1.sql",
+        "issue": "References table 'auth' that may not exist yet",
+        "severity": "HIGH",
+        "description": "References table 'auth' that may not exist yet"
+      },
+      {
+        "type": "MIGRATION_DEPENDENCY",
+        "file": "20250911120000_missing_core_tables_phase1.sql",
+        "issue": "References table 'auth' that may not exist yet",
+        "severity": "HIGH",
+        "description": "References table 'auth' that may not exist yet"
+      },
+      {
+        "type": "MIGRATION_DEPENDENCY",
+        "file": "20250911120000_missing_core_tables_phase1.sql",
+        "issue": "References table 'auth' that may not exist yet",
+        "severity": "HIGH",
+        "description": "References table 'auth' that may not exist yet"
+      },
+      {
+        "type": "MIGRATION_DEPENDENCY",
+        "file": "20250911120000_missing_core_tables_phase1.sql",
+        "issue": "References table 'auth' that may not exist yet",
+        "severity": "HIGH",
+        "description": "References table 'auth' that may not exist yet"
+      },
+      {
+        "type": "MIGRATION_DEPENDENCY",
+        "file": "20250911120000_missing_core_tables_phase1.sql",
+        "issue": "References table 'auth' that may not exist yet",
+        "severity": "HIGH",
+        "description": "References table 'auth' that may not exist yet"
+      },
+      {
+        "type": "MIGRATION_DEPENDENCY",
+        "file": "20250911120000_missing_core_tables_phase1.sql",
+        "issue": "References table 'auth' that may not exist yet",
+        "severity": "HIGH",
+        "description": "References table 'auth' that may not exist yet"
+      },
+      {
+        "type": "MIGRATION_DEPENDENCY",
+        "file": "20250911120000_missing_core_tables_phase1.sql",
+        "issue": "References table 'auth' that may not exist yet",
+        "severity": "HIGH",
+        "description": "References table 'auth' that may not exist yet"
+      },
+      {
+        "type": "MIGRATION_DEPENDENCY",
+        "file": "20250911120000_missing_core_tables_phase1.sql",
+        "issue": "References table 'auth' that may not exist yet",
+        "severity": "HIGH",
+        "description": "References table 'auth' that may not exist yet"
+      },
+      {
+        "type": "MIGRATION_DEPENDENCY",
+        "file": "20250911120000_missing_core_tables_phase1.sql",
+        "issue": "References table 'auth' that may not exist yet",
+        "severity": "HIGH",
+        "description": "References table 'auth' that may not exist yet"
+      },
+      {
+        "type": "MIGRATION_DEPENDENCY",
+        "file": "20250911120000_missing_core_tables_phase1.sql",
+        "issue": "References table 'auth' that may not exist yet",
+        "severity": "HIGH",
+        "description": "References table 'auth' that may not exist yet"
+      },
+      {
+        "type": "MIGRATION_DEPENDENCY",
+        "file": "20250911120000_missing_core_tables_phase1.sql",
+        "issue": "References table 'auth' that may not exist yet",
+        "severity": "HIGH",
+        "description": "References table 'auth' that may not exist yet"
+      },
+      {
+        "type": "MIGRATION_DEPENDENCY",
+        "file": "20250911120000_missing_core_tables_phase1.sql",
+        "issue": "References table 'auth' that may not exist yet",
+        "severity": "HIGH",
+        "description": "References table 'auth' that may not exist yet"
+      },
+      {
+        "type": "MIGRATION_DEPENDENCY",
+        "file": "20250911120000_missing_core_tables_phase1.sql",
+        "issue": "References table 'auth' that may not exist yet",
+        "severity": "HIGH",
+        "description": "References table 'auth' that may not exist yet"
+      },
+      {
+        "type": "MIGRATION_DEPENDENCY",
+        "file": "20250911120000_missing_core_tables_phase1.sql",
+        "issue": "References table 'per' that may not exist yet",
+        "severity": "HIGH",
+        "description": "References table 'per' that may not exist yet"
+      },
+      {
+        "type": "MIGRATION_DEPENDENCY",
+        "file": "20250911120000_missing_core_tables_phase1.sql",
+        "issue": "References table 'auth' that may not exist yet",
+        "severity": "HIGH",
+        "description": "References table 'auth' that may not exist yet"
+      },
+      {
+        "type": "MIGRATION_DEPENDENCY",
+        "file": "20250911120000_missing_core_tables_phase1.sql",
+        "issue": "References table 'enable' that may not exist yet",
+        "severity": "HIGH",
+        "description": "References table 'enable' that may not exist yet"
+      },
+      {
+        "type": "MIGRATION_DEPENDENCY",
+        "file": "20250911130000_missing_core_tables_phase2.sql",
+        "issue": "References table 'auth' that may not exist yet",
+        "severity": "HIGH",
+        "description": "References table 'auth' that may not exist yet"
+      },
+      {
+        "type": "MIGRATION_DEPENDENCY",
+        "file": "20250911130000_missing_core_tables_phase2.sql",
+        "issue": "References table 'auth' that may not exist yet",
+        "severity": "HIGH",
+        "description": "References table 'auth' that may not exist yet"
+      },
+      {
+        "type": "MIGRATION_DEPENDENCY",
+        "file": "20250911130000_missing_core_tables_phase2.sql",
+        "issue": "References table 'auth' that may not exist yet",
+        "severity": "HIGH",
+        "description": "References table 'auth' that may not exist yet"
+      },
+      {
+        "type": "MIGRATION_DEPENDENCY",
+        "file": "20250911130000_missing_core_tables_phase2.sql",
+        "issue": "References table 'auth' that may not exist yet",
+        "severity": "HIGH",
+        "description": "References table 'auth' that may not exist yet"
+      },
+      {
+        "type": "MIGRATION_DEPENDENCY",
+        "file": "20250911130000_missing_core_tables_phase2.sql",
+        "issue": "References table 'auth' that may not exist yet",
+        "severity": "HIGH",
+        "description": "References table 'auth' that may not exist yet"
+      },
+      {
+        "type": "MIGRATION_DEPENDENCY",
+        "file": "20250911130000_missing_core_tables_phase2.sql",
+        "issue": "References table 'auth' that may not exist yet",
+        "severity": "HIGH",
+        "description": "References table 'auth' that may not exist yet"
+      },
+      {
+        "type": "MIGRATION_DEPENDENCY",
+        "file": "20250911130000_missing_core_tables_phase2.sql",
+        "issue": "References table 'auth' that may not exist yet",
+        "severity": "HIGH",
+        "description": "References table 'auth' that may not exist yet"
+      },
+      {
+        "type": "MIGRATION_DEPENDENCY",
+        "file": "20250911130000_missing_core_tables_phase2.sql",
+        "issue": "References table 'auth' that may not exist yet",
+        "severity": "HIGH",
+        "description": "References table 'auth' that may not exist yet"
+      },
+      {
+        "type": "MIGRATION_DEPENDENCY",
+        "file": "20250911130000_missing_core_tables_phase2.sql",
+        "issue": "References table 'auth' that may not exist yet",
+        "severity": "HIGH",
+        "description": "References table 'auth' that may not exist yet"
+      },
+      {
+        "type": "MIGRATION_DEPENDENCY",
+        "file": "20250911130000_missing_core_tables_phase2.sql",
+        "issue": "References table 'auth' that may not exist yet",
+        "severity": "HIGH",
+        "description": "References table 'auth' that may not exist yet"
+      },
+      {
+        "type": "MIGRATION_DEPENDENCY",
+        "file": "20250911130000_missing_core_tables_phase2.sql",
+        "issue": "References table 'auth' that may not exist yet",
+        "severity": "HIGH",
+        "description": "References table 'auth' that may not exist yet"
+      },
+      {
+        "type": "MIGRATION_DEPENDENCY",
+        "file": "20250911130000_missing_core_tables_phase2.sql",
+        "issue": "References table 'auth' that may not exist yet",
+        "severity": "HIGH",
+        "description": "References table 'auth' that may not exist yet"
+      },
+      {
+        "type": "MIGRATION_DEPENDENCY",
+        "file": "20250911130000_missing_core_tables_phase2.sql",
+        "issue": "References table 'auth' that may not exist yet",
+        "severity": "HIGH",
+        "description": "References table 'auth' that may not exist yet"
+      },
+      {
+        "type": "MIGRATION_DEPENDENCY",
+        "file": "20250911130000_missing_core_tables_phase2.sql",
+        "issue": "References table 'auth' that may not exist yet",
+        "severity": "HIGH",
+        "description": "References table 'auth' that may not exist yet"
+      },
+      {
+        "type": "MIGRATION_DEPENDENCY",
+        "file": "20250911130000_missing_core_tables_phase2.sql",
+        "issue": "References table 'auth' that may not exist yet",
+        "severity": "HIGH",
+        "description": "References table 'auth' that may not exist yet"
+      },
+      {
+        "type": "MIGRATION_DEPENDENCY",
+        "file": "20250911160000_auth_mfa_setup.sql",
+        "issue": "References table 'auth' that may not exist yet",
+        "severity": "HIGH",
+        "description": "References table 'auth' that may not exist yet"
+      },
+      {
+        "type": "MIGRATION_DEPENDENCY",
+        "file": "20250911160000_auth_mfa_setup.sql",
+        "issue": "References table 'auth' that may not exist yet",
+        "severity": "HIGH",
+        "description": "References table 'auth' that may not exist yet"
+      },
+      {
+        "type": "MIGRATION_DEPENDENCY",
+        "file": "20250911160000_auth_mfa_setup.sql",
+        "issue": "References table 'auth' that may not exist yet",
+        "severity": "HIGH",
+        "description": "References table 'auth' that may not exist yet"
+      },
+      {
+        "type": "MIGRATION_DEPENDENCY",
+        "file": "20250911160000_auth_mfa_setup.sql",
+        "issue": "References table 'auth' that may not exist yet",
+        "severity": "HIGH",
+        "description": "References table 'auth' that may not exist yet"
+      },
+      {
+        "type": "MIGRATION_DEPENDENCY",
+        "file": "20250911160000_auth_mfa_setup.sql",
+        "issue": "References table 'user_sessions' that may not exist yet",
+        "severity": "HIGH",
+        "description": "References table 'user_sessions' that may not exist yet"
+      },
+      {
+        "type": "MIGRATION_DEPENDENCY",
+        "file": "20250911160000_auth_mfa_setup.sql",
+        "issue": "References table 'mfa_factors' that may not exist yet",
+        "severity": "HIGH",
+        "description": "References table 'mfa_factors' that may not exist yet"
+      },
+      {
+        "type": "MIGRATION_DEPENDENCY",
+        "file": "20250911160000_auth_mfa_setup.sql",
+        "issue": "References table 'auth' that may not exist yet",
+        "severity": "HIGH",
+        "description": "References table 'auth' that may not exist yet"
+      },
+      {
+        "type": "MIGRATION_DEPENDENCY",
+        "file": "20250911160000_auth_mfa_setup.sql",
+        "issue": "References table 'auth' that may not exist yet",
+        "severity": "HIGH",
+        "description": "References table 'auth' that may not exist yet"
+      },
+      {
+        "type": "MIGRATION_DEPENDENCY",
+        "file": "20250911161000_verification_tables.sql",
+        "issue": "References table 'auth' that may not exist yet",
+        "severity": "HIGH",
+        "description": "References table 'auth' that may not exist yet"
+      },
+      {
+        "type": "MIGRATION_DEPENDENCY",
+        "file": "20250911161000_verification_tables.sql",
+        "issue": "References table 'auth' that may not exist yet",
+        "severity": "HIGH",
+        "description": "References table 'auth' that may not exist yet"
+      },
+      {
+        "type": "MIGRATION_DEPENDENCY",
+        "file": "20250911162000_oauth_states_table.sql",
+        "issue": "References table 'auth' that may not exist yet",
+        "severity": "HIGH",
+        "description": "References table 'auth' that may not exist yet"
+      },
+      {
+        "type": "MIGRATION_DEPENDENCY",
+        "file": "20250911163000_refresh_tokens_table.sql",
+        "issue": "References table 'auth' that may not exist yet",
+        "severity": "HIGH",
+        "description": "References table 'auth' that may not exist yet"
+      },
+      {
+        "type": "MIGRATION_DEPENDENCY",
+        "file": "20250911164000_gdpr_data_export_tables.sql",
+        "issue": "References table 'auth' that may not exist yet",
+        "severity": "HIGH",
+        "description": "References table 'auth' that may not exist yet"
+      },
+      {
+        "type": "MIGRATION_DEPENDENCY",
+        "file": "20250911164000_gdpr_data_export_tables.sql",
+        "issue": "References table 'data_export_jobs' that may not exist yet",
+        "severity": "HIGH",
+        "description": "References table 'data_export_jobs' that may not exist yet"
+      },
+      {
+        "type": "MIGRATION_DEPENDENCY",
+        "file": "20250911164000_gdpr_data_export_tables.sql",
+        "issue": "References table 'auth' that may not exist yet",
+        "severity": "HIGH",
+        "description": "References table 'auth' that may not exist yet"
+      },
+      {
+        "type": "MIGRATION_DEPENDENCY",
+        "file": "20250911164000_gdpr_data_export_tables.sql",
+        "issue": "References table 'auth' that may not exist yet",
+        "severity": "HIGH",
+        "description": "References table 'auth' that may not exist yet"
+      },
+      {
+        "type": "MIGRATION_DEPENDENCY",
+        "file": "20250911165000_gdpr_data_deletion_tables.sql",
+        "issue": "References table 'auth' that may not exist yet",
+        "severity": "HIGH",
+        "description": "References table 'auth' that may not exist yet"
+      },
+      {
+        "type": "MIGRATION_DEPENDENCY",
+        "file": "20250911165000_gdpr_data_deletion_tables.sql",
+        "issue": "References table 'data_deletion_jobs' that may not exist yet",
+        "severity": "HIGH",
+        "description": "References table 'data_deletion_jobs' that may not exist yet"
+      },
+      {
+        "type": "MIGRATION_DEPENDENCY",
+        "file": "20250911165000_gdpr_data_deletion_tables.sql",
+        "issue": "References table 'auth' that may not exist yet",
+        "severity": "HIGH",
+        "description": "References table 'auth' that may not exist yet"
+      },
+      {
+        "type": "MIGRATION_DEPENDENCY",
+        "file": "20250911165000_gdpr_data_deletion_tables.sql",
+        "issue": "References table 'auth' that may not exist yet",
+        "severity": "HIGH",
+        "description": "References table 'auth' that may not exist yet"
+      },
+      {
+        "type": "MIGRATION_DEPENDENCY",
+        "file": "20250911165000_gdpr_data_deletion_tables.sql",
+        "issue": "References table 'data_deletion_jobs' that may not exist yet",
+        "severity": "HIGH",
+        "description": "References table 'data_deletion_jobs' that may not exist yet"
+      },
+      {
+        "type": "MIGRATION_DEPENDENCY",
+        "file": "20250911165000_gdpr_data_deletion_tables.sql",
+        "issue": "References table 'auth' that may not exist yet",
+        "severity": "HIGH",
+        "description": "References table 'auth' that may not exist yet"
+      },
+      {
+        "type": "MIGRATION_DEPENDENCY",
+        "file": "20250911165000_gdpr_data_deletion_tables.sql",
+        "issue": "References table 'data_deletion_jobs' that may not exist yet",
+        "severity": "HIGH",
+        "description": "References table 'data_deletion_jobs' that may not exist yet"
+      },
+      {
+        "type": "MIGRATION_DEPENDENCY",
+        "file": "20250911166000_consent_support_tables.sql",
+        "issue": "References table 'yearbook_faces' that may not exist yet",
+        "severity": "HIGH",
+        "description": "References table 'yearbook_faces' that may not exist yet"
+      },
+      {
+        "type": "MIGRATION_DEPENDENCY",
+        "file": "20250911166000_consent_support_tables.sql",
+        "issue": "References table 'auth' that may not exist yet",
+        "severity": "HIGH",
+        "description": "References table 'auth' that may not exist yet"
+      },
+      {
+        "type": "MIGRATION_DEPENDENCY",
+        "file": "20250911166000_consent_support_tables.sql",
+        "issue": "References table 'auth' that may not exist yet",
+        "severity": "HIGH",
+        "description": "References table 'auth' that may not exist yet"
+      },
+      {
+        "type": "MIGRATION_DEPENDENCY",
+        "file": "20250911166000_consent_support_tables.sql",
+        "issue": "References table 'auth' that may not exist yet",
+        "severity": "HIGH",
+        "description": "References table 'auth' that may not exist yet"
+      },
+      {
+        "type": "MIGRATION_DEPENDENCY",
+        "file": "20250911166000_consent_support_tables.sql",
+        "issue": "References table 'auth' that may not exist yet",
+        "severity": "HIGH",
+        "description": "References table 'auth' that may not exist yet"
+      },
+      {
+        "type": "MIGRATION_DEPENDENCY",
+        "file": "20250911166000_consent_support_tables.sql",
+        "issue": "References table 'table' that may not exist yet",
+        "severity": "HIGH",
+        "description": "References table 'table' that may not exist yet"
+      },
+      {
+        "type": "MIGRATION_DEPENDENCY",
+        "file": "20250911166000_consent_support_tables.sql",
+        "issue": "References table 'auth' that may not exist yet",
+        "severity": "HIGH",
+        "description": "References table 'auth' that may not exist yet"
+      },
+      {
+        "type": "MIGRATION_DEPENDENCY",
+        "file": "20250911166000_consent_support_tables.sql",
+        "issue": "References table 'indexes' that may not exist yet",
+        "severity": "HIGH",
+        "description": "References table 'indexes' that may not exist yet"
+      },
+      {
+        "type": "MIGRATION_DEPENDENCY",
+        "file": "20250911166000_consent_support_tables.sql",
+        "issue": "References table 'enable' that may not exist yet",
+        "severity": "HIGH",
+        "description": "References table 'enable' that may not exist yet"
+      },
+      {
+        "type": "MIGRATION_DEPENDENCY",
+        "file": "20250911166000_consent_support_tables.sql",
+        "issue": "References table 'policies' that may not exist yet",
+        "severity": "HIGH",
+        "description": "References table 'policies' that may not exist yet"
+      },
+      {
+        "type": "MIGRATION_DEPENDENCY",
+        "file": "20250911167000_rate_limits_table.sql",
+        "issue": "References table 'auth' that may not exist yet",
+        "severity": "HIGH",
+        "description": "References table 'auth' that may not exist yet"
+      },
+      {
+        "type": "MIGRATION_DEPENDENCY",
+        "file": "20250911167000_rate_limits_table.sql",
+        "issue": "References table 'auth' that may not exist yet",
+        "severity": "HIGH",
+        "description": "References table 'auth' that may not exist yet"
+      }
+    ],
+    "recommendations": []
+  }
+}

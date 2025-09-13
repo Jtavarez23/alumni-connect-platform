@@ -35,7 +35,7 @@ export function SchoolYearbookArchive({ schoolId }: SchoolYearbookArchiveProps) 
       try {
         setLoading(true);
         const { data, error } = await supabase
-          .from("yearbook_editions")
+          .from("yearbooks")
           .select(`
             id,
             title,

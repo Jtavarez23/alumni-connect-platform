@@ -31,7 +31,7 @@ export function ShareableMemoryCard({ title, school, year, photos, className }: 
       // Simulate card generation
       await new Promise(resolve => setTimeout(resolve, 1000));
       
-      const shareText = `Found my yearbook squad! ${school} Class of ${year} 🎓 Join us on ReconnectHive!`;
+      const shareText = `Found my yearbook squad! ${school} Class of ${year} 🎓 Join us on Alumni Connect!`;
       const shareUrl = `${window.location.origin}?ref=share`;
       
       if (platform === 'copy') {
@@ -146,7 +146,7 @@ export function ShareableMemoryCard({ title, school, year, photos, className }: 
                 </div>
                 
                 <div className="text-sm text-muted-foreground">
-                  Join us: ReconnectHive.com
+                  Join us: AlumniConnect.com
                 </div>
               </CardContent>
             </Card>

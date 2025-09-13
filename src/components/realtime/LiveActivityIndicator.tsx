@@ -47,7 +47,7 @@ export function LiveActivityIndicator({
               <Avatar key={user.user_id} className="h-6 w-6 border-2 border-green-500">
                 <AvatarImage src={user.avatar_url} />
                 <AvatarFallback className="text-xs bg-green-100">
-                  {user.first_name[0]}{user.last_name[0]}
+                  {user.first_name?.[0]}{user.last_name?.[0]}
                 </AvatarFallback>
               </Avatar>
             ))}

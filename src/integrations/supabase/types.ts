@@ -1370,7 +1370,7 @@ export type Database = {
           tagged_profile_id: string
           updated_at: string | null
           verification_status: string | null
-          yearbook_entry_id: string
+          yearbook_page_id: string
         }
         Insert: {
           created_at?: string | null
@@ -1379,7 +1379,7 @@ export type Database = {
           tagged_profile_id: string
           updated_at?: string | null
           verification_status?: string | null
-          yearbook_entry_id: string
+          yearbook_page_id: string
         }
         Update: {
           created_at?: string | null
@@ -1388,7 +1388,7 @@ export type Database = {
           tagged_profile_id?: string
           updated_at?: string | null
           verification_status?: string | null
-          yearbook_entry_id?: string
+          yearbook_page_id?: string
         }
         Relationships: [
           {
@@ -1406,10 +1406,10 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
-            foreignKeyName: "student_tags_yearbook_entry_id_fkey"
-            columns: ["yearbook_entry_id"]
+            foreignKeyName: "student_tags_yearbook_page_id_fkey"
+            columns: ["yearbook_page_id"]
             isOneToOne: false
-            referencedRelation: "yearbook_entries"
+            referencedRelation: "yearbook_pages"
             referencedColumns: ["id"]
           },
         ]
@@ -1511,7 +1511,7 @@ export type Database = {
           suggested_by_id: string | null
           suggested_profile_id: string
           suggestion_type: string | null
-          yearbook_entry_id: string
+          yearbook_page_id: string
         }
         Insert: {
           confidence_score?: number | null
@@ -1522,7 +1522,7 @@ export type Database = {
           suggested_by_id?: string | null
           suggested_profile_id: string
           suggestion_type?: string | null
-          yearbook_entry_id: string
+          yearbook_page_id: string
         }
         Update: {
           confidence_score?: number | null
@@ -1533,7 +1533,7 @@ export type Database = {
           suggested_by_id?: string | null
           suggested_profile_id?: string
           suggestion_type?: string | null
-          yearbook_entry_id?: string
+          yearbook_page_id?: string
         }
         Relationships: [
           {
@@ -1551,10 +1551,10 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
-            foreignKeyName: "tag_suggestions_yearbook_entry_id_fkey"
-            columns: ["yearbook_entry_id"]
+            foreignKeyName: "tag_suggestions_yearbook_page_id_fkey"
+            columns: ["yearbook_page_id"]
             isOneToOne: false
-            referencedRelation: "yearbook_entries"
+            referencedRelation: "yearbook_pages"
             referencedColumns: ["id"]
           },
         ]
@@ -1614,7 +1614,7 @@ export type Database = {
           updated_at: string | null
           user_id: string
           visibility: string | null
-          yearbook_entry_id: string | null
+          yearbook_page_id: string | null
         }
         Insert: {
           caption?: string | null
@@ -1625,7 +1625,7 @@ export type Database = {
           updated_at?: string | null
           user_id: string
           visibility?: string | null
-          yearbook_entry_id?: string | null
+          yearbook_page_id?: string | null
         }
         Update: {
           caption?: string | null
@@ -1636,7 +1636,7 @@ export type Database = {
           updated_at?: string | null
           user_id?: string
           visibility?: string | null
-          yearbook_entry_id?: string | null
+          yearbook_page_id?: string | null
         }
         Relationships: [
           {
@@ -1647,10 +1647,10 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
-            foreignKeyName: "then_vs_now_posts_yearbook_entry_id_fkey"
-            columns: ["yearbook_entry_id"]
+            foreignKeyName: "then_vs_now_posts_yearbook_page_id_fkey"
+            columns: ["yearbook_page_id"]
             isOneToOne: false
-            referencedRelation: "yearbook_entries"
+            referencedRelation: "yearbook_pages"
             referencedColumns: ["id"]
           },
         ]
@@ -1738,43 +1738,46 @@ export type Database = {
         }
         Relationships: []
       }
-      yearbook_editions: {
+      yearbooks: {
         Row: {
-          cover_image_url: string | null
-          created_at: string | null
           id: string
-          page_count: number | null
           school_id: string
-          title: string | null
-          upload_status: string | null
-          uploaded_by: string | null
           year: number
+          title: string | null
+          cover_image_url: string | null
+          page_count: number | null
+          status: string
+          uploaded_by: string | null
+          file_url: string | null
+          created_at: string
         }
         Insert: {
-          cover_image_url?: string | null
-          created_at?: string | null
           id?: string
-          page_count?: number | null
           school_id: string
-          title?: string | null
-          upload_status?: string | null
-          uploaded_by?: string | null
           year: number
+          title?: string | null
+          cover_image_url?: string | null
+          page_count?: number | null
+          status?: string
+          uploaded_by?: string | null
+          file_url?: string | null
+          created_at?: string
         }
         Update: {
-          cover_image_url?: string | null
-          created_at?: string | null
           id?: string
-          page_count?: number | null
           school_id?: string
-          title?: string | null
-          upload_status?: string | null
-          uploaded_by?: string | null
           year?: number
+          title?: string | null
+          cover_image_url?: string | null
+          page_count?: number | null
+          status?: string
+          uploaded_by?: string | null
+          file_url?: string | null
+          created_at?: string
         }
         Relationships: [
           {
-            foreignKeyName: "yearbook_editions_school_id_fkey"
+            foreignKeyName: "yearbooks_school_id_fkey"
             columns: ["school_id"]
             isOneToOne: false
             referencedRelation: "schools"
@@ -1782,54 +1785,234 @@ export type Database = {
           },
         ]
       }
-      yearbook_entries: {
+      yearbook_pages: {
         Row: {
-          activities: string[] | null
-          created_at: string | null
-          edition_id: string
-          honors: string[] | null
           id: string
+          yearbook_id: string
           page_number: number | null
-          photo_url: string | null
-          profile_id: string | null
-          quote: string | null
           student_name: string
+          photo_url: string | null
+          activities: string[] | null
+          honors: string[] | null
+          quote: string | null
+          profile_id: string | null
+          ocr_text: string | null
+          processed_at: string | null
+          image_url: string | null
+          created_at: string
         }
         Insert: {
-          activities?: string[] | null
-          created_at?: string | null
-          edition_id: string
-          honors?: string[] | null
           id?: string
+          yearbook_id: string
           page_number?: number | null
-          photo_url?: string | null
-          profile_id?: string | null
-          quote?: string | null
           student_name: string
+          photo_url?: string | null
+          activities?: string[] | null
+          honors?: string[] | null
+          quote?: string | null
+          profile_id?: string | null
+          ocr_text?: string | null
+          processed_at?: string | null
+          image_url?: string | null
+          created_at?: string
         }
         Update: {
-          activities?: string[] | null
-          created_at?: string | null
-          edition_id?: string
-          honors?: string[] | null
           id?: string
+          yearbook_id?: string
           page_number?: number | null
-          photo_url?: string | null
-          profile_id?: string | null
-          quote?: string | null
           student_name?: string
+          photo_url?: string | null
+          activities?: string[] | null
+          honors?: string[] | null
+          quote?: string | null
+          profile_id?: string | null
+          ocr_text?: string | null
+          processed_at?: string | null
+          image_url?: string | null
+          created_at?: string
         }
         Relationships: [
           {
-            foreignKeyName: "yearbook_entries_edition_id_fkey"
-            columns: ["edition_id"]
+            foreignKeyName: "yearbook_pages_yearbook_id_fkey"
+            columns: ["yearbook_id"]
             isOneToOne: false
-            referencedRelation: "yearbook_editions"
+            referencedRelation: "yearbooks"
             referencedColumns: ["id"]
           },
           {
-            foreignKeyName: "yearbook_entries_profile_id_fkey"
+            foreignKeyName: "yearbook_pages_profile_id_fkey"
             columns: ["profile_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      yearbook_faces: {
+        Row: {
+          id: string
+          page_id: string
+          bbox: Json
+          detected_name: string | null
+          claimed_by: string | null
+          verified: boolean
+          created_at: string
+        }
+        Insert: {
+          id?: string
+          page_id: string
+          bbox: Json
+          detected_name?: string | null
+          claimed_by?: string | null
+          verified?: boolean
+          created_at?: string
+        }
+        Update: {
+          id?: string
+          page_id?: string
+          bbox?: Json
+          detected_name?: string | null
+          claimed_by?: string | null
+          verified?: boolean
+          created_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "yearbook_faces_page_id_fkey"
+            columns: ["page_id"]
+            isOneToOne: false
+            referencedRelation: "yearbook_pages"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "yearbook_faces_claimed_by_fkey"
+            columns: ["claimed_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      yearbook_claims: {
+        Row: {
+          id: string
+          face_id: string
+          user_id: string
+          status: string
+          created_at: string
+        }
+        Insert: {
+          id?: string
+          face_id: string
+          user_id: string
+          status?: string
+          created_at?: string
+        }
+        Update: {
+          id?: string
+          face_id?: string
+          user_id?: string
+          status?: string
+          created_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "yearbook_claims_face_id_fkey"
+            columns: ["face_id"]
+            isOneToOne: false
+            referencedRelation: "yearbook_faces"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "yearbook_claims_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      groups: {
+        Row: {
+          id: string
+          type: string
+          school_id: string | null
+          name: string
+          description: string | null
+          created_by: string | null
+          privacy: string
+          created_at: string
+        }
+        Insert: {
+          id?: string
+          type: string
+          school_id?: string | null
+          name: string
+          description?: string | null
+          created_by?: string | null
+          privacy?: string
+          created_at?: string
+        }
+        Update: {
+          id?: string
+          type?: string
+          school_id?: string | null
+          name?: string
+          description?: string | null
+          created_by?: string | null
+          privacy?: string
+          created_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "groups_school_id_fkey"
+            columns: ["school_id"]
+            isOneToOne: false
+            referencedRelation: "schools"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "groups_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      group_members: {
+        Row: {
+          id: string
+          group_id: string
+          user_id: string
+          role: string
+          joined_at: string
+        }
+        Insert: {
+          id?: string
+          group_id: string
+          user_id: string
+          role?: string
+          joined_at?: string
+        }
+        Update: {
+          id?: string
+          group_id?: string
+          user_id?: string
+          role?: string
+          joined_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "group_members_group_id_fkey"
+            columns: ["group_id"]
+            isOneToOne: false
+            referencedRelation: "groups"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "group_members_user_id_fkey"
+            columns: ["user_id"]
             isOneToOne: false
             referencedRelation: "profiles"
             referencedColumns: ["id"]
@@ -1889,7 +2072,7 @@ export type Database = {
           max_participants: number | null
           name: string
           updated_at: string | null
-          yearbook_edition_id: string | null
+          yearbook_id: string | null
         }
         Insert: {
           created_at?: string | null
@@ -1901,7 +2084,7 @@ export type Database = {
           max_participants?: number | null
           name: string
           updated_at?: string | null
-          yearbook_edition_id?: string | null
+          yearbook_id?: string | null
         }
         Update: {
           created_at?: string | null
@@ -1913,7 +2096,7 @@ export type Database = {
           max_participants?: number | null
           name?: string
           updated_at?: string | null
-          yearbook_edition_id?: string | null
+          yearbook_id?: string | null
         }
         Relationships: [
           {
@@ -1924,10 +2107,10 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
-            foreignKeyName: "yearbook_party_rooms_yearbook_edition_id_fkey"
-            columns: ["yearbook_edition_id"]
+            foreignKeyName: "yearbook_party_rooms_yearbook_id_fkey"
+            columns: ["yearbook_id"]
             isOneToOne: false
-            referencedRelation: "yearbook_editions"
+            referencedRelation: "yearbooks"
             referencedColumns: ["id"]
           },
         ]

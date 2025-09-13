@@ -27,9 +27,7 @@ export default function Login() {
     e.preventDefault()
     setLoading(true)
     try {
-      console.log('Starting login process...', { email })
       await signIn(email, password)
-      console.log('Login successful, navigating to dashboard...')
       navigate('/dashboard')
     } catch (error: any) {
       console.error('Login error:', error)

@@ -53,7 +53,7 @@ export function MysteryFeature() {
   const createMysteryActivity = async () => {
     // Demo function - in production this would create mystery lookup entries
     // For now we'll just simulate the data
-    console.log('Demo mystery activity created');
+    // Demo mystery activity created
   };
 
   const revealIdentity = async (mysteryId: string) => {

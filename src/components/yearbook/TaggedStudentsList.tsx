@@ -147,13 +147,13 @@ export function TaggedStudentsList({ yearbookEntryId, onTagUpdate }: TaggedStude
           <Avatar className="w-8 h-8">
             <AvatarImage src={tag.tagged_profile.avatar_url || undefined} />
             <AvatarFallback className="text-xs">
-              {tag.tagged_profile.first_name[0]}{tag.tagged_profile.last_name[0]}
+              {tag.tagged_profile.first_name?.[0]}{tag.tagged_profile.last_name?.[0]}
             </AvatarFallback>
           </Avatar>
           
           <div className="flex-1">
             <p className="text-sm font-medium">
-              {tag.tagged_profile.first_name} {tag.tagged_profile.last_name}
+              {tag.tagged_profile.first_name || ''} {tag.tagged_profile.last_name || ''}
             </p>
             <div className="flex items-center gap-2 mt-1">
               <Badge 

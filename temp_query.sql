@@ -1,0 +1,1 @@
+GRANT EXECUTE ON FUNCTION get_mentorship_matches TO authenticated;

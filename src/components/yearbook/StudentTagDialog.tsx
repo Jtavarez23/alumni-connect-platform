@@ -199,12 +199,12 @@ export function StudentTagDialog({
                   <Avatar className="w-10 h-10">
                     <AvatarImage src={profile.avatar_url || undefined} />
                     <AvatarFallback>
-                      {profile.first_name[0]}{profile.last_name[0]}
+                      {profile.first_name?.[0]}{profile.last_name?.[0]}
                     </AvatarFallback>
                   </Avatar>
                   <div className="flex-1">
                     <p className="font-medium">
-                      {profile.first_name} {profile.last_name}
+                      {profile.first_name || ''} {profile.last_name || ''}
                     </p>
                     {profile.graduation_year && (
                       <Badge variant="secondary" className="text-xs">

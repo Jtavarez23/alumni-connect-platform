@@ -1,0 +1,219 @@
+// Business Directory Page
+// Main business listing and discovery interface
+
+import React, { useState } from 'react';
+import { Plus, Search, Filter, MapPin, Star, Award, Gift, ExternalLink } from 'lucide-react';
+import { Link } from 'react-router-dom';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { useBusinesses } from '@/hooks/useBusiness';
+import { BusinessCard } from '@/components/business/BusinessCard';
+import { BusinessFilters } from '@/components/business/BusinessFilters';
+import { LoadingSpinner } from '@/components/ui/loading-spinner';
+import { AppLayout } from '@/components/layout/AppLayout';
+import { BUSINESS_CATEGORIES } from '@/types/business';
+import type { BusinessFilters as BusinessFiltersType } from '@/types/business';
+
+export function Businesses() {
+  const [searchQuery, setSearchQuery] = useState('');
+  const [filters, setFilters] = useState<BusinessFiltersType>({});
+  const [showFilters, setShowFilters] = useState(false);
+
+  const {
+    data: businessesData,
+    fetchNextPage,
+    hasNextPage,
+    isFetchingNextPage,
+    isLoading,
+    error,
+  } = useBusinesses({ ...filters, search: searchQuery });
+
+  const allBusinesses = businessesData?.pages.flatMap(page => page.businesses) || [];
+  const featuredBusinesses = allBusinesses.filter(business => business.featured);
+  const verifiedBusinesses = allBusinesses.filter(business => business.verification_status === 'verified');
+  const withPerksBusinesses = allBusinesses.filter(business => business.alumni_perks);
+
+  const handleFilterChange = (newFilters: BusinessFiltersType) => {
+    setFilters(newFilters);
+  };
+
+  if (isLoading) {
+    return (
+      <AppLayout title="Businesses">
+        <div className="flex items-center justify-center min-h-[400px]">
+          <LoadingSpinner size="lg" />
+        </div>
+      </AppLayout>
+    );
+  }
+
+  if (error) {
+    return (
+      <AppLayout title="Businesses">
+        <div className="text-center py-12">
+          <p className="text-muted-foreground mb-4">Failed to load businesses</p>
+          <Button onClick={() => window.location.reload()} variant="outline">
+            Try Again
+          </Button>
+        </div>
+      </AppLayout>
+    );
+  }
+
+  return (
+    <AppLayout title="Businesses">
+      <div className="space-y-6 pb-20 md:pb-6 p-6">
+        {/* Header */}
+        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+          <div>
+            <h1 className="text-2xl font-bold">Alumni Business Directory</h1>
+            <p className="text-muted-foreground">
+              Discover and support alumni-owned businesses
+            </p>
+          </div>
+          <Link to="/businesses/create">
+            <Button className="w-full sm:w-auto">
+              <Plus className="w-4 h-4 mr-2" />
+              Add Business
+            </Button>
+          </Link>
+        </div>
+
+        {/* Search and Filters */}
+        <div className="flex flex-col sm:flex-row gap-4">
+          <div className="relative flex-1">
+            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-4 h-4" />
+            <Input
+              placeholder="Search businesses..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="pl-10"
+            />
+          </div>
+          <Button
+            variant="outline"
+            onClick={() => setShowFilters(!showFilters)}
+          >
+            <Filter className="w-4 h-4 mr-2" />
+            Filters
+          </Button>
+        </div>
+
+        {/* Filters Panel */}
+        {showFilters && (
+          <div className="border rounded-lg p-4">
+            <BusinessFilters
+              filters={filters}
+              onChange={handleFilterChange}
+              onClose={() => setShowFilters(false)}
+            />
+          </div>
+        )}
+
+        {/* Business Tabs */}
+        <Tabs defaultValue="all" className="w-full">
+          <TabsList className="grid w-full grid-cols-4">
+            <TabsTrigger value="all">All ({allBusinesses.length})</TabsTrigger>
+            <TabsTrigger value="featured">Featured ({featuredBusinesses.length})</TabsTrigger>
+            <TabsTrigger value="verified">Verified ({verifiedBusinesses.length})</TabsTrigger>
+            <TabsTrigger value="perks">Alumni Perks ({withPerksBusinesses.length})</TabsTrigger>
+          </TabsList>
+
+          <TabsContent value="all" className="mt-6">
+            <BusinessGrid businesses={allBusinesses} />
+          </TabsContent>
+
+          <TabsContent value="featured" className="mt-6">
+            <BusinessGrid businesses={featuredBusinesses} />
+          </TabsContent>
+
+          <TabsContent value="verified" className="mt-6">
+            <BusinessGrid businesses={verifiedBusinesses} />
+          </TabsContent>
+
+          <TabsContent value="perks" className="mt-6">
+            <BusinessGrid businesses={withPerksBusinesses} />
+          </TabsContent>
+        </Tabs>
+
+        {/* Load More */}
+        {hasNextPage && (
+          <div className="text-center">
+            <Button
+              variant="outline"
+              onClick={() => fetchNextPage()}
+              disabled={isFetchingNextPage}
+            >
+              {isFetchingNextPage ? (
+                <>
+                  <LoadingSpinner size="sm" className="mr-2" />
+                  Loading...
+                </>
+              ) : (
+                'Load More Businesses'
+              )}
+            </Button>
+          </div>
+        )}
+
+        {/* Results Summary */}
+        {allBusinesses.length > 0 && (
+          <div className="text-center text-sm text-muted-foreground border-t pt-4">
+            Showing {allBusinesses.length} businesses
+            {businessesData?.pages[0]?.total_count && 
+              ` of ${businessesData.pages[0].total_count} total`
+            }
+          </div>
+        )}
+      </div>
+    </AppLayout>
+  );
+}
+
+interface BusinessGridProps {
+  businesses: any[];
+}
+
+function BusinessGrid({ businesses }: BusinessGridProps) {
+  if (businesses.length === 0) {
+    return <EmptyState />;
+  }
+
+  return (
+    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+      {businesses.map((business) => (
+        <BusinessCard key={business.id} business={business} />
+      ))}
+    </div>
+  );
+}
+
+function EmptyState() {
+  return (
+    <div className="text-center py-12">
+      <MapPin className="w-16 h-16 text-muted-foreground mx-auto mb-4" />
+      <h3 className="text-lg font-medium mb-2">No businesses found</h3>
+      <p className="text-muted-foreground mb-6 max-w-md mx-auto">
+        Be the first to add your business to the alumni directory and connect with fellow graduates!
+      </p>
+      <div className="flex flex-col sm:flex-row gap-3 justify-center">
+        <Link to="/businesses/create">
+          <Button>
+            <Plus className="w-4 h-4 mr-2" />
+            Add Your Business
+          </Button>
+        </Link>
+        <Button variant="outline" onClick={() => window.location.reload()}>
+          Refresh
+        </Button>
+      </div>
+    </div>
+  );
+}
+
+export default Businesses;

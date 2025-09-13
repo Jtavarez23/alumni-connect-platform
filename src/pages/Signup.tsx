@@ -44,15 +44,11 @@ export default function Signup() {
 
     setLoading(true)
     try {
-      console.log('Starting signup process...', { email: formData.email, firstName: formData.firstName, lastName: formData.lastName })
-      
       await signUp(formData.email, formData.password, {
         first_name: formData.firstName,
         last_name: formData.lastName,
         graduation_year: parseInt(formData.graduationYear) || null
       })
-      
-      console.log('Signup successful, navigating to dashboard...')
       navigate('/dashboard')
     } catch (error: any) {
       console.error('Signup error:', error)

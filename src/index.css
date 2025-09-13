@@ -1,4 +1,5 @@
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Merriweather:wght@300;400;700&display=swap');
 
 @tailwind base;
 @tailwind components;
@@ -136,6 +137,38 @@
 }
 
 @layer components {
+  /* Typography Scale - Design System */
+  .text-display {
+    @apply text-3xl font-bold tracking-tight;
+  }
+  
+  .text-h1 {
+    @apply text-2xl font-semibold;
+  }
+  
+  .text-h2 {
+    @apply text-xl font-semibold;
+  }
+  
+  .text-body {
+    @apply text-base leading-relaxed;
+  }
+  
+  .text-small {
+    @apply text-sm text-muted-foreground;
+  }
+  
+  /* Yearbook Context Typography */
+  .yearbook-heading {
+    font-family: 'Merriweather', serif;
+    @apply font-bold text-foreground;
+  }
+  
+  .yearbook-text {
+    font-family: 'Merriweather', serif;
+    @apply leading-relaxed text-foreground;
+  }
+
   /* Animations */
   .float-animation {
     animation: float 6s ease-in-out infinite;
@@ -194,5 +227,153 @@
     50% { 
       box-shadow: 0 0 40px hsl(var(--primary) / 0.4); 
     }
+  }
+  
+  /* Mobile-specific utilities */
+  .safe-area-pb {
+    padding-bottom: env(safe-area-inset-bottom);
+  }
+  
+  .safe-area-pt {
+    padding-top: env(safe-area-inset-top);
+  }
+  
+  .touch-manipulation {
+    touch-action: manipulation;
+  }
+  
+  /* Better mobile tap targets */
+  @media (max-width: 768px) {
+    .tap-target {
+      min-height: 44px;
+      min-width: 44px;
+    }
+    
+    /* Larger touch targets on mobile */
+    button, a, input, select, textarea {
+      min-height: 44px;
+    }
+    
+    /* Improve form elements on mobile */
+    input, textarea, select {
+      font-size: 16px; /* Prevents zoom on iOS */
+    }
+    
+    /* Better mobile cards */
+    .mobile-card {
+      @apply rounded-lg shadow-sm border border-border/50 bg-card;
+      transition: all 0.2s ease;
+    }
+    
+    .mobile-card:active {
+      transform: scale(0.98);
+      background-color: hsl(var(--muted) / 0.5);
+    }
+  }
+}
+
+/* Accessibility Enhancements - WCAG AA Compliance */
+@layer utilities {
+  /* High Contrast Focus Indicators */
+  .focus-visible:focus-visible {
+    outline: 2px solid hsl(var(--ring));
+    outline-offset: 2px;
+  }
+  
+  /* Skip Link for Screen Readers */
+  .skip-link {
+    @apply absolute -top-10 left-4 z-50 bg-primary text-primary-foreground px-4 py-2 rounded-md;
+    transition: top 0.3s;
+  }
+  
+  .skip-link:focus {
+    @apply top-4;
+  }
+  
+  /* Screen Reader Only Text */
+  .sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
+  }
+  
+  /* High Contrast Mode Support */
+  @media (prefers-contrast: high) {
+    .glass-card {
+      background: hsl(var(--card));
+      border: 2px solid hsl(var(--border));
+      backdrop-filter: none;
+    }
+  }
+  
+  /* Reduced Motion Support */
+  @media (prefers-reduced-motion: reduce) {
+    .float-animation,
+    .fade-in-up,
+    .hover-scale {
+      animation: none;
+      transition: none;
+    }
+    
+    .hover-scale:hover {
+      transform: none;
+    }
+  }
+  
+  /* Color Blind Friendly Status Indicators */
+  .status-indicator {
+    position: relative;
+  }
+  
+  .status-indicator::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 4px;
+    height: 100%;
+    border-radius: 2px;
+  }
+  
+  .status-success::before {
+    background: hsl(var(--success));
+  }
+  
+  .status-warning::before {
+    background: hsl(var(--warning));
+  }
+  
+  .status-error::before {
+    background: hsl(var(--error));
+  }
+  
+  /* Enhanced Button Feedback */
+  .button-enhanced {
+    position: relative;
+    overflow: hidden;
+  }
+  
+  .button-enhanced::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 0;
+    height: 0;
+    background: rgba(255, 255, 255, 0.3);
+    border-radius: 50%;
+    transform: translate(-50%, -50%);
+    transition: width 0.3s, height 0.3s;
+  }
+  
+  .button-enhanced:active::after {
+    width: 300px;
+    height: 300px;
   }
 }

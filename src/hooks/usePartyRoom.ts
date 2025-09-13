@@ -51,7 +51,7 @@ export function usePartyRoom(roomId: string | null) {
         .from("yearbook_party_rooms")
         .select(`
           *,
-          yearbook_edition:yearbook_editions(
+          yearbook_edition:yearbooks(
             title,
             year,
             school:schools(name)

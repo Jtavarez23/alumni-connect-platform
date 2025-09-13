@@ -210,7 +210,7 @@ export function MemoryStories() {
                         <Avatar className="h-6 w-6">
                           <AvatarImage src={story.user.avatar_url} />
                           <AvatarFallback className="text-xs">
-                            {story.user.first_name[0]}{story.user.last_name[0]}
+                            {story.user.first_name?.[0]}{story.user.last_name?.[0]}
                           </AvatarFallback>
                         </Avatar>
                       )}

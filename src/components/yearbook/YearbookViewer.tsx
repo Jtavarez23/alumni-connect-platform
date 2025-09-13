@@ -5,12 +5,17 @@ import { Input } from "@/components/ui/input";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
-import { ArrowLeft, Search, User, Heart, MessageCircle, Tag } from "lucide-react";
+import { ArrowLeft, Search, User, Heart, MessageCircle, Tag, BookOpen, Users, LayoutGrid, Monitor } from "lucide-react";
 import { toast } from "sonner";
 import { StudentTagDialog } from "./StudentTagDialog";
 import { TaggedStudentsList } from "./TaggedStudentsList";
 import { ReactionSystem } from "../social/ReactionSystem";
 import { ShareableMemoryCard } from "../social/ShareableMemoryCard";
+import { PageFlipYearbook } from "./PageFlipYearbook";
+import { YearbookSocialHub } from "./YearbookSocialHub";
+import { DesktopYearbookHub } from "./DesktopYearbookHub";
+import { DesktopPageFlip } from "./DesktopPageFlip";
+import { useIsMobile } from "@/hooks/use-mobile";
 
 interface YearbookEdition {
   id: string;
@@ -47,6 +52,9 @@ export function YearbookViewer({ yearbook, onBack }: YearbookViewerProps) {
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedEntryForTag, setSelectedEntryForTag] = useState<YearbookEntry | null>(null);
+  const [viewMode, setViewMode] = useState<'grid' | 'pages' | 'social'>('grid');
+  const [useDesktopMode, setUseDesktopMode] = useState(false);
+  const isMobile = useIsMobile();
 
   useEffect(() => {
     fetchEntries();
@@ -55,7 +63,7 @@ export function YearbookViewer({ yearbook, onBack }: YearbookViewerProps) {
   const fetchEntries = async () => {
     try {
       const { data, error } = await supabase
-        .from("yearbook_entries")
+        .from("yearbook_pages")
         .select("*")
         .eq("edition_id", yearbook.id)
         .order("student_name");
@@ -80,6 +88,45 @@ export function YearbookViewer({ yearbook, onBack }: YearbookViewerProps) {
     )
   );
 
+  // Auto-enable desktop mode for larger screens
+  useEffect(() => {
+    setUseDesktopMode(!isMobile && window.innerWidth >= 1200);
+  }, [isMobile]);
+
+  // Use desktop components for better experience on larger screens
+  if (useDesktopMode && viewMode === 'pages') {
+    return <DesktopPageFlip yearbook={yearbook} onBack={onBack} />;
+  }
+
+  if (useDesktopMode && (viewMode === 'grid' || viewMode === 'social')) {
+    return <DesktopYearbookHub yearbook={yearbook} onBack={onBack} />;
+  }
+
+  // Render different view modes (mobile/tablet)
+  if (viewMode === 'pages') {
+    return <PageFlipYearbook yearbook={yearbook} onBack={onBack} />;
+  }
+
+  if (viewMode === 'social') {
+    return (
+      <div className="min-h-screen bg-background">
+        <div className="border-b bg-card sticky top-0 z-10">
+          <div className="container mx-auto px-4 py-4">
+            <div className="flex items-center gap-4 mb-4">
+              <Button variant="ghost" size="sm" onClick={() => setViewMode('grid')}>
+                <ArrowLeft className="w-4 h-4 mr-2" />
+                Back to Yearbook
+              </Button>
+            </div>
+          </div>
+        </div>
+        <div className="container mx-auto px-4 py-8">
+          <YearbookSocialHub yearbookId={yearbook.id} yearbook={yearbook} />
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen bg-background">
       {/* Header */}
@@ -101,6 +148,53 @@ export function YearbookViewer({ yearbook, onBack }: YearbookViewerProps) {
                 <p className="text-muted-foreground">{yearbook.schools.name}</p>
                 <Badge variant="secondary">{yearbook.year}</Badge>
               </div>
+            </div>
+            
+            {/* View Mode Switcher */}
+            <div className="flex items-center gap-2">
+              <div className="flex items-center gap-2 bg-muted p-1 rounded-lg">
+                <Button
+                  variant={viewMode === 'grid' ? "default" : "ghost"}
+                  size="sm"
+                  onClick={() => setViewMode('grid')}
+                  className="flex items-center gap-2"
+                >
+                  <LayoutGrid className="w-4 h-4" />
+                  Grid
+                </Button>
+                <Button
+                  variant={viewMode === 'pages' ? "default" : "ghost"}
+                  size="sm"
+                  onClick={() => setViewMode('pages')}
+                  className="flex items-center gap-2"
+                >
+                  <BookOpen className="w-4 h-4" />
+                  Pages
+                </Button>
+                <Button
+                  variant={viewMode === 'social' ? "default" : "ghost"}
+                  size="sm"
+                  onClick={() => setViewMode('social')}
+                  className="flex items-center gap-2"
+                >
+                  <Users className="w-4 h-4" />
+                  Social
+                </Button>
+              </div>
+              
+              {/* Desktop Mode Toggle */}
+              {!isMobile && (
+                <Button
+                  variant={useDesktopMode ? "default" : "outline"}
+                  size="sm"
+                  onClick={() => setUseDesktopMode(!useDesktopMode)}
+                  className="flex items-center gap-2"
+                  title="Toggle Desktop Mode"
+                >
+                  <Monitor className="w-4 h-4" />
+                  {useDesktopMode ? 'Desktop' : 'Standard'}
+                </Button>
+              )}
             </div>
           </div>
 

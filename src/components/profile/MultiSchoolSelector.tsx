@@ -321,7 +321,7 @@ const MultiSchoolSelector = ({ onSchoolHistoryChange }: MultiSchoolSelectorProps
                     <GraduationCap className="h-8 w-8 text-primary flex-shrink-0" />
                     <div className="flex-1">
                       <div className="flex items-center space-x-2">
-                        <h3 className="font-semibold">{school.school?.name}</h3>
+                        <h3 className="font-semibold">{school.schools?.name}</h3>
                         {school.is_primary && (
                           <Badge variant="default">Primary</Badge>
                         )}

@@ -79,7 +79,6 @@ export function LiveReactionNotifications() {
                   label: "View",
                   onClick: () => {
                     // Navigate to the content that was reacted to
-                    console.log('Navigate to:', newReaction.entity_type, newReaction.entity_id);
                   }
                 }
               }

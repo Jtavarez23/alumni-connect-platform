@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { MapPin, Globe, Phone, Calendar } from "lucide-react";
 import { SchoolDetails } from "@/hooks/useSchoolDetails";
 import { SchoolAlumniStats } from "./SchoolAlumniStats";
+import { formatSchoolType } from "@/lib/utils/schoolUtils";
 
 interface SchoolHeaderProps {
   school: SchoolDetails;
@@ -36,7 +37,7 @@ export function SchoolHeader({ school }: SchoolHeaderProps) {
               <div className="flex-1">
                 <div className="flex items-center gap-2 mb-2">
                   <Badge variant="secondary" className="text-xs">
-                    {school.type}
+                    {formatSchoolType(school.type)}
                   </Badge>
                   {school.founding_year && (
                     <Badge variant="outline" className="text-xs text-white border-white/50">

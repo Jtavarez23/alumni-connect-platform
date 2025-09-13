@@ -14,6 +14,7 @@ import { useSchoolHistory } from "@/hooks/useSchoolHistory";
 import { useSubscription } from "@/hooks/useSubscription";
 import { UpgradePrompt } from "@/components/ui/upgrade-prompt";
 import SchoolSwitcher from "@/components/dashboard/SchoolSwitcher";
+import { AlumniSearchIntegration } from "@/components/search/AlumniSearchIntegration";
 import { ArrowLeft, Search, MapPin, Calendar, GraduationCap, Check, Clock, UserPlus, Shield, Users, Crown } from "lucide-react";
 
 interface Profile {
@@ -268,53 +269,19 @@ const Alumni = () => {
           </Card>
         )}
 
-        {/* Search and Filters */}
-        <Card className="mb-6">
-          <CardContent className="p-6">
-            <div className="space-y-4">
-              <div className="relative">
-                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-4 h-4" />
-                <Input
-                  placeholder="Search by name or email..."
-                  value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
-                  className="pl-10"
-                />
-              </div>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <Select value={selectedSchoolId} onValueChange={setSelectedSchoolId}>
-                  <SelectTrigger>
-                    <SelectValue placeholder="Filter by school" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="all">All Schools</SelectItem>
-                    {schools.map((school) => (
-                      <SelectItem key={school.id} value={school.id}>
-                        {school.name}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-                <Select value={selectedYear} onValueChange={setSelectedYear}>
-                  <SelectTrigger>
-                    <SelectValue placeholder="Filter by graduation year" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="all">All Years</SelectItem>
-                    {graduationYears.map((year) => (
-                      <SelectItem key={year} value={year!.toString()}>
-                        {year}
-                        {isFreeTier && yearRange && year === yearRange.minYear && (
-                          <Badge variant="secondary" className="ml-2">Your Year</Badge>
-                        )}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
+        {/* Search Integration with Quota Widget */}
+        <AlumniSearchIntegration 
+          searchTerm={searchTerm}
+          onSearchChange={setSearchTerm}
+          selectedSchoolId={selectedSchoolId}
+          onSchoolChange={setSelectedSchoolId}
+          selectedYear={selectedYear}
+          onYearChange={setSelectedYear}
+          schools={schools}
+          graduationYears={graduationYears}
+          isFreeTier={isFreeTier}
+          yearRange={yearRange}
+        />
 
         {/* Alumni Grid */}
         {filteredAlumni.length === 0 ? (
@@ -337,7 +304,7 @@ const Alumni = () => {
               const friendshipStatus = getFriendshipStatus(person.id);
               
               return (
-                <Card key={person.id} className="hover:shadow-md transition-shadow">
+                <Card key={person.id} className="hover:shadow-md transition-shadow active:scale-[0.98] touch-manipulation">
                   <CardContent className="p-4 sm:p-6">
                     <div className="flex flex-col sm:flex-row items-center sm:items-start gap-3 sm:gap-4 mb-4">
                       <Avatar className="h-12 w-12 sm:h-16 sm:w-16 flex-shrink-0">

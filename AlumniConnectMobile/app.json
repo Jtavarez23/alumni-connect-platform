@@ -1,0 +1,114 @@
+{
+  "expo": {
+    "name": "Alumni Connect",
+    "slug": "alumni-connect-mobile",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "icon": "./assets/images/icon.png",
+    "scheme": "alumniconnect",
+    "userInterfaceStyle": "automatic",
+    "newArchEnabled": true,
+    "description": "Connect with your classmates through yearbooks, events, and shared memories",
+    "githubUrl": "https://github.com/reconnect-hive/alumni-connect",
+    "primaryColor": "#0F172A",
+    "backgroundColor": "#ffffff",
+    "ios": {
+      "supportsTablet": true,
+      "bundleIdentifier": "com.alumniconnect.mobile",
+      "buildNumber": "1",
+      "infoPlist": {
+        "NSCameraUsageDescription": "Access camera to upload yearbook photos and capture memories",
+        "NSPhotoLibraryUsageDescription": "Access photo library to select yearbook photos",
+        "NSLocationWhenInUseUsageDescription": "Show nearby alumni and events"
+      }
+    },
+    "android": {
+      "package": "com.alumniconnect.mobile",
+      "versionCode": 1,
+      "adaptiveIcon": {
+        "backgroundColor": "#0F172A",
+        "foregroundImage": "./assets/images/android-icon-foreground.png",
+        "backgroundImage": "./assets/images/android-icon-background.png",
+        "monochromeImage": "./assets/images/android-icon-monochrome.png"
+      },
+      "edgeToEdgeEnabled": true,
+      "predictiveBackGestureEnabled": false,
+      "permissions": [
+        "android.permission.CAMERA",
+        "android.permission.WRITE_EXTERNAL_STORAGE",
+        "android.permission.ACCESS_FINE_LOCATION",
+        "android.permission.INTERNET",
+        "android.permission.VIBRATE"
+      ]
+    },
+    "web": {
+      "output": "static",
+      "favicon": "./assets/images/favicon.png",
+      "bundler": "metro"
+    },
+    "plugins": [
+      "expo-router",
+      [
+        "expo-splash-screen",
+        {
+          "image": "./assets/images/splash-icon.png",
+          "imageWidth": 200,
+          "resizeMode": "contain",
+          "backgroundColor": "#ffffff",
+          "dark": {
+            "backgroundColor": "#0F172A"
+          }
+        }
+      ],
+      [
+        "expo-notifications",
+        {
+          "icon": "./assets/images/notification-icon.png",
+          "color": "#0F172A",
+          "sounds": [
+            "./assets/sounds/notification.wav"
+          ]
+        }
+      ],
+      [
+        "expo-camera",
+        {
+          "cameraPermission": "Allow Alumni Connect to access camera to upload yearbook photos"
+        }
+      ],
+      [
+        "expo-image-picker",
+        {
+          "photosPermission": "Allow Alumni Connect to access photos to share memories"
+        }
+      ],
+      [
+        "expo-media-library",
+        {
+          "photosPermission": "Allow Alumni Connect to save yearbook photos to your device",
+          "savePhotosPermission": "Allow Alumni Connect to save photos to your device"
+        }
+      ]
+    ],
+    "experiments": {
+      "typedRoutes": true,
+      "reactCompiler": true,
+      "tsconfigPaths": true,
+      "lazyImports": true
+    },
+    "extra": {
+      "router": {
+        "origin": false
+      },
+      "eas": {
+        "projectId": "alumni-connect-mobile"
+      }
+    },
+    "updates": {
+      "fallbackToCacheTimeout": 0
+    },
+    "assetBundlePatterns": [
+      "**/*"
+    ]
+  }
+}

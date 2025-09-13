@@ -10,7 +10,13 @@ import {
   LogOut,
   Camera,
   GraduationCap,
-  Shield
+  Shield,
+  Calendar,
+  MapPin,
+  Briefcase,
+  UserPlus,
+  Bell,
+  Search
 } from "lucide-react";
 import { NavLink, useLocation } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
@@ -32,18 +38,27 @@ import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
 const mainNavItems = [
-  { title: "Dashboard", url: "/dashboard", icon: Home },
+  { title: "Home", url: "/dashboard", icon: Home },
   { title: "Yearbooks", url: "/yearbooks", icon: Book },
-  { title: "Messages", url: "/messages", icon: MessageCircle },
-  { title: "Channels", url: "/channels", icon: Hash },
-  { title: "Schools", url: "/schools", icon: GraduationCap },
-  { title: "Social Hub", url: "/social", icon: Camera },
-  { title: "Alumni", url: "/alumni", icon: Users },
   { title: "Network", url: "/network", icon: NetworkIcon },
+  { title: "Messages", url: "/messages", icon: MessageCircle },
+  { title: "Events", url: "/events", icon: Calendar },
+  { title: "Businesses", url: "/businesses", icon: MapPin },
+  { title: "Jobs", url: "/jobs", icon: Briefcase },
+  { title: "Mentorship", url: "/mentorship", icon: UserPlus },
+  { title: "Notifications", url: "/notifications", icon: Bell },
+  { title: "Profile", url: "/profile", icon: User },
+];
+
+const yearbookSubItems = [
+  { title: "Face Search", url: "/yearbooks/claim", icon: Search },
+];
+
+const secondaryNavItems = [
+  { title: "Schools", url: "/schools", icon: GraduationCap },
 ];
 
 const userNavItems = [
-  { title: "Profile", url: "/profile", icon: User },
   { title: "Settings", url: "/settings", icon: Settings },
 ];
 
@@ -59,6 +74,7 @@ export function AppSidebar() {
   const currentPath = location.pathname;
 
   const isActive = (path: string) => currentPath === path;
+  const isYearbookSection = currentPath.startsWith('/yearbooks');
   
   const getNavClass = ({ isActive }: { isActive: boolean }) =>
     isActive 
@@ -74,10 +90,10 @@ export function AppSidebar() {
       <SidebarHeader className="border-b border-sidebar-border">
         <div className="flex items-center gap-2 px-2 py-3">
           <div className="w-8 h-8 bg-gradient-to-r from-primary to-secondary rounded-lg flex items-center justify-center flex-shrink-0">
-            <span className="text-white font-bold text-sm">YC</span>
+            <span className="text-white font-bold text-sm">AC</span>
           </div>
           {!collapsed && (
-            <span className="text-lg font-bold gradient-text">YearbookConnect</span>
+            <span className="text-lg font-bold gradient-text">Alumni Connect</span>
           )}
         </div>
       </SidebarHeader>
@@ -93,6 +109,41 @@ export function AppSidebar() {
                     <NavLink to={item.url} className={getNavClass}>
                       <item.icon className="h-4 w-4" />
                       {!collapsed && <span>{item.title}</span>}
+                      {item.title === "Notifications" && !collapsed && (
+                        <div className="ml-auto">
+                          <div className="w-2 h-2 bg-destructive rounded-full"></div>
+                        </div>
+                      )}
+                    </NavLink>
+                  </SidebarMenuButton>
+                  {item.title === "Yearbooks" && !collapsed && (
+                    <div className="ml-6 mt-1 space-y-1">
+                      {yearbookSubItems.map((subItem) => (
+                        <SidebarMenuButton key={subItem.title} asChild size="sm">
+                          <NavLink to={subItem.url} className={getNavClass}>
+                            <subItem.icon className="h-3 w-3" />
+                            <span className="text-xs">{subItem.title}</span>
+                          </NavLink>
+                        </SidebarMenuButton>
+                      ))}
+                    </div>
+                  )}
+                </SidebarMenuItem>
+              ))}
+            </SidebarMenu>
+          </SidebarGroupContent>
+        </SidebarGroup>
+
+        <SidebarGroup>
+          <SidebarGroupLabel>Discovery</SidebarGroupLabel>
+          <SidebarGroupContent>
+            <SidebarMenu>
+              {secondaryNavItems.map((item) => (
+                <SidebarMenuItem key={item.title}>
+                  <SidebarMenuButton asChild>
+                    <NavLink to={item.url} className={getNavClass}>
+                      <item.icon className="h-4 w-4" />
+                      {!collapsed && <span>{item.title}</span>}
                     </NavLink>
                   </SidebarMenuButton>
                 </SidebarMenuItem>
@@ -102,7 +153,7 @@ export function AppSidebar() {
         </SidebarGroup>
 
         <SidebarGroup>
-          <SidebarGroupLabel>Account</SidebarGroupLabel>
+          <SidebarGroupLabel>Settings</SidebarGroupLabel>
           <SidebarGroupContent>
             <SidebarMenu>
               {userNavItems.map((item) => (

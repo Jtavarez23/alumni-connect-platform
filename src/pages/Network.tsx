@@ -1,325 +1,520 @@
-import { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Badge } from "@/components/ui/badge";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Skeleton } from "@/components/ui/skeleton";
-import { AppLayout } from "@/components/layout/AppLayout";
-import { useAuth } from "@/contexts/AuthContext";
-import { supabase } from "@/integrations/supabase/client";
-import { createNotification } from "@/lib/notifications";
-import { MessageDialog } from "@/components/messaging/MessageDialog";
-import { useSchoolHistory } from "@/hooks/useSchoolHistory";
-import { useSubscription } from "@/hooks/useSubscription";
-import { UpgradePrompt } from "@/components/ui/upgrade-prompt";
-import SchoolSwitcher from "@/components/dashboard/SchoolSwitcher";
+import React, { useState, useMemo } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { Skeleton } from '@/components/ui/skeleton';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { Badge } from '@/components/ui/badge';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Input } from '@/components/ui/input';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { AppLayout } from '@/components/layout/AppLayout';
+import { useAuth } from '@/contexts/AuthContext';
+import { useSubscription } from '@/hooks/useSubscription';
+import { UpgradePrompt } from '@/components/ui/upgrade-prompt';
+import SchoolSwitcher from '@/components/dashboard/SchoolSwitcher';
+import { MessageDialog } from '@/components/messaging/MessageDialog';
 import { 
-  ArrowLeft, 
-  MessageCircle, 
-  Check, 
-  X, 
-  Clock, 
   Users, 
-  UserPlus,
+  School,
+  GraduationCap,
+  Users2,
+  Search,
   MapPin,
   Calendar,
-  GraduationCap,
-  Shield,
-  Crown
-} from "lucide-react";
+  Filter,
+  UserPlus,
+  MessageCircle,
+  Star,
+  Crown,
+  Building,
+  Heart,
+  Clock
+} from 'lucide-react';
 
-interface Profile {
+// AC-ARCH-001 Network interfaces
+interface Person {
   id: string;
-  first_name: string;
-  last_name: string;
-  email: string;
-  avatar_url?: string;
-  school_id?: string;
-  graduation_year?: number;
-  verification_status: string;
-  schools?: {
-    name: string;
-    type: string;
-    location: any;
-  };
-  school_history?: Array<{
-    school_id: string;
-    start_year: number;
-    end_year?: number;
-    school?: {
-      name: string;
-      type: string;
-      location: any;
-    };
-  }>;
+  name: string;
+  avatar: string;
+  school: string;
+  gradYear: number;
+  location: string;
+  industry: string;
+  mutualConnections: number;
+  sharedClubs: string[];
+  isConnected: boolean;
+  recentlyJoined?: boolean;
 }
 
-interface Friendship {
+interface SchoolDirectory {
   id: string;
-  requester_id: string;
-  addressee_id: string;
-  status: string;
-  created_at: string;
-  updated_at: string;
-  verification_method?: string;
-  requester?: Profile;
-  addressee?: Profile;
+  name: string;
+  type: string;
+  location: string;
+  alumniCount: number;
+  isFollowing: boolean;
+  recentActivity: string;
+  logo?: string;
 }
 
-const Network = () => {
+interface ClassClub {
+  id: string;
+  name: string;
+  type: 'class' | 'club';
+  school: string;
+  year?: number;
+  memberCount: number;
+  description: string;
+  isJoined: boolean;
+  lastActivity: string;
+}
+
+interface CustomGroup {
+  id: string;
+  name: string;
+  description: string;
+  memberCount: number;
+  isPrivate: boolean;
+  isPremium: boolean;
+  isJoined: boolean;
+  category: string;
+  lastActivity: string;
+}
+
+function Network() {
   const { user, profile } = useAuth();
+  const { isFreeTier } = useSubscription();
   const navigate = useNavigate();
-  const { schoolHistory } = useSchoolHistory();
-  const { isFreeTier, isPremium, canNetworkWithUser, getNetworkableSchools } = useSubscription();
-  const [connections, setConnections] = useState<Friendship[]>([]);
-  const [pendingRequests, setPendingRequests] = useState<Friendship[]>([]);
-  const [sentRequests, setSentRequests] = useState<Friendship[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
+  const [activeTab, setActiveTab] = useState('people');
+  const [searchQuery, setSearchQuery] = useState('');
+  const [contextSchool, setContextSchool] = useState<string | null>(null);
+  const [connections, setConnections] = useState<any[]>([]);
+  const [pendingRequests, setPendingRequests] = useState<any[]>([]);
+  const [sentRequests, setSentRequests] = useState<any[]>([]);
+  const [selectedUser, setSelectedUser] = useState<any>(null);
   const [messageDialogOpen, setMessageDialogOpen] = useState(false);
-  const [selectedUser, setSelectedUser] = useState<Profile | null>(null);
-  const [contextSchool, setContextSchool] = useState<any>(null);
-
-  useEffect(() => {
-    if (user) {
-      loadFriendships();
+  const [isLoading, setIsLoading] = useState(false);
+  
+  // AC-ARCH-001: Network → People filters
+  const [selectedSchool, setSelectedSchool] = useState<string>('all');
+  const [gradYearRange, setGradYearRange] = useState<string>('all');
+  const [selectedLocation, setSelectedLocation] = useState<string>('all');
+  const [selectedIndustry, setSelectedIndustry] = useState<string>('all');
+  const [sortBy, setSortBy] = useState<string>('mutuals');
+  
+  // AC-ARCH-001: Mock data following "classmates, same era, mutuals" spec
+  const mockPeople = useMemo(() => [
+    {
+      id: '1',
+      name: 'Sarah Johnson',
+      avatar: 'https://images.unsplash.com/photo-1494790108755-2616b612b786?w=150&h=150&fit=crop&crop=face',
+      school: 'Miami High School',
+      gradYear: 2005,
+      location: 'Miami, FL',
+      industry: 'Technology',
+      mutualConnections: 12,
+      sharedClubs: ['Drama Club', 'Student Council'],
+      isConnected: false,
+      recentlyJoined: true
+    },
+    {
+      id: '2',
+      name: 'Michael Chen',
+      avatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&h=150&fit=crop&crop=face',
+      school: 'Central Academy',
+      gradYear: 2003,
+      location: 'Orlando, FL',
+      industry: 'Marketing',
+      mutualConnections: 8,
+      sharedClubs: ['Chess Club'],
+      isConnected: true,
+      recentlyJoined: false
     }
-  }, [user]);
-
-  const loadFriendships = async () => {
-    if (!user) return;
-
-    try {
-      const { data, error } = await supabase
-        .from('friendships')
-        .select(`
-          *,
-          requester:profiles!friendships_requester_id_fkey(
-            id, first_name, last_name, email, avatar_url, school_id, graduation_year, verification_status,
-            schools(name, type, location),
-            school_history(
-              school_id,
-              start_year,
-              end_year,
-              school:schools(name, type, location)
-            )
-          ),
-          addressee:profiles!friendships_addressee_id_fkey(
-            id, first_name, last_name, email, avatar_url, school_id, graduation_year, verification_status,
-            schools(name, type, location),
-            school_history(
-              school_id,
-              start_year,
-              end_year,
-              school:schools(name, type, location)
-            )
-          )
-        `)
-        .or(`requester_id.eq.${user.id},addressee_id.eq.${user.id}`)
-        .order('created_at', { ascending: false });
-
-      if (error) throw error;
-
-      // Filter friendships based on subscription restrictions
-      const filteredData = data.filter(friendship => {
-        const otherProfile = getOtherProfile(friendship);
-        if (!otherProfile) return false;
-        
-        // For free users, only show connections they can actually network with
-        if (isFreeTier) {
-          return canNetworkWithUser(otherProfile);
-        }
-        
-        return true;
-      });
-
-      const accepted = filteredData.filter(f => f.status === 'accepted');
-      const pending = filteredData.filter(f => f.status === 'pending' && f.addressee_id === user.id);
-      const sent = filteredData.filter(f => f.status === 'pending' && f.requester_id === user.id);
-
-      setConnections(accepted);
-      setPendingRequests(pending);
-      setSentRequests(sent);
-    } catch (error) {
-      console.error('Error loading friendships:', error);
-    } finally {
-      setIsLoading(false);
+  ], []);
+  
+  const mockSchools = useMemo(() => [
+    {
+      id: '1',
+      name: 'Miami High School',
+      type: 'Public High School',
+      location: 'Miami, FL',
+      alumniCount: 12450,
+      isFollowing: true,
+      recentActivity: '15 new alumni joined this month',
+      logo: undefined
+    },
+    {
+      id: '2', 
+      name: 'Central Academy',
+      type: 'Private Academy',
+      location: 'Orlando, FL',
+      alumniCount: 3200,
+      isFollowing: false,
+      recentActivity: '8 new alumni joined this month'
     }
-  };
-
-  const handleAcceptRequest = async (friendshipId: string, requesterId: string) => {
-    try {
-      const { error } = await supabase
-        .from('friendships')
-        .update({ status: 'accepted', updated_at: new Date().toISOString() })
-        .eq('id', friendshipId);
-
-      if (error) throw error;
-
-      // Send notification to requester
-      await createNotification({
-        user_id: requesterId,
-        type: 'friend_accepted',
-        title: 'Friend Request Accepted',
-        message: `${profile?.first_name} ${profile?.last_name} accepted your friend request`,
-        related_user_id: user?.id
-      });
-
-      await loadFriendships();
-    } catch (error) {
-      console.error('Error accepting request:', error);
+  ], []);
+  
+  const mockClassesClubs = useMemo(() => [
+    {
+      id: '1',
+      name: 'Class of 2005',
+      type: 'class' as const,
+      school: 'Miami High School',
+      year: 2005,
+      memberCount: 287,
+      description: 'Official hub for Miami High Class of 2005 graduates',
+      isJoined: true,
+      lastActivity: '2 days ago'
+    },
+    {
+      id: '2',
+      name: 'Drama Club Alumni',
+      type: 'club' as const,
+      school: 'Miami High School',
+      memberCount: 94,
+      description: 'Former Drama Club members staying connected',
+      isJoined: false,
+      lastActivity: '1 week ago'
     }
-  };
-
-  const handleRejectRequest = async (friendshipId: string) => {
-    try {
-      const { error } = await supabase
-        .from('friendships')
-        .update({ status: 'rejected', updated_at: new Date().toISOString() })
-        .eq('id', friendshipId);
-
-      if (error) throw error;
-      await loadFriendships();
-    } catch (error) {
-      console.error('Error rejecting request:', error);
+  ], []);
+  
+  const mockGroups = useMemo(() => [
+    {
+      id: '1',
+      name: 'Miami Tech Professionals',
+      description: 'Alumni working in technology companies',
+      memberCount: 156,
+      isPrivate: false,
+      isPremium: false,
+      isJoined: true,
+      category: 'Professional',
+      lastActivity: '3 hours ago'
+    },
+    {
+      id: '2',
+      name: 'Elite Networking Circle',
+      description: 'Premium networking group for verified professionals',
+      memberCount: 42,
+      isPrivate: true,
+      isPremium: true,
+      isJoined: false,
+      category: 'Premium',
+      lastActivity: '1 day ago'
     }
-  };
+  ], []);
 
-  const getInitials = (firstName?: string, lastName?: string) => {
-    return `${firstName?.[0] || ''}${lastName?.[0] || ''}`.toUpperCase();
-  };
-
-  const getOtherProfile = (friendship: Friendship): Profile | null => {
-    if (!user) return null;
+  // AC-ARCH-001: People filtering logic
+  const filteredPeople = useMemo(() => {
+    let filtered = mockPeople;
     
-    if (friendship.requester_id === user.id) {
-      return friendship.addressee || null;
-    } else {
-      return friendship.requester || null;
+    if (searchQuery) {
+      filtered = filtered.filter(person => 
+        person.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        person.school.toLowerCase().includes(searchQuery.toLowerCase())
+      );
     }
+    
+    if (selectedSchool !== 'all') {
+      filtered = filtered.filter(person => person.school === selectedSchool);
+    }
+    
+    if (gradYearRange !== 'all') {
+      const currentYear = new Date().getFullYear();
+      const ranges: Record<string, [number, number]> = {
+        'recent': [currentYear - 5, currentYear],
+        'same-era': [2000, 2010],
+        'older': [1980, 1999]
+      };
+      const [min, max] = ranges[gradYearRange] || [0, 9999];
+      filtered = filtered.filter(person => person.gradYear >= min && person.gradYear <= max);
+    }
+    
+    // AC-ARCH-001: Sort by "Mutuals, Recently joined, Same class"
+    if (sortBy === 'mutuals') {
+      filtered.sort((a, b) => b.mutualConnections - a.mutualConnections);
+    } else if (sortBy === 'recently-joined') {
+      filtered.sort((a, b) => (b.recentlyJoined ? 1 : 0) - (a.recentlyJoined ? 1 : 0));
+    } else if (sortBy === 'same-class') {
+      const userGradYear = profile?.graduation_year || 2005;
+      filtered.sort((a, b) => Math.abs(a.gradYear - userGradYear) - Math.abs(b.gradYear - userGradYear));
+    }
+    
+    return filtered;
+  }, [mockPeople, searchQuery, selectedSchool, gradYearRange, sortBy, profile?.graduation_year]);
+
+  const getInitials = (name: string) => {
+    return name.split(' ').map(n => n[0]).join('').toUpperCase();
+  };
+  
+  const handleConnect = (personId: string) => {
+    console.log('Connect with person:', personId);
+    // TODO: Implement connection logic
+  };
+  
+  const handleFollowSchool = (schoolId: string) => {
+    console.log('Follow school:', schoolId);
+    // TODO: Implement school follow logic
+  };
+  
+  const handleJoinGroup = (groupId: string) => {
+    console.log('Join group:', groupId);
+    // TODO: Implement group join logic
   };
 
-  const handleOpenMessage = (profile: Profile) => {
-    setSelectedUser(profile);
-    setMessageDialogOpen(true);
-  };
-
-  const renderConnectionCard = (friendship: Friendship) => {
-    const otherProfile = getOtherProfile(friendship);
-    if (!otherProfile) return null;
-
+  // AC-ARCH-001: Person card component
+  const renderPersonCard = (person: Person) => {
     return (
-      <Card key={friendship.id} className="p-4">
-        <div className="flex items-center gap-4">
-          <Avatar className="h-12 w-12">
-            <AvatarImage src={otherProfile.avatar_url} />
-            <AvatarFallback>
-              {getInitials(otherProfile.first_name, otherProfile.last_name)}
-            </AvatarFallback>
-          </Avatar>
-          
-          <div className="flex-1 min-w-0">
-            <h4 className="font-semibold truncate">
-              {otherProfile.first_name} {otherProfile.last_name}
-            </h4>
-            <div className="flex items-center gap-2 text-sm text-muted-foreground">
-              {otherProfile.schools && (
-                <>
+      <Card key={person.id} className="hover:shadow-md transition-shadow">
+        <CardContent className="p-4">
+          <div className="flex items-start gap-4">
+            <Avatar className="h-12 w-12">
+              <AvatarImage src={person.avatar} />
+              <AvatarFallback>{getInitials(person.name)}</AvatarFallback>
+            </Avatar>
+            
+            <div className="flex-1 min-w-0">
+              <div className="flex items-center gap-2 mb-1">
+                <h3 className="text-h2 font-semibold truncate">{person.name}</h3>
+                {person.recentlyJoined && (
+                  <Badge variant="secondary" className="text-xs">New</Badge>
+                )}
+              </div>
+              
+              <div className="space-y-1 text-small text-muted-foreground">
+                <div className="flex items-center gap-1">
                   <GraduationCap className="h-3 w-3" />
-                  <span className="truncate">{otherProfile.schools.name}</span>
-                </>
-              )}
-              {otherProfile.graduation_year && (
-                <>
-                  <Calendar className="h-3 w-3 ml-2" />
-                  <span>{otherProfile.graduation_year}</span>
-                </>
+                  <span>{person.school} '{String(person.gradYear).slice(-2)}</span>
+                </div>
+                <div className="flex items-center gap-1">
+                  <MapPin className="h-3 w-3" />
+                  <span>{person.location}</span>
+                </div>
+                {person.mutualConnections > 0 && (
+                  <div className="flex items-center gap-1">
+                    <Users className="h-3 w-3" />
+                    <span>{person.mutualConnections} mutual connections</span>
+                  </div>
+                )}
+                {person.sharedClubs.length > 0 && (
+                  <div className="flex items-center gap-1">
+                    <Users2 className="h-3 w-3" />
+                    <span>Shared: {person.sharedClubs.slice(0, 2).join(', ')}</span>
+                  </div>
+                )}
+              </div>
+            </div>
+            
+            <div className="flex items-center gap-2">
+              {person.isConnected ? (
+                <Button variant="secondary" size="sm">
+                  <MessageCircle className="h-4 w-4" />
+                </Button>
+              ) : (
+                <Button variant="primary" size="sm" onClick={() => handleConnect(person.id)}>
+                  <UserPlus className="h-4 w-4 mr-2" />
+                  Connect
+                </Button>
               )}
             </div>
           </div>
+        </CardContent>
+      </Card>
+    );
+  };
 
-          <div className="flex items-center gap-2">
-            <Badge variant={otherProfile.verification_status === 'verified' ? 'default' : 'secondary'}>
-              {otherProfile.verification_status === 'verified' && <Shield className="h-3 w-3 mr-1" />}
-              {otherProfile.verification_status}
-            </Badge>
+  // AC-ARCH-001: School card component
+  const renderSchoolCard = (school: SchoolDirectory) => {
+    return (
+      <Card key={school.id} className="hover:shadow-md transition-shadow">
+        <CardContent className="p-4">
+          <div className="flex items-start gap-4">
+            <div className="h-12 w-12 rounded-lg bg-muted flex items-center justify-center">
+              {school.logo ? (
+                <img src={school.logo} alt={school.name} className="h-8 w-8 rounded" />
+              ) : (
+                <School className="h-6 w-6 text-muted-foreground" />
+              )}
+            </div>
+            
+            <div className="flex-1 min-w-0">
+              <h3 className="text-h2 font-semibold truncate mb-1">{school.name}</h3>
+              <p className="text-small text-muted-foreground mb-2">{school.type}</p>
+              
+              <div className="space-y-1 text-small text-muted-foreground">
+                <div className="flex items-center gap-1">
+                  <MapPin className="h-3 w-3" />
+                  <span>{school.location}</span>
+                </div>
+                <div className="flex items-center gap-1">
+                  <Users className="h-3 w-3" />
+                  <span>{school.alumniCount.toLocaleString()} alumni</span>
+                </div>
+                <p className="text-xs">{school.recentActivity}</p>
+              </div>
+            </div>
+            
             <Button 
-              variant="outline" 
+              variant={school.isFollowing ? "secondary" : "primary"} 
               size="sm"
-              onClick={() => handleOpenMessage(otherProfile)}
+              onClick={() => handleFollowSchool(school.id)}
             >
-              <MessageCircle className="h-4 w-4" />
+              {school.isFollowing ? (
+                <><Heart className="h-4 w-4 mr-2" />Following</>
+              ) : (
+                <><UserPlus className="h-4 w-4 mr-2" />Follow</>
+              )}
             </Button>
           </div>
-        </div>
+        </CardContent>
       </Card>
     );
   };
-
-  const renderRequestCard = (friendship: Friendship, showActions: boolean = false) => {
-    const otherProfile = getOtherProfile(friendship);
-    if (!otherProfile) return null;
-
+  
+  // AC-ARCH-001: Classes & Clubs card component
+  const renderClassClubCard = (item: ClassClub) => {
     return (
-      <Card key={friendship.id} className="p-4">
-        <div className="flex items-center gap-4">
-          <Avatar className="h-12 w-12">
-            <AvatarImage src={otherProfile.avatar_url} />
-            <AvatarFallback>
-              {getInitials(otherProfile.first_name, otherProfile.last_name)}
-            </AvatarFallback>
-          </Avatar>
-          
-          <div className="flex-1 min-w-0">
-            <h4 className="font-semibold truncate">
-              {otherProfile.first_name} {otherProfile.last_name}
-            </h4>
-            <div className="flex items-center gap-2 text-sm text-muted-foreground">
-              {otherProfile.schools && (
-                <>
-                  <GraduationCap className="h-3 w-3" />
-                  <span className="truncate">{otherProfile.schools.name}</span>
-                </>
-              )}
-              {otherProfile.graduation_year && (
-                <>
-                  <Calendar className="h-3 w-3 ml-2" />
-                  <span>{otherProfile.graduation_year}</span>
-                </>
+      <Card key={item.id} className="hover:shadow-md transition-shadow">
+        <CardContent className="p-4">
+          <div className="flex items-start gap-4">
+            <div className="h-12 w-12 rounded-lg bg-muted flex items-center justify-center">
+              {item.type === 'class' ? (
+                <GraduationCap className="h-6 w-6 text-primary" />
+              ) : (
+                <Users2 className="h-6 w-6 text-secondary" />
               )}
             </div>
-          </div>
-
-          <div className="flex items-center gap-2">
-            {showActions ? (
-              <>
-                <Button 
-                  size="sm" 
-                  onClick={() => handleAcceptRequest(friendship.id, friendship.requester_id)}
-                  className="bg-success hover:bg-success/90"
-                >
-                  <Check className="h-4 w-4" />
-                </Button>
-                <Button 
-                  variant="outline" 
-                  size="sm"
-                  onClick={() => handleRejectRequest(friendship.id)}
-                >
-                  <X className="h-4 w-4" />
-                </Button>
-              </>
-            ) : (
-              <div className="flex items-center gap-1 text-sm text-muted-foreground">
-                <Clock className="h-4 w-4" />
-                <span>Pending</span>
+            
+            <div className="flex-1 min-w-0">
+              <div className="flex items-center gap-2 mb-1">
+                <h3 className="text-h2 font-semibold truncate">{item.name}</h3>
+                <Badge variant={item.type === 'class' ? 'default' : 'secondary'}>
+                  {item.type === 'class' ? 'Class' : 'Club'}
+                </Badge>
               </div>
-            )}
+              
+              <p className="text-small text-muted-foreground mb-2 line-clamp-2">
+                {item.description}
+              </p>
+              
+              <div className="space-y-1 text-small text-muted-foreground">
+                <div className="flex items-center gap-1">
+                  <School className="h-3 w-3" />
+                  <span>{item.school}</span>
+                </div>
+                <div className="flex items-center gap-1">
+                  <Users className="h-3 w-3" />
+                  <span>{item.memberCount} members</span>
+                </div>
+                <p className="text-xs">Active {item.lastActivity}</p>
+              </div>
+            </div>
+            
+            <Button 
+              variant={item.isJoined ? "secondary" : "primary"} 
+              size="sm"
+              onClick={() => handleJoinGroup(item.id)}
+            >
+              {item.isJoined ? 'Joined' : 'Join'}
+            </Button>
           </div>
-        </div>
+        </CardContent>
       </Card>
     );
   };
+  
+  // AC-ARCH-001: Custom Groups card component
+  const renderGroupCard = (group: CustomGroup) => {
+    return (
+      <Card key={group.id} className="hover:shadow-md transition-shadow">
+        <CardContent className="p-4">
+          <div className="flex items-start gap-4">
+            <div className="h-12 w-12 rounded-lg bg-muted flex items-center justify-center">
+              {group.isPremium ? (
+                <Crown className="h-6 w-6 text-yellow-500" />
+              ) : (
+                <Users className="h-6 w-6 text-muted-foreground" />
+              )}
+            </div>
+            
+            <div className="flex-1 min-w-0">
+              <div className="flex items-center gap-2 mb-1">
+                <h3 className="text-h2 font-semibold truncate">{group.name}</h3>
+                {group.isPremium && (
+                  <Badge variant="premium">Premium</Badge>
+                )}
+                {group.isPrivate && (
+                  <Badge variant="secondary">Private</Badge>
+                )}
+              </div>
+              
+              <p className="text-small text-muted-foreground mb-2 line-clamp-2">
+                {group.description}
+              </p>
+              
+              <div className="space-y-1 text-small text-muted-foreground">
+                <div className="flex items-center gap-1">
+                  <Users className="h-3 w-3" />
+                  <span>{group.memberCount} members</span>
+                </div>
+                <div className="flex items-center gap-1">
+                  <Building className="h-3 w-3" />
+                  <span>{group.category}</span>
+                </div>
+                <p className="text-xs">Active {group.lastActivity}</p>
+              </div>
+            </div>
+            
+            <Button 
+              variant={group.isJoined ? "secondary" : "primary"} 
+              size="sm"
+              onClick={() => handleJoinGroup(group.id)}
+              disabled={group.isPremium && !group.isJoined}
+            >
+              {group.isJoined ? 'Joined' : (group.isPremium ? 'Premium' : 'Join')}
+            </Button>
+          </div>
+        </CardContent>
+      </Card>
+    );
+  };
+
+  // Placeholder functions for connection and request rendering
+  const renderConnectionCard = (connection: any) => (
+    <Card key={connection.id} className="p-4">
+      <div className="flex items-center gap-4">
+        <Avatar className="h-12 w-12">
+          <AvatarFallback>{getInitials(connection.name || 'Unknown')}</AvatarFallback>
+        </Avatar>
+        <div className="flex-1">
+          <h4 className="font-semibold">{connection.name || 'Unknown User'}</h4>
+          <p className="text-sm text-muted-foreground">Connection</p>
+        </div>
+      </div>
+    </Card>
+  );
+
+  const renderRequestCard = (friendship: any, isIncoming: boolean) => (
+    <Card key={friendship.id} className="p-4">
+      <div className="flex items-center gap-4">
+        <Avatar className="h-12 w-12">
+          <AvatarFallback>{getInitials(friendship.name || 'Unknown')}</AvatarFallback>
+        </Avatar>
+        <div className="flex-1">
+          <h4 className="font-semibold">{friendship.name || 'Unknown User'}</h4>
+          <p className="text-sm text-muted-foreground">
+            {isIncoming ? 'Incoming request' : 'Sent request'}
+          </p>
+        </div>
+        {isIncoming && (
+          <div className="flex gap-2">
+            <Button size="sm" variant="default">Accept</Button>
+            <Button size="sm" variant="outline">Decline</Button>
+          </div>
+        )}
+      </div>
+    </Card>
+  );
 
   return (
     <AppLayout title="My Network">

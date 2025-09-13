@@ -1,0 +1,24 @@
+{
+  "watch": [
+    "src/**/*",
+    "supabase/migrations/**/*",
+    "supabase/functions/**/*",
+    ".env*"
+  ],
+  "ext": "ts,tsx,js,jsx,sql,json",
+  "ignore": [
+    "dist/*",
+    "node_modules/*",
+    "coverage/*",
+    "*.log"
+  ],
+  "exec": "npm run dev:app",
+  "env": {
+    "NODE_ENV": "development",
+    "FORCE_COLOR": "1"
+  },
+  "restartable": "rs",
+  "colours": true,
+  "verbose": true,
+  "delay": 1000
+}
