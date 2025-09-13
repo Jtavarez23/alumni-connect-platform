@@ -5,6 +5,14 @@ import type { Database } from './types';
 const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL || "https://dyhloaxsdcfgfyfhrdfc.supabase.co";
 const SUPABASE_PUBLISHABLE_KEY = import.meta.env.VITE_SUPABASE_ANON_KEY || "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImR5aGxvYXhzZGNmZ2Z5ZmhyZGZjIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTYzMTMwNTIsImV4cCI6MjA3MTg4OTA1Mn0.eg_bc94ySXthS_A8_oIffrrsW4UcSSu5lEKOw89OIz0";
 
+// Debug logging for production
+console.log('🔗 Supabase Config:', {
+  url: SUPABASE_URL,
+  hasKey: !!SUPABASE_PUBLISHABLE_KEY,
+  keyPrefix: SUPABASE_PUBLISHABLE_KEY?.substring(0, 20) + '...',
+  env: import.meta.env.MODE
+});
+
 // Import the supabase client like this:
 // import { supabase } from "@/integrations/supabase/client";
 
