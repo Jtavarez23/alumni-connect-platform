@@ -1,6 +1,6 @@
 // Virtual scrolling message list for better performance with large message history
 import React, { memo, useCallback, useEffect, useRef, useState } from 'react';
-import { FixedSizeList as List } from 'react-window';
+import { List } from 'react-window';
 import { Message } from '@/lib/messaging/types';
 import { MessageBubble } from './MessageBubble';
 import { Badge } from '@/components/ui/badge';
