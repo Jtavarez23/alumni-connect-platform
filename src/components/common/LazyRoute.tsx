@@ -229,4 +229,20 @@ export class RoutePreloader {
   }
 }
 
+// Default export for LazyRoute component
+const LazyRoute: React.ComponentType<LazyRouteProps> = ({ importFn, fallback, errorFallback, className, props }) => {
+  const LazyComponent = lazy(importFn);
+  const FallbackComponent = fallback || RouteSkeletons.Page;
+
+  return (
+    <ErrorBoundary fallback={errorFallback}>
+      <Suspense fallback={<FallbackComponent />}>
+        <div className={cn(className)}>
+          <LazyComponent {...props} />
+        </div>
+      </Suspense>
+    </ErrorBoundary>
+  );
+};
+
 export default LazyRoute;
