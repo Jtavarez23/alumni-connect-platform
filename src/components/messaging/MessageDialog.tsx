@@ -1,263 +1,97 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useCallback, memo } from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
 import { ScrollArea } from '@/components/ui/scroll-area';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { Send, X } from 'lucide-react';
+import { X } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
-import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/components/ui/use-toast';
-import { notifyNewMessage } from '@/lib/notifications';
-import { format } from 'date-fns';
 import { MessagingRestrictions } from '@/components/messaging/MessagingRestrictions';
 import { useSubscription } from '@/hooks/useSubscription';
-
-interface Message {
-  id: string;
-  text: string;
-  sender_id: string;
-  created_at: string;
-  read_at?: string;
-}
-
-interface Conversation {
-  id: string;
-  participant_1_id: string;
-  participant_2_id: string;
-  last_message_at: string;
-}
-
-interface Profile {
-  id: string;
-  first_name: string;
-  last_name: string;
-  avatar_url?: string;
-}
+import { useOptimizedMessages } from '@/hooks/useOptimizedMessages';
+import { messagingService } from '@/lib/messaging/service';
+import { UserProfile } from '@/lib/messaging/types';
+import { getInitials, getDisplayName } from '@/lib/messaging/utils';
+import { UserAvatar, MessageBubble, LoadingSpinner, TypingIndicator } from './shared';
+import { MessageInput } from './MessageInput';
 
 interface MessageDialogProps {
   isOpen: boolean;
   onClose: () => void;
-  otherUser: Profile;
+  otherUser: UserProfile;
 }
 
-export function MessageDialog({ isOpen, onClose, otherUser }: MessageDialogProps) {
+export const MessageDialog = memo<MessageDialogProps>(({ isOpen, onClose, otherUser }) => {
   const { user } = useAuth();
   const { toast } = useToast();
   const { isPremium } = useSubscription();
-  const [messages, setMessages] = useState<Message[]>([]);
-  const [newMessage, setNewMessage] = useState('');
   const [conversationId, setConversationId] = useState<string | null>(null);
-  const [loading, setLoading] = useState(false);
-  const [sending, setSending] = useState(false);
+  const [loadingConversation, setLoadingConversation] = useState(false);
   const [canMessage, setCanMessage] = useState<boolean | null>(null);
-  const messagesEndRef = useRef<HTMLDivElement>(null);
 
-  const scrollToBottom = () => {
-    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-  };
+  // Use optimized messages hook
+  const {
+    messages,
+    loading: messagesLoading,
+    sending,
+    typingUsers,
+    startTyping,
+    stopTyping,
+    scrollToBottom,
+  } = useOptimizedMessages({
+    conversationId,
+  });
 
-  useEffect(() => {
-    scrollToBottom();
-  }, [messages]);
+  // Load or create conversation when dialog opens
+  const loadOrCreateConversation = useCallback(async () => {
+    if (!user || !otherUser) return;
 
-  useEffect(() => {
-    if (isOpen && user && otherUser) {
-      loadOrCreateConversation();
-    }
-  }, [isOpen, user, otherUser]);
-
-  useEffect(() => {
-    if (conversationId) {
-      loadMessages();
-      subscribeToMessages();
-    }
-  }, [conversationId]);
-
-  const loadOrCreateConversation = async () => {
-    if (!user) return;
-
-    setLoading(true);
+    setLoadingConversation(true);
     try {
-      // Try to find existing conversation
-      const { data: existingConversation, error: fetchError } = await supabase
-        .from('conversations')
-        .select('*')
-        .or(`and(participant_1_id.eq.${user.id},participant_2_id.eq.${otherUser.id}),and(participant_1_id.eq.${otherUser.id},participant_2_id.eq.${user.id})`)
-        .single();
-
-      if (fetchError && fetchError.code !== 'PGRST116') {
-        throw fetchError;
-      }
-
-      if (existingConversation) {
-        setConversationId(existingConversation.id);
-      } else {
-        // Create new conversation
-        const { data: newConversation, error: createError } = await supabase
-          .from('conversations')
-          .insert({
-            participant_1_id: user.id,
-            participant_2_id: otherUser.id,
-          })
-          .select()
-          .single();
-
-        if (createError) throw createError;
-        setConversationId(newConversation.id);
-      }
+      const convId = await messagingService.getOrCreateDirectConversation(user.id, otherUser.id);
+      setConversationId(convId);
     } catch (error) {
       console.error('Error loading/creating conversation:', error);
       toast({
-        title: "Error",
-        description: "Failed to load conversation",
-        variant: "destructive",
+        title: 'Error',
+        description: 'Failed to load conversation',
+        variant: 'destructive',
       });
     } finally {
-      setLoading(false);
+      setLoadingConversation(false);
     }
-  };
+  }, [user, otherUser, toast]);
 
-  const loadMessages = async () => {
-    if (!conversationId) return;
-
-    try {
-      const { data, error } = await supabase
-        .from('messages')
-        .select('*')
-        .eq('conversation_id', conversationId)
-        .order('created_at', { ascending: true });
-
-      if (error) throw error;
-      setMessages(data || []);
-
-      // Mark messages as read
-      await markMessagesAsRead();
-    } catch (error) {
-      console.error('Error loading messages:', error);
+  // Load conversation when dialog opens
+  useEffect(() => {
+    if (isOpen && user && otherUser) {
+      loadOrCreateConversation();
+    } else {
+      setConversationId(null);
     }
-  };
+  }, [isOpen, loadOrCreateConversation]);
 
-  const markMessagesAsRead = async () => {
-    if (!conversationId || !user) return;
-
-    try {
-      await supabase
-        .from('messages')
-        .update({ read_at: new Date().toISOString() })
-        .eq('conversation_id', conversationId)
-        .neq('sender_id', user.id)
-        .is('read_at', null);
-    } catch (error) {
-      console.error('Error marking messages as read:', error);
+  // Handle typing indicators
+  const handleTypingChange = useCallback((isTyping: boolean) => {
+    if (isTyping) {
+      startTyping();
+    } else {
+      stopTyping();
     }
-  };
+  }, [startTyping, stopTyping]);
 
-  const subscribeToMessages = () => {
-    if (!conversationId) return;
-
-    const channel = supabase
-      .channel('messages')
-      .on(
-        'postgres_changes',
-        {
-          event: 'INSERT',
-          schema: 'public',
-          table: 'messages',
-          filter: `conversation_id=eq.${conversationId}`,
-        },
-        (payload) => {
-          const newMessage = payload.new as Message;
-          setMessages(prev => [...prev, newMessage]);
-          
-          // Mark as read if not sent by current user
-          if (newMessage.sender_id !== user?.id) {
-            markMessagesAsRead();
-          }
-        }
-      )
-      .subscribe();
-
-    return () => {
-      supabase.removeChannel(channel);
-    };
-  };
-
-  const sendMessage = async () => {
-    if (!newMessage.trim() || !conversationId || !user || sending) return;
-    
-    // Check if user can send message (for free users)
-    if (!isPremium && canMessage === false) {
-      toast({
-        title: "Cannot send message",
-        description: "You need to connect with this person first or upgrade to Premium.",
-        variant: "destructive",
-      });
-      return;
-    }
-
-    setSending(true);
-    try {
-      const { error } = await supabase
-        .from('messages')
-        .insert({
-          conversation_id: conversationId,
-          sender_id: user.id,
-          text: newMessage.trim(),
-        });
-
-      if (error) throw error;
-
-      // Send notification to other user
-      try {
-        await notifyNewMessage(
-          otherUser.id,
-          user.id,
-          `${user.user_metadata?.first_name || 'Someone'}`,
-          conversationId
-        );
-      } catch (notifError) {
-        console.error('Error sending notification:', notifError);
-        // Don't fail the message send if notification fails
-      }
-
-      setNewMessage('');
-    } catch (error) {
-      console.error('Error sending message:', error);
-      toast({
-        title: "Error",
-        description: "Failed to send message",
-        variant: "destructive",
-      });
-    } finally {
-      setSending(false);
-    }
-  };
-
-  const handleKeyPress = (e: React.KeyboardEvent) => {
-    if (e.key === 'Enter' && !e.shiftKey) {
-      e.preventDefault();
-      sendMessage();
-    }
-  };
-
-  const getInitials = (firstName: string, lastName: string) => {
-    return `${firstName.charAt(0)}${lastName.charAt(0)}`.toUpperCase();
-  };
+  // Handle message sent callback
+  const handleMessageSent = useCallback(() => {
+    scrollToBottom();
+  }, [scrollToBottom]);
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="max-w-md h-[600px] flex flex-col p-0">
         <DialogHeader className="flex flex-row items-center justify-between p-4 pb-2">
           <div className="flex items-center gap-3">
-            <Avatar className="h-8 w-8">
-              <AvatarImage src={otherUser.avatar_url} />
-              <AvatarFallback className="text-xs">
-                {getInitials(otherUser.first_name, otherUser.last_name)}
-              </AvatarFallback>
-            </Avatar>
+            <UserAvatar user={otherUser} size="small" />
             <DialogTitle className="text-lg">
-              {otherUser.first_name} {otherUser.last_name}
+              {getDisplayName(otherUser)}
             </DialogTitle>
           </div>
           <Button variant="ghost" size="sm" onClick={onClose}>
@@ -278,9 +112,9 @@ export function MessageDialog({ isOpen, onClose, otherUser }: MessageDialogProps
           )}
           
           <ScrollArea className="flex-1 px-4">
-            {loading ? (
+            {loadingConversation || messagesLoading ? (
               <div className="flex items-center justify-center h-32">
-                <div className="text-muted-foreground">Loading messages...</div>
+                <LoadingSpinner text="Loading messages..." />
               </div>
             ) : messages.length === 0 ? (
               <div className="flex items-center justify-center h-32">
@@ -291,54 +125,37 @@ export function MessageDialog({ isOpen, onClose, otherUser }: MessageDialogProps
               </div>
             ) : (
               <div className="space-y-4 py-4">
-                {messages.map((message) => {
-                  const isOwnMessage = message.sender_id === user?.id;
-                  return (
-                    <div
-                      key={message.id}
-                      className={`flex ${isOwnMessage ? 'justify-end' : 'justify-start'}`}
-                    >
-                      <div
-                        className={`max-w-[80%] rounded-lg px-3 py-2 ${
-                          isOwnMessage
-                            ? 'bg-primary text-primary-foreground'
-                            : 'bg-muted'
-                        }`}
-                      >
-                        <p className="text-sm">{message.text}</p>
-                        <p className={`text-xs mt-1 ${
-                          isOwnMessage ? 'text-primary-foreground/70' : 'text-muted-foreground'
-                        }`}>
-                          {format(new Date(message.created_at), 'HH:mm')}
-                        </p>
-                      </div>
-                    </div>
-                  );
-                })}
-                <div ref={messagesEndRef} />
+                {messages.map((message) => (
+                  <MessageBubble
+                    key={message.id}
+                    message={message}
+                    isOwnMessage={message.sender_id === user?.id}
+                  />
+                ))}
+                <TypingIndicator typingUsers={typingUsers} />
               </div>
             )}
           </ScrollArea>
 
           <div className="p-4 border-t">
-            <div className="flex gap-2">
-              <Input
-                value={newMessage}
-                onChange={(e) => setNewMessage(e.target.value)}
-                onKeyPress={handleKeyPress}
-                placeholder={canMessage === false ? "Connect first to message" : "Type a message..."}
-                disabled={sending || loading || (!isPremium && canMessage === false)}
-                className="flex-1"
+            {conversationId ? (
+              <MessageInput
+                conversationId={conversationId}
+                onTypingChange={handleTypingChange}
+                onMessageSent={handleMessageSent}
+                disabled={(!isPremium && canMessage === false) || sending}
+                placeholder={
+                  canMessage === false
+                    ? "Connect first to message"
+                    : "Type a message..."
+                }
               />
-              <Button
-                onClick={sendMessage}
-                disabled={!newMessage.trim() || sending || loading || (!isPremium && canMessage === false)}
-                size="sm"
-                title={canMessage === false ? "You need to connect with this person first" : "Send message"}
-              >
-                <Send className="h-4 w-4" />
-              </Button>
-            </div>
+            ) : (
+              <div className="flex items-center justify-center p-4">
+                <LoadingSpinner size="small" text="Setting up conversation..." />
+              </div>
+            )}
+
             {!isPremium && canMessage === false && (
               <p className="text-xs text-muted-foreground mt-2 text-center">
                 Send a connection request or upgrade to Premium to message anyone
@@ -349,4 +166,6 @@ export function MessageDialog({ isOpen, onClose, otherUser }: MessageDialogProps
       </DialogContent>
     </Dialog>
   );
-}
+});
+
+MessageDialog.displayName = 'MessageDialog';

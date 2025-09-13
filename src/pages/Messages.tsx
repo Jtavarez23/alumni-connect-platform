@@ -12,7 +12,7 @@ import { MessageDialog } from "@/components/messaging/MessageDialog";
 import { ThreadView } from "@/components/messaging/ThreadView";
 import { GroupConversationCreator } from "@/components/messaging/GroupConversationCreator";
 import { MessagingLimitsWidget } from "@/components/messaging/MessagingRestrictions";
-import { useConversations } from "@/hooks/useConversations";
+import { useOptimizedConversations } from "@/hooks/useOptimizedConversations";
 import { useSubscription } from "@/hooks/useSubscription";
 import { Search, MessageCircle, Clock, Users, ArrowLeft, Plus, MoreVertical } from "lucide-react";
 import { formatDistanceToNow } from "date-fns";
@@ -20,21 +20,13 @@ import { formatDistanceToNow } from "date-fns";
 export default function Messages() {
   const { threadId } = useParams<{ threadId: string }>();
   const navigate = useNavigate();
-  const { conversations, loading } = useConversations();
+  const { conversations, loading, searchConversations } = useOptimizedConversations();
   const { isFreeTier } = useSubscription();
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedUser, setSelectedUser] = useState<any>(null);
   const [isMessageDialogOpen, setIsMessageDialogOpen] = useState(false);
 
-  const filteredConversations = conversations.filter(conv => {
-    if (conv.is_group) {
-      return conv.title?.toLowerCase().includes(searchQuery.toLowerCase());
-    } else {
-      return `${conv.other_user?.first_name} ${conv.other_user?.last_name}`
-        .toLowerCase()
-        .includes(searchQuery.toLowerCase());
-    }
-  });
+  const filteredConversations = searchConversations(searchQuery);
 
   const handleConversationClick = (conversation: any) => {
     if (conversation.is_group) {

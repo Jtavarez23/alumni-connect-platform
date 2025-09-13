@@ -215,9 +215,9 @@ export const MessagingRestrictions = ({
               <UserPlus className="h-4 w-4 mr-2" />
               Send Connection Request
             </Button>
-            <Button size="sm" className="flex-1">
-              <Crown className="h-4 w-4 mr-2" />
-              Upgrade to Premium
+            <Button size="sm" className="flex-1 text-xs">
+              <Crown className="h-4 w-4 mr-1" />
+              <span className="truncate">Upgrade to Premium</span>
             </Button>
           </div>
         </CardContent>
@@ -332,9 +332,9 @@ export const MessagingLimitsWidget = () => {
           </Alert>
         )}
 
-        <Button variant="outline" size="sm" className="w-full">
-          <Crown className="h-4 w-4 mr-2" />
-          Upgrade for Unlimited Messaging
+        <Button variant="outline" size="sm" className="w-full text-xs">
+          <Crown className="h-4 w-4 mr-1" />
+          <span className="truncate">Upgrade for Unlimited Messaging</span>
         </Button>
       </CardContent>
     </Card>
