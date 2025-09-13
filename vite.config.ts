@@ -64,7 +64,6 @@ export default defineConfig(({ mode }) => {
       react({
         // Enable Fast Refresh
         fastRefresh: true,
-        jsxImportSource: '@emotion/react',
       }),
       mode === 'development' && componentTagger(),
       // Add Sentry plugin for production builds
@@ -99,50 +98,11 @@ export default defineConfig(({ mode }) => {
     build: {
       rollupOptions: {
         output: {
-          manualChunks: (id) => {
-            if (id.includes('node_modules')) {
-              if (id.includes('react') || id.includes('react-dom')) {
-                return 'react-vendor';
-              }
-              if (id.includes('@radix-ui')) {
-                return 'ui-vendor';
-              }
-              if (id.includes('@supabase')) {
-                return 'supabase-vendor';
-              }
-              if (id.includes('@tanstack')) {
-                return 'query-vendor';
-              }
-              if (id.includes('lucide-react')) {
-                return 'icons-vendor';
-              }
-              return 'vendor';
-            }
-            
-            // Split pages more granularly
-            if (id.includes('/src/pages/')) {
-              if (id.includes('Profile')) {
-                return 'profile-page';
-              }
-              if (id.includes('Dashboard')) {
-                return 'dashboard-page';
-              }
-              if (id.includes('Login') || id.includes('Signup') || id.includes('ForgotPassword')) {
-                return 'auth-pages';
-              }
-              if (id.includes('Network') || id.includes('Messages') || id.includes('Social')) {
-                return 'social-pages';
-              }
-              if (id.includes('Yearbooks') || id.includes('Channels')) {
-                return 'content-pages';
-              }
-              if (id.includes('Schools')) {
-                return 'school-pages';
-              }
-              if (id.includes('Admin') || id.includes('Settings')) {
-                return 'admin-pages';
-              }
-            }
+          manualChunks: {
+            vendor: ['react', 'react-dom'],
+            router: ['react-router-dom'],
+            supabase: ['@supabase/supabase-js'],
+            query: ['@tanstack/react-query'],
           },
         },
       },
