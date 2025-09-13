@@ -89,6 +89,7 @@ export default function Signup() {
                     value={formData.firstName}
                     onChange={(e) => setFormData({...formData, firstName: e.target.value})}
                     required
+                    autoComplete="given-name"
                     className="pl-10"
                   />
                 </div>
@@ -104,6 +105,7 @@ export default function Signup() {
                     value={formData.lastName}
                     onChange={(e) => setFormData({...formData, lastName: e.target.value})}
                     required
+                    autoComplete="family-name"
                     className="pl-10"
                   />
                 </div>
@@ -121,6 +123,7 @@ export default function Signup() {
                   value={formData.email}
                   onChange={(e) => setFormData({...formData, email: e.target.value})}
                   required
+                  autoComplete="email"
                   className="pl-10"
                 />
               </div>
@@ -155,6 +158,7 @@ export default function Signup() {
                     value={formData.password}
                     onChange={(e) => setFormData({...formData, password: e.target.value})}
                     required
+                    autoComplete="new-password"
                     className="pl-10"
                   />
                 </div>
@@ -171,6 +175,7 @@ export default function Signup() {
                     value={formData.confirmPassword}
                     onChange={(e) => setFormData({...formData, confirmPassword: e.target.value})}
                     required
+                    autoComplete="new-password"
                     className="pl-10"
                   />
                 </div>
