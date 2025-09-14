@@ -26,26 +26,26 @@ export function useNetworkFeed() {
 
       if (error) throw error;
       
-      // Transform RPC response to match Post interface
+      // Transform RPC response to match Post interface (camelCase per master docs)
       const items = (data?.items || []).map((item: any) => ({
         id: item.id,
-        author_id: item.author?.id,
-        school_id: item.school_id,
-        group_id: item.group_id,
+        authorId: item.author?.id,        // snake_case → camelCase transformation
+        schoolId: item.school_id,         // snake_case → camelCase transformation
+        groupId: item.group_id,           // snake_case → camelCase transformation
         visibility: item.visibility,
         text: item.content?.text,
         media: item.content?.media,
         metrics: {
-          likes: item.metrics?.likes || 0,
-          comments: item.metrics?.comments || 0,
-          shares: item.metrics?.shares || 0
+          like_count: item.metrics?.likes || item.metrics?.like_count || 0,      // Keep snake_case per master docs
+          comment_count: item.metrics?.comments || item.metrics?.comment_count || 0,  // Keep snake_case per master docs
+          share_count: item.metrics?.shares || item.metrics?.share_count || 0         // Keep snake_case per master docs
         },
-        created_at: item.created_at,
-        updated_at: item.updated_at,
+        createdAt: item.created_at,       // snake_case → camelCase transformation
+        updatedAt: item.updated_at,       // snake_case → camelCase transformation
         author: item.author
       }));
-      
-      const nextCursor = items.length === 20 ? items[items.length - 1]?.created_at : undefined;
+
+      const nextCursor = items.length === 20 ? items[items.length - 1]?.createdAt : undefined;
       
       return {
         items,
@@ -71,28 +71,28 @@ export function useForYouFeed() {
 
       if (error) throw error;
       
-      // Transform RPC response to match Post interface
+      // Transform RPC response to match Post interface (camelCase per master docs)
       const items = (data?.items || []).map((item: any) => ({
         id: item.id,
-        author_id: item.author?.id,
-        school_id: item.school_id,
-        group_id: item.group_id,
+        authorId: item.author?.id,        // snake_case → camelCase transformation
+        schoolId: item.school_id,         // snake_case → camelCase transformation
+        groupId: item.group_id,           // snake_case → camelCase transformation
         visibility: item.visibility,
         text: item.content?.text,
         media: item.content?.media,
         metrics: {
-          likes: item.metrics?.likes || 0,
-          comments: item.metrics?.comments || 0,
-          shares: item.metrics?.shares || 0,
-          trending_score: item.metrics?.trending_score || 0
+          like_count: item.metrics?.likes || item.metrics?.like_count || 0,      // Keep snake_case per master docs
+          comment_count: item.metrics?.comments || item.metrics?.comment_count || 0,  // Keep snake_case per master docs
+          share_count: item.metrics?.shares || item.metrics?.share_count || 0,         // Keep snake_case per master docs
+          trending_score: item.metrics?.trending_score || 0    // snake_case per convention
         },
-        created_at: item.created_at,
-        updated_at: item.updated_at,
+        createdAt: item.created_at,       // snake_case → camelCase transformation
+        updatedAt: item.updated_at,       // snake_case → camelCase transformation
         author: item.author,
-        trending_reason: item.trending_reason
+        trendingReason: item.trending_reason  // snake_case → camelCase transformation
       }));
-      
-      const nextCursor = items.length === 20 ? items[items.length - 1]?.created_at : undefined;
+
+      const nextCursor = items.length === 20 ? items[items.length - 1]?.createdAt : undefined;
       
       return {
         items,
@@ -128,10 +128,10 @@ export function useCreatePost() {
         .insert({
           text,
           media,
-          school_id: schoolId,
-          group_id: groupId,
+          school_id: schoolId,    // Database uses snake_case
+          group_id: groupId,      // Database uses snake_case
           visibility,
-          author_id: (await supabase.auth.getUser()).data.user?.id,
+          author_id: (await supabase.auth.getUser()).data.user?.id,  // Database uses snake_case
           metrics: { like_count: 0, comment_count: 0, share_count: 0 }
         })
         .select(`
@@ -142,7 +142,22 @@ export function useCreatePost() {
         .single();
 
       if (error) throw error;
-      return data as Post;
+
+      // Transform database response to camelCase for consistency
+      const transformedPost: Post = {
+        id: data.id,
+        authorId: data.author_id,
+        schoolId: data.school_id,
+        groupId: data.group_id,
+        visibility: data.visibility,
+        text: data.text,
+        media: data.media,
+        metrics: data.metrics,  // Already properly formatted
+        createdAt: data.created_at,
+        updatedAt: data.updated_at
+      };
+
+      return transformedPost;
     },
     onSuccess: (newPost) => {
       // Add to the beginning of both feeds

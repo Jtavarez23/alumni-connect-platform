@@ -136,19 +136,19 @@ export interface SafetyQueue {
 // Social and Content Types
 export interface Post {
   id: UUID;
-  authorId: UUID;
-  schoolId?: UUID;
-  groupId?: UUID;
+  authorId: UUID;              // camelCase per master docs
+  schoolId?: UUID;             // camelCase per master docs
+  groupId?: UUID;              // camelCase per master docs
   visibility: Visibility;
   text?: string;
   media?: any;
   metrics?: {
-    likeCount?: number;
-    commentCount?: number;
-    shareCount?: number;
+    like_count?: number;       // snake_case per master docs line 48
+    comment_count?: number;    // snake_case per master docs line 48
+    share_count?: number;      // snake_case per master docs line 48
   };
-  createdAt: string;
-  updatedAt: string;
+  createdAt: string;           // camelCase per master docs
+  updatedAt?: string;          // camelCase for consistency
 }
 
 export interface Comment {
